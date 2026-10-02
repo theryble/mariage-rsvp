@@ -28,6 +28,7 @@ as $$
 declare
   api_key    text;
   recipients text[];
+  recipient  text;
   is_new     boolean := (tg_op = 'INSERT');
   subject    text;
   body       text;
@@ -36,7 +37,7 @@ declare
 begin
   begin
     select decrypted_secret into api_key from vault.decrypted_secrets where name = 'resend_api_key' limit 1;
-    select array_agg(u.email) into recipients
+    select array_agg(distinct lower(btrim(u.email))) into recipients
       from public.admins a join auth.users u on u.id = a.user_id
       where u.email is not null;
     if api_key is null or recipients is null then
@@ -73,12 +74,15 @@ begin
       || '<a href="https://theryble.github.io/mariage-rsvp/admin.html" style="color:#a85f76">Ouvrir l''espace mariés</a></p>'
       || '</div>';
 
-    perform net.http_post(
-      url     := 'https://api.resend.com/emails',
-      headers := jsonb_build_object('Authorization', 'Bearer ' || api_key, 'Content-Type', 'application/json'),
-      body    := jsonb_build_object('from', public.notify_sender(), 'to', to_jsonb(recipients),
-                                    'subject', subject, 'html', body)
-    );
+    -- Un envoi par administrateur : une adresse refusée (mode test de Resend) ne bloque pas les autres.
+    foreach recipient in array recipients loop
+      perform net.http_post(
+        url     := 'https://api.resend.com/emails',
+        headers := jsonb_build_object('Authorization', 'Bearer ' || api_key, 'Content-Type', 'application/json'),
+        body    := jsonb_build_object('from', public.notify_sender(), 'to', jsonb_build_array(recipient),
+                                      'subject', subject, 'html', body)
+      );
+    end loop;
   exception when others then
     raise warning 'notify_rsvp : envoi impossible (%)', sqlerrm;
   end;
