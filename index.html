@@ -467,7 +467,14 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   // Date limite : après le 31 mai 2027 à 23h59 (heure de Paris), une réponse envoyée ne se modifie plus.
   // La base applique la même règle, cette partie sert à l'afficher clairement.
   const DEADLINE = new Date('2027-06-01T00:00:00+02:00');
-  function closed(){ return Date.now() >= DEADLINE.getTime(); }
+  // Test : ?simuler-date=2027-06-02 affiche la page comme à cette date (affichage seulement,
+  // la base garde la vraie date limite).
+  const SIMULATED = (function(){
+    const v = new URLSearchParams(location.search).get('simuler-date');
+    const d = v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(v + 'T12:00:00+02:00') : null;
+    return d && !isNaN(d) ? d.getTime() : null;
+  })();
+  function closed(){ return (SIMULATED || Date.now()) >= DEADLINE.getTime(); }
 
   function showDone(data){
     form.hidden = true;
