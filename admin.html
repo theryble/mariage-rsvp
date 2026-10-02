@@ -96,7 +96,8 @@
   th, td{ text-align:left; padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
   th{ font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; white-space:nowrap; }
   td.name{ font-weight:600; }
-  td.msg{ color:var(--ink-soft); max-width:30ch; overflow-wrap:anywhere; }
+  td.msg{ color:var(--ink-soft); min-width:24ch; max-width:36ch; overflow-wrap:anywhere; }
+  td.contact{ max-width:24ch; overflow-wrap:anywhere; }
   td.date{ white-space:nowrap; font-variant-numeric:tabular-nums; color:var(--ink-soft); font-size:.84rem; }
   .pill{ display:inline-block; font-size:.78rem; font-weight:600; padding:3px 10px; border-radius:999px; white-space:nowrap; }
   .pill.yes{ background:var(--ok-tint); color:var(--ok); }
@@ -155,19 +156,28 @@
     .send .btn{ flex:1 1 100%; justify-content:center; }
   }
 
-  @media (max-width:640px){
-    .card{ padding:16px; }
-    .stat{ padding:12px; } .stat .n{ font-size:1.9rem; }
+  /* Liste en cartes tant que le tableau n'a pas la place (téléphones et tablettes). */
+  @media (max-width:860px){
     thead{ display:none; }
     table, tbody, tr, td{ display:block; width:100%; }
-    tr{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px; background:var(--paper); display:grid; grid-template-columns:1fr auto; gap:4px 10px; }
-    td{ border:0; padding:0; }
+    tbody{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap:10px; }
+    tr{ border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--paper); display:grid; grid-template-columns:minmax(0,1fr) auto; align-content:start; gap:4px 10px; }
+    td{ border:0; padding:0; min-width:0; }
     td.name{ grid-column:1; font-size:1rem; }
     td.att{ grid-column:2; grid-row:1; text-align:right; }
     td.contact, td.msg, td.date, td.actions{ grid-column:1 / -1; }
+    td.contact{ overflow-wrap:anywhere; }
     td.msg{ max-width:none; }
     td.msg:empty, td.contact:empty{ display:none; }
     td.date::before{ content:"Reçue le "; }
+  }
+
+  @media (max-width:640px){
+    .card{ padding:16px; }
+    .stat{ padding:12px; } .stat .n{ font-size:1.9rem; }
+    .stat .l{ font-size:.68rem; letter-spacing:.05em; }
+    .header-actions .btn, .header-actions button{ padding:8px 13px; font-size:.84rem; }
+    .tools .btn-ghost{ flex:1 1 auto; }
   }
 </style>
 </head>
