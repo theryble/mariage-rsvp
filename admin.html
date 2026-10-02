@@ -110,6 +110,24 @@
   .empty{ color:var(--ink-soft); text-align:center; padding:28px 0; margin:0; }
   .meta:empty, #dash-error:empty{ display:none; }
 
+  /* ---------- onglets ---------- */
+  .tabs{
+    position:sticky; top:env(safe-area-inset-top, 0px); z-index:20;
+    display:flex; gap:4px; padding:5px; margin:0 0 18px;
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:999px;
+    box-shadow:var(--shadow); overflow-x:auto;
+  }
+  .tab{
+    flex:1 0 auto; background:transparent; color:var(--ink-soft); border:0;
+    padding:10px 18px; font-weight:600; font-size:.92rem; border-radius:999px;
+  }
+  .tab:hover{ color:var(--ink); background:var(--card); }
+  .tab[aria-selected="true"]{ background:var(--rose-deep); color:var(--on-accent); }
+  .tab .count{ font-variant-numeric:tabular-nums; opacity:.8; margin-left:4px; font-weight:500; }
+  .tab-panel{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+  .tab-panel > *{ margin-top:0 !important; }
+  .list-card{ display:grid; gap:14px; }
+
   /* ---------- date limite ---------- */
   .deadline-card{ margin-top:16px; display:grid; gap:10px; }
   .dl-head{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; }
@@ -254,113 +272,125 @@
   </form>
 
   <main id="dash" hidden>
-    <div class="stats">
-      <div class="stat yes"><span class="n" id="n-yes">–</span><span class="l">Présents</span></div>
-      <div class="stat no"><span class="n" id="n-no">–</span><span class="l">Absents</span></div>
-      <div class="stat"><span class="n" id="n-all">–</span><span class="l">Réponses</span></div>
+    <nav class="tabs" role="tablist" aria-label="Sections de l'espace mariés">
+      <button type="button" role="tab" class="tab" id="tab-reponses" aria-controls="panel-reponses" data-tab="reponses">Réponses</button>
+      <button type="button" role="tab" class="tab" id="tab-messages" aria-controls="panel-messages" data-tab="messages">Messages</button>
+      <button type="button" role="tab" class="tab" id="tab-reglages" aria-controls="panel-reglages" data-tab="reglages">Réglages</button>
+    </nav>
+
+    <div class="tab-panel" role="tabpanel" id="panel-reponses" aria-labelledby="tab-reponses">
+      <div class="stats">
+        <div class="stat yes"><span class="n" id="n-yes">–</span><span class="l">Présents</span></div>
+        <div class="stat no"><span class="n" id="n-no">–</span><span class="l">Absents</span></div>
+        <div class="stat"><span class="n" id="n-all">–</span><span class="l">Réponses</span></div>
+      </div>
+
+      <section class="card list-card">
+        <div class="tools">
+          <input type="search" id="search" placeholder="Rechercher un nom…" aria-label="Rechercher un nom">
+          <div class="chips" role="group" aria-label="Filtrer">
+            <button type="button" class="chip" data-filter="all" aria-pressed="true">Tous</button>
+            <button type="button" class="chip" data-filter="yes" aria-pressed="false">Présents</button>
+            <button type="button" class="chip" data-filter="no" aria-pressed="false">Absents</button>
+          </div>
+          <button type="button" class="btn-ghost" id="refresh">Actualiser</button>
+          <button type="button" class="btn-ghost" id="export">Exporter en CSV</button>
+        </div>
+        <p class="meta" id="meta"></p>
+        <p class="error" id="dash-error" role="alert"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Invité</th><th>Présence</th><th>Contact</th><th>Message</th><th>Reçue le</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="empty" hidden>Aucune réponse pour l'instant.</p>
+      </section>
     </div>
 
-    <section class="card deadline-card" aria-labelledby="dl-title">
-      <div class="dl-head">
-        <h2 id="dl-title">Date limite des réponses</h2>
-        <span class="pill" id="dl-state"></span>
-      </div>
-      <p class="dl-help">Dernier jour où les invités peuvent modifier leur réponse (jusqu'à 23h59). Le lendemain, la modification est bloquée et les présents voient le bouton « Prévenir d'un empêchement ». La date s'affiche aussi sur le formulaire et dans le message d'invitation.</p>
-      <div class="dl-row">
-        <div class="field">
-          <label for="dl-date">Dernier jour</label>
-          <input type="date" id="dl-date">
-        </div>
-        <button type="button" class="btn-primary" id="dl-save">Enregistrer la date</button>
-      </div>
-      <p class="toast" id="dl-toast" role="status" aria-live="polite"></p>
-    </section>
-
-    <details class="card invite" id="invite">
-      <summary><span class="sum-text">Envoyer une invitation</span></summary>
-      <div class="invite-body">
-        <p>Saisissez le prénom de l'invité, vérifiez le message, puis choisissez comment l'envoyer. Le téléphone et l'e-mail sont facultatifs : sans eux, vous choisirez le contact dans l'application.</p>
-        <div class="invite-fields">
-          <div class="field">
-            <label for="inv-name">Prénom</label>
-            <input type="text" id="inv-name" autocomplete="off" placeholder="Camille">
+    <div class="tab-panel" role="tabpanel" id="panel-messages" aria-labelledby="tab-messages" hidden>
+      <details class="card invite" id="invite">
+        <summary><span class="sum-text">Envoyer une invitation</span></summary>
+        <div class="invite-body">
+          <p>Saisissez le prénom de l'invité, vérifiez le message, puis choisissez comment l'envoyer. Le téléphone et l'e-mail sont facultatifs : sans eux, vous choisirez le contact dans l'application.</p>
+          <div class="invite-fields">
+            <div class="field">
+              <label for="inv-name">Prénom</label>
+              <input type="text" id="inv-name" autocomplete="off" placeholder="Camille">
+            </div>
+            <div class="field">
+              <label for="inv-phone">Téléphone WhatsApp</label>
+              <input type="tel" id="inv-phone" autocomplete="off" placeholder="06 12 34 56 78">
+            </div>
+            <div class="field">
+              <label for="inv-email">E-mail</label>
+              <input type="email" id="inv-email" autocomplete="off" placeholder="camille@exemple.fr">
+            </div>
           </div>
           <div class="field">
-            <label for="inv-phone">Téléphone WhatsApp</label>
-            <input type="tel" id="inv-phone" autocomplete="off" placeholder="06 12 34 56 78">
+            <label for="inv-text">Message</label>
+            <textarea id="inv-text"></textarea>
+          </div>
+          <p class="hint">« {prénom} » est remplacé par le prénom saisi, « {date limite} » par la date limite réglée. Vos modifications du message sont gardées sur cet appareil.</p>
+          <button type="button" class="link-reset" id="inv-reset">Revenir au message d'origine</button>
+          <div class="send">
+            <button type="button" class="btn btn-ghost" id="send-wa"><span class="dot wa" aria-hidden="true"></span>WhatsApp</button>
+            <button type="button" class="btn btn-ghost" id="send-ms"><span class="dot ms" aria-hidden="true"></span>Messenger</button>
+            <button type="button" class="btn btn-ghost" id="send-mail"><span class="dot mail" aria-hidden="true"></span>E-mail</button>
+            <button type="button" class="btn btn-ghost" id="send-copy">Copier le message</button>
+          </div>
+          <p class="toast" id="inv-toast" role="status" aria-live="polite"></p>
+        </div>
+      </details>
+
+      <details class="card invite rappel" id="rappel">
+        <summary>
+          <span class="sum-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z"/><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0"/></svg></span>
+          <span class="sum-text">Envoyer un rappel aux présents</span>
+        </summary>
+        <div class="invite-body">
+          <p>Le rappel s'ouvre dans votre messagerie, avec votre adresse en destinataire et les invités présents en copie cachée (Cci) : ils ne voient pas les adresses des autres. Il ne reste qu'à cliquer sur « Envoyer ».</p>
+          <div class="recap" id="rap-recap"></div>
+          <div class="field">
+            <label for="rap-subject">Objet</label>
+            <input type="text" id="rap-subject" autocomplete="off">
           </div>
           <div class="field">
-            <label for="inv-email">E-mail</label>
-            <input type="email" id="inv-email" autocomplete="off" placeholder="camille@exemple.fr">
+            <label for="rap-body">Message</label>
+            <textarea id="rap-body" style="min-height:320px"></textarea>
           </div>
+          <p class="saved" id="rap-saved" aria-live="polite"></p>
+          <div class="send">
+            <button type="button" class="btn btn-ghost" id="rap-save">Enregistrer le modèle</button>
+            <button type="button" class="link-reset" id="rap-reset">Revenir au modèle par défaut</button>
+          </div>
+          <div class="send">
+            <button type="button" class="btn btn-primary" id="rap-open">Ouvrir dans ma messagerie</button>
+            <button type="button" class="btn btn-ghost" id="rap-copy-emails">Copier les adresses</button>
+            <button type="button" class="btn btn-ghost" id="rap-copy-text">Copier le message</button>
+          </div>
+          <p class="toast" id="rap-toast" role="status" aria-live="polite"></p>
         </div>
-        <div class="field">
-          <label for="inv-text">Message</label>
-          <textarea id="inv-text"></textarea>
-        </div>
-        <p class="hint">« {prénom} » est remplacé par le prénom saisi, « {date limite} » par la date limite réglée. Vos modifications du message sont gardées sur cet appareil.</p>
-        <button type="button" class="link-reset" id="inv-reset">Revenir au message d'origine</button>
-        <div class="send">
-          <button type="button" class="btn btn-ghost" id="send-wa"><span class="dot wa" aria-hidden="true"></span>WhatsApp</button>
-          <button type="button" class="btn btn-ghost" id="send-ms"><span class="dot ms" aria-hidden="true"></span>Messenger</button>
-          <button type="button" class="btn btn-ghost" id="send-mail"><span class="dot mail" aria-hidden="true"></span>E-mail</button>
-          <button type="button" class="btn btn-ghost" id="send-copy">Copier le message</button>
-        </div>
-        <p class="toast" id="inv-toast" role="status" aria-live="polite"></p>
-      </div>
-    </details>
+      </details>
+    </div>
 
-    <details class="card invite rappel" id="rappel">
-      <summary>
-        <span class="sum-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z"/><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0"/></svg></span>
-        <span class="sum-text">Envoyer un rappel aux présents</span>
-      </summary>
-      <div class="invite-body">
-        <p>Le rappel s'ouvre dans votre messagerie, avec votre adresse en destinataire et les invités présents en copie cachée (Cci) : ils ne voient pas les adresses des autres. Il ne reste qu'à cliquer sur « Envoyer ».</p>
-        <div class="recap" id="rap-recap"></div>
-        <div class="field">
-          <label for="rap-subject">Objet</label>
-          <input type="text" id="rap-subject" autocomplete="off">
+    <div class="tab-panel" role="tabpanel" id="panel-reglages" aria-labelledby="tab-reglages" hidden>
+      <section class="card deadline-card" aria-labelledby="dl-title">
+        <div class="dl-head">
+          <h2 id="dl-title">Date limite des réponses</h2>
+          <span class="pill" id="dl-state"></span>
         </div>
-        <div class="field">
-          <label for="rap-body">Message</label>
-          <textarea id="rap-body" style="min-height:320px"></textarea>
+        <p class="dl-help">Dernier jour où les invités peuvent modifier leur réponse (jusqu'à 23h59). Le lendemain, la modification est bloquée et les présents voient le bouton « Prévenir d'un empêchement ». La date s'affiche aussi sur le formulaire et dans le message d'invitation.</p>
+        <div class="dl-row">
+          <div class="field">
+            <label for="dl-date">Dernier jour</label>
+            <input type="date" id="dl-date">
+          </div>
+          <button type="button" class="btn-primary" id="dl-save">Enregistrer la date</button>
         </div>
-        <p class="saved" id="rap-saved" aria-live="polite"></p>
-        <div class="send">
-          <button type="button" class="btn btn-ghost" id="rap-save">Enregistrer le modèle</button>
-          <button type="button" class="link-reset" id="rap-reset">Revenir au modèle par défaut</button>
-        </div>
-        <div class="send">
-          <button type="button" class="btn btn-primary" id="rap-open">Ouvrir dans ma messagerie</button>
-          <button type="button" class="btn btn-ghost" id="rap-copy-emails">Copier les adresses</button>
-          <button type="button" class="btn btn-ghost" id="rap-copy-text">Copier le message</button>
-        </div>
-        <p class="toast" id="rap-toast" role="status" aria-live="polite"></p>
-      </div>
-    </details>
-
-    <section class="card" style="margin-top:16px; display:grid; gap:14px;">
-      <div class="tools">
-        <input type="search" id="search" placeholder="Rechercher un nom…" aria-label="Rechercher un nom">
-        <div class="chips" role="group" aria-label="Filtrer">
-          <button type="button" class="chip" data-filter="all" aria-pressed="true">Tous</button>
-          <button type="button" class="chip" data-filter="yes" aria-pressed="false">Présents</button>
-          <button type="button" class="chip" data-filter="no" aria-pressed="false">Absents</button>
-        </div>
-        <button type="button" class="btn-ghost" id="refresh">Actualiser</button>
-        <button type="button" class="btn-ghost" id="export">Exporter en CSV</button>
-      </div>
-      <p class="meta" id="meta"></p>
-      <p class="error" id="dash-error" role="alert"></p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Invité</th><th>Présence</th><th>Contact</th><th>Message</th><th>Reçue le</th><th></th></tr></thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-      <p class="empty" id="empty" hidden>Aucune réponse pour l'instant.</p>
-    </section>
+        <p class="toast" id="dl-toast" role="status" aria-live="polite"></p>
+      </section>
+    </div>
   </main>
 </div>
 
@@ -545,6 +575,39 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   });
 
+
+  // ---------- Onglets ----------
+  const TAB_KEY = 'rsvp-admin-tab';
+  const TABS = ['reponses', 'messages', 'reglages'];
+  function showTab(name, focus){
+    if (TABS.indexOf(name) < 0) name = 'reponses';
+    TABS.forEach(function(t){
+      const on = t === name;
+      const tab = $('tab-' + t);
+      tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
+      $('panel-' + t).hidden = !on;
+    });
+    if (focus) $('tab-' + name).focus();
+    try { localStorage.setItem(TAB_KEY, name); } catch(e){}
+    if (location.hash !== '#' + name) history.replaceState(null, '', '#' + name);
+  }
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){ showTab(tab.dataset.tab); });
+    tab.addEventListener('keydown', function(e){
+      const k = TABS.indexOf(tab.dataset.tab);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
+        e.preventDefault();
+        showTab(TABS[(k + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length], true);
+      }
+    });
+  });
+  window.addEventListener('hashchange', function(){ showTab(location.hash.slice(1)); });
+  (function(){
+    let start = location.hash.slice(1);
+    if (TABS.indexOf(start) < 0){ try { start = localStorage.getItem(TAB_KEY) || ''; } catch(e){} }
+    showTab(start);
+  })();
 
   // ---------- Date limite ----------
   const DEADLINE_DEFAULT = '2027-05-31';
