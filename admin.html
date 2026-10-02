@@ -110,6 +110,21 @@
   .empty{ color:var(--ink-soft); text-align:center; padding:28px 0; margin:0; }
   .meta:empty, #dash-error:empty{ display:none; }
 
+  /* ---------- date limite ---------- */
+  .deadline-card{ margin-top:16px; display:grid; gap:10px; }
+  .dl-head{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 12px; }
+  .dl-head h2{ font-size:1.35rem; }
+  .dl-help{ margin:0; font-size:.88rem; color:var(--ink-soft); max-width:70ch; }
+  .dl-row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+  .dl-row .field{ flex:0 1 220px; }
+  .dl-row input[type=date]{
+    width:100%; font:inherit; font-size:.98rem; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  }
+  .pill.open{ background:var(--ok-tint); color:var(--ok); }
+  .pill.closed{ background:var(--no-tint); color:var(--no); }
+  .deadline-card .toast:empty{ display:none; }
+
   /* ---------- invitation ---------- */
   details.invite{ margin-top:16px; padding:0; }
   details.invite > summary{
@@ -245,6 +260,22 @@
       <div class="stat"><span class="n" id="n-all">–</span><span class="l">Réponses</span></div>
     </div>
 
+    <section class="card deadline-card" aria-labelledby="dl-title">
+      <div class="dl-head">
+        <h2 id="dl-title">Date limite des réponses</h2>
+        <span class="pill" id="dl-state"></span>
+      </div>
+      <p class="dl-help">Dernier jour où les invités peuvent modifier leur réponse (jusqu'à 23h59). Le lendemain, la modification est bloquée et les présents voient le bouton « Prévenir d'un empêchement ». La date s'affiche aussi sur le formulaire et dans le message d'invitation.</p>
+      <div class="dl-row">
+        <div class="field">
+          <label for="dl-date">Dernier jour</label>
+          <input type="date" id="dl-date">
+        </div>
+        <button type="button" class="btn-primary" id="dl-save">Enregistrer la date</button>
+      </div>
+      <p class="toast" id="dl-toast" role="status" aria-live="polite"></p>
+    </section>
+
     <details class="card invite" id="invite">
       <summary><span class="sum-text">Envoyer une invitation</span></summary>
       <div class="invite-body">
@@ -267,7 +298,7 @@
           <label for="inv-text">Message</label>
           <textarea id="inv-text"></textarea>
         </div>
-        <p class="hint">« {prénom} » est remplacé par le prénom saisi. Vos modifications du message sont gardées sur cet appareil.</p>
+        <p class="hint">« {prénom} » est remplacé par le prénom saisi, « {date limite} » par la date limite réglée. Vos modifications du message sont gardées sur cet appareil.</p>
         <button type="button" class="link-reset" id="inv-reset">Revenir au message d'origine</button>
         <div class="send">
           <button type="button" class="btn btn-ghost" id="send-wa"><span class="dot wa" aria-hidden="true"></span>WhatsApp</button>
@@ -411,6 +442,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       $('meta').textContent = 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
       render();
       rapLoad();
+      dlLoad();
       if (!rows.length && !(await isAdmin())){
         $('dash-error').textContent = "Ce compte n'est pas autorisé à voir les réponses. Ajoutez-le avec le script supabase/admin.sql.";
       }
@@ -512,6 +544,57 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   });
 
 
+  // ---------- Date limite ----------
+  const DEADLINE_DEFAULT = '2027-05-31';
+  let deadlineDay = DEADLINE_DEFAULT;
+  function dlLabel(day){
+    return new Date(day + 'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+  }
+  function dlClosingInstant(day){
+    const m = Number(day.slice(5, 7));
+    const d = new Date(day + 'T00:00:00' + (m >= 4 && m <= 10 ? '+02:00' : '+01:00'));
+    d.setDate(d.getDate() + 1);
+    return d;
+  }
+  function dlRender(){
+    $('dl-date').value = deadlineDay;
+    const isClosed = Date.now() >= dlClosingInstant(deadlineDay).getTime();
+    const st = $('dl-state');
+    st.className = 'pill ' + (isClosed ? 'closed' : 'open');
+    st.textContent = isClosed ? 'Modifications bloquées depuis le ' + dlLabel(deadlineDay) : 'Modifications ouvertes jusqu’au ' + dlLabel(deadlineDay);
+  }
+  function dlToast(text){
+    $('dl-toast').textContent = text;
+    setTimeout(function(){ if ($('dl-toast').textContent === text) $('dl-toast').textContent = ''; }, 7000);
+  }
+  async function dlLoad(){
+    try {
+      const day = await api('rpc/get_deadline', { method:'POST', body:'{}' });
+      if (typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)) deadlineDay = day;
+    } catch(e){ /* script non exécuté : on garde la date par défaut */ }
+    dlRender();
+  }
+  $('dl-save').addEventListener('click', async function(){
+    const v = $('dl-date').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)){ dlToast('Choisissez une date.'); return; }
+    const btn = $('dl-save'); btn.disabled = true;
+    try {
+      await api('settings', {
+        method:'POST',
+        headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
+        body:JSON.stringify({ key:'deadline', value:{ date:v }, updated_at:new Date().toISOString() })
+      });
+      deadlineDay = v;
+      dlRender();
+      dlToast('Date limite enregistrée : ' + dlLabel(v) + '. Le formulaire est à jour.');
+    } catch(err){
+      dlToast(err.status === 404 || err.code === 'PGRST205' || err.code === '42P01'
+        ? "Enregistrement impossible : exécutez d'abord supabase/date-limite-reglable.sql dans Supabase."
+        : "L'enregistrement n'a pas abouti. Réessayez.");
+    } finally { btn.disabled = false; }
+  });
+  dlRender();
+
   // ---------- Invitation ----------
   const FORM_URL = 'https://theryble.github.io/mariage-rsvp/';
   const TEMPLATE_KEY = 'rsvp-invite-template';
@@ -519,7 +602,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     "Bonjour {prénom},\n\n" +
     "Nous serions très heureux de vous compter parmi nous pour le vin d'honneur de notre mariage, " +
     "le dimanche 22 août 2027 de 17h15 à 19h, au Manoir des Lys à Auchel.\n\n" +
-    "Merci de nous confirmer votre présence avant le 31 mai 2027 sur ce formulaire :\n" + FORM_URL + "\n\n" +
+    "Merci de nous confirmer votre présence au plus tard le {date limite} sur ce formulaire :\n" + FORM_URL + "\n\n" +
     "L'invitation est nominative, sans accompagnant.\n\n" +
     "À très bientôt,\nMarine & Jeremy";
 
@@ -536,7 +619,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   function message(){
     const name = $('inv-name').value.trim();
-    return invText.value.replace(/\{prénom\}/g, name).replace(/Bonjour ,/g, 'Bonjour,').trim();
+    return invText.value.replace(/\{prénom\}/g, name).replace(/\{date limite\}/g, dlLabel(deadlineDay)).replace(/Bonjour ,/g, 'Bonjour,').trim();
   }
 
   let toastTimer = null;

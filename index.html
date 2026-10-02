@@ -277,7 +277,7 @@
     <h1>Marine <span class="amp">&amp;</span> Jeremy</h1>
     <div class="date-line"><span class="dl">Dimanche 22 août 2027</span><span class="sep" aria-hidden="true">·</span><span class="dl">17h15 → 19h</span><span class="sep" aria-hidden="true">·</span><span class="dl">Manoir des Lys, Auchel</span></div>
     <p class="intro">Ce formulaire sert à vous inscrire pour participer au mariage de <strong>Marine &amp; Jeremy</strong>, le <strong>dimanche 22 août 2027, de 17h15 à 19h</strong>. Vous êtes invité(e) au <strong>vin d'honneur</strong>. Merci de nous indiquer si vous serez présent(e).</p>
-    <p class="deadline">Réponse souhaitée avant le <strong>31 mai 2027</strong></p>
+    <p class="deadline">Réponse souhaitée au plus tard le <strong class="dl-date">31 mai 2027</strong></p>
   </header>
 
   <div class="rule" role="note">
@@ -308,7 +308,7 @@
 
   <section class="card" id="form-card" aria-labelledby="form-title">
     <h2 id="form-title">Votre réponse</h2>
-    <p class="lede" id="lede">Merci de répondre au plus tard le 31 mai 2027. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
+    <p class="lede" id="lede">Merci de répondre au plus tard le <span class="dl-date">31 mai 2027</span>. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
     <p class="notice" id="setup-note" hidden>Le formulaire n'est pas encore ouvert. Il le sera très bientôt.</p>
 
     <form id="rsvp" novalidate>
@@ -370,7 +370,7 @@
       <p id="done-text"></p>
       <p class="urn" id="done-urn" hidden>Pour rappel : tenue beige et/ou dorée. Côté cadeaux, nous souhaitons uniquement une participation financière, une urne sera à disposition pendant le vin d'honneur.</p>
       <button type="button" class="link-btn" id="edit-btn">Modifier ma réponse</button>
-      <p class="closed-note" id="done-closed" hidden>La date limite du 31 mai 2027 est passée : votre réponse ne peut plus être modifiée. Pour tout autre changement, contactez directement Marine ou Jeremy.</p>
+      <p class="closed-note" id="done-closed" hidden>La date limite du <span class="dl-date">31 mai 2027</span> est passée : votre réponse ne peut plus être modifiée. Pour tout autre changement, contactez directement Marine ou Jeremy.</p>
       <button type="button" class="btn-cancel" id="absence-btn" hidden>Prévenir d'un empêchement</button>
       <div class="absence" id="absence" hidden>
         <p>Vous ne pourrez finalement pas venir ? Prévenez-nous ici : votre réponse passera en absence.</p>
@@ -464,9 +464,47 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     setProgress(0);
   }
 
-  // Date limite : après le 31 mai 2027 à 23h59 (heure de Paris), une réponse envoyée ne se modifie plus.
-  // La base applique la même règle, cette partie sert à l'afficher clairement.
-  const DEADLINE = new Date('2027-06-01T00:00:00+02:00');
+  // Date limite : dernier jour où une réponse peut être modifiée (jusqu'à 23h59, heure de Paris).
+  // Elle se règle dans l'espace mariés ; la base applique la même règle, la page l'affiche.
+  let DEADLINE_DAY = '2027-05-31';
+  let DEADLINE = closingInstant(DEADLINE_DAY);
+  function closingInstant(day){
+    // lendemain à minuit, heure de Paris (UTC+2 d'avril à octobre, UTC+1 sinon)
+    const m = Number(day.slice(5, 7));
+    const d = new Date(day + 'T00:00:00' + (m >= 4 && m <= 10 ? '+02:00' : '+01:00'));
+    d.setDate(d.getDate() + 1);
+    return d;
+  }
+  function deadlineLabel(){
+    return new Date(DEADLINE_DAY + 'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+  }
+  function updateDeadlineTexts(){
+    const label = deadlineLabel();
+    document.querySelectorAll('.dl-date').forEach(function(el){ el.textContent = label; });
+    const lede = document.getElementById('lede');
+    if (closed()){
+      lede.textContent = 'La date limite de réponse était le ' + label + '. Les réponses déjà envoyées ne peuvent plus être modifiées.';
+    } else {
+      lede.textContent = '';
+      lede.append('Merci de répondre au plus tard le ', Object.assign(document.createElement('span'), { className:'dl-date', textContent:label }),
+        ". Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.");
+    }
+  }
+  async function loadDeadline(){
+    try {
+      const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+      if (SUPABASE_KEY.indexOf('eyJ') === 0) headers['Authorization'] = 'Bearer ' + SUPABASE_KEY;
+      const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/get_deadline', { method:'POST', headers:headers, body:'{}' });
+      if (!res.ok) return;
+      const day = await res.json();
+      if (typeof day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(day) || day === DEADLINE_DAY) return;
+      DEADLINE_DAY = day;
+      DEADLINE = closingInstant(day);
+      updateDeadlineTexts();
+      const saved = load();
+      if (saved && !done.hidden) showDone(saved);
+    } catch(e){ /* on garde la date par défaut */ }
+  }
   // Test : ?simuler-date=2027-06-02 affiche la page comme à cette date (affichage seulement,
   // la base garde la vraie date limite).
   const SIMULATED = (function(){
@@ -546,7 +584,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       if (err && err.closed){
         const saved = load();
         if (saved) showDone(saved);
-        else setStatus('La date limite du 31 mai 2027 est passée : cette réponse ne peut plus être modifiée.', 'err');
+        else setStatus('La date limite du ' + deadlineLabel() + ' est passée : cette réponse ne peut plus être modifiée.', 'err');
       } else {
         setStatus("La réponse n'a pas été enregistrée. Vérifiez votre connexion Internet puis réessayez.", 'err');
       }
@@ -626,9 +664,10 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   });
 
   if (!SUPABASE_URL || !SUPABASE_KEY) document.getElementById('setup-note').hidden = false;
-  if (closed()) document.getElementById('lede').textContent = "La date limite de réponse était le 31 mai 2027. Les réponses déjà envoyées ne peuvent plus être modifiées.";
+  updateDeadlineTexts();
   const saved = load();
   if (saved){ fill(saved); showDone(saved); }
+  if (SUPABASE_URL && SUPABASE_KEY) loadDeadline();
 })();
 </script>
 </body>
