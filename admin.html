@@ -115,7 +115,22 @@
     font-family:'Cormorant Garamond',Georgia,serif; font-size:1.35rem; font-weight:600;
   }
   details.invite > summary::-webkit-details-marker{ display:none; }
-  details.invite > summary::after{ content:"+"; font-family:'Marcellus',serif; font-size:1.4rem; color:var(--gold); }
+  /* Bandeau doré pour distinguer l'envoi d'invitations du reste de la page. */
+  details.invite{ border-color:var(--gold); overflow:hidden; }
+  details.invite > summary{ background:var(--gold-tint); color:var(--gold-ink); }
+  details.invite[open] > summary{ border-bottom:1px solid var(--gold); margin-bottom:18px; }
+  details.invite > summary:hover{ filter:brightness(1.04); }
+  details.invite > summary::before{
+    content:"✉"; flex:none; width:38px; height:38px; border-radius:50%;
+    display:grid; place-items:center; font-size:1.1rem;
+    background:var(--gold); color:var(--paper-raised); margin-right:-2px;
+  }
+  details.invite > summary .sum-text{ flex:1; }
+  details.invite > summary::after{
+    content:"+"; flex:none; width:32px; height:32px; border-radius:50%;
+    display:grid; place-items:center; font-family:'Inter',sans-serif; font-size:1.2rem; font-weight:600;
+    background:var(--rose-deep); color:var(--on-accent);
+  }
   details.invite[open] > summary::after{ content:"–"; }
   details.invite > summary:focus-visible{ outline:2px solid var(--rose); outline-offset:-2px; border-radius:16px; }
   .invite-body{ display:grid; gap:14px; padding:0 24px 24px; }
@@ -198,7 +213,7 @@
     </div>
 
     <details class="card invite" id="invite">
-      <summary>Envoyer une invitation</summary>
+      <summary><span class="sum-text">Envoyer une invitation</span></summary>
       <div class="invite-body">
         <p>Saisissez le prénom de l'invité, vérifiez le message, puis choisissez comment l'envoyer. Le téléphone et l'e-mail sont facultatifs : sans eux, vous choisirez le contact dans l'application.</p>
         <div class="invite-fields">
