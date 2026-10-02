@@ -1,68 +1,76 @@
 # Inscription au vin d'honneur — Marine & Jeremy
 
 Page d'inscription au vin d'honneur du 22 août 2027 (17h15 – 19h, Manoir des Lys, Auchel).
-La page est hébergée sur GitHub Pages et les réponses arrivent dans une feuille Google Sheets.
-Les invités n'ont besoin d'aucun compte.
+La page est hébergée sur GitHub Pages : <https://theryble.github.io/mariage-rsvp/>.
+Les réponses sont enregistrées dans une base Supabase. Les invités n'ont besoin d'aucun compte.
 
 ```
-index.html                    la page du formulaire
-assets/                       logos (clair et sombre)
-google-apps-script/Code.gs    le script qui enregistre les réponses dans la feuille
+index.html                         la page du formulaire
+assets/                            logos (clair et sombre)
+supabase/schema.sql                création de la base (à exécuter une fois)
+.github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
-## Étape 1 — Créer la feuille de réponses
+## Étape 1 — Créer le projet Supabase
 
-1. Ouvrir <https://sheets.new> (connecté à ton compte Google).
-2. Nommer la feuille, par exemple « Mariage — Réponses vin d'honneur ».
-3. Menu **Extensions → Apps Script**.
-4. Effacer le contenu de `Code.gs` dans l'éditeur et coller celui de `google-apps-script/Code.gs`.
-5. Cliquer sur l'icône **Enregistrer**.
+1. Créer un compte sur <https://supabase.com> (connexion possible avec GitHub).
+2. **New project** :
+   - **Name** : `mariage-rsvp`
+   - **Database password** : cliquer sur *Generate a password* (il ne servira pas ici, inutile de le noter)
+   - **Region** : *West EU (Paris)* ou la plus proche
+3. **Create new project**, puis attendre une à deux minutes.
 
-## Étape 2 — Publier le script comme application Web
+## Étape 2 — Créer la base
 
-1. En haut à droite : **Déployer → Nouveau déploiement**.
-2. Roue dentée à côté de « Sélectionner le type » → **Application Web**.
-3. Régler :
-   - **Exécuter en tant que** : Moi
-   - **Qui a accès** : Tout le monde
-4. **Déployer**, puis **Autoriser l'accès** et choisir ton compte Google.
-   Google affiche « Google n'a pas validé cette application » : cliquer sur **Paramètres avancés → Accéder à … (non sécurisé)**. C'est normal pour un script personnel.
-5. Copier l'**URL de l'application Web** (elle se termine par `/exec`).
-6. Dans `index.html`, coller cette adresse entre les guillemets :
+1. Menu de gauche : **SQL Editor** → **New query**.
+2. Coller tout le contenu de `supabase/schema.sql`.
+3. Cliquer sur **Run**. Le message attendu est « Success. No rows returned ».
+
+## Étape 3 — Relier la page
+
+1. Menu de gauche : **Project Settings** (roue dentée) → **Data API** : copier la **Project URL**
+   (`https://xxxxxxxx.supabase.co`).
+2. **Project Settings → API Keys** : copier la **Publishable key** (`sb_publishable_…`).
+   Si seule l'ancienne présentation existe, prendre la clé **anon public** (elle commence par `eyJ`).
+   Ne jamais utiliser la clé **secret** ou **service_role**.
+3. Dans `index.html`, remplir :
 
    ```js
-   const SCRIPT_URL = 'https://script.google.com/macros/s/…/exec';
+   const SUPABASE_URL = 'https://xxxxxxxx.supabase.co';
+   const SUPABASE_KEY = 'sb_publishable_…';
    ```
 
-Pour vérifier : ouvrir l'adresse `/exec` dans le navigateur doit afficher `{"ok":true,"service":"rsvp-marine-jeremy"}`.
-
-> Si tu modifies `Code.gs` plus tard : **Déployer → Gérer les déploiements → crayon → Version : Nouvelle version → Déployer**. L'adresse reste la même.
-
-## Étape 3 — Mettre la page en ligne avec GitHub Pages
-
-1. Sur <https://github.com/new>, créer un dépôt **public** (par exemple `mariage-rsvp`), sans README.
-2. Dans ce dossier :
-
-   ```sh
-   git add .
-   git commit -m "Formulaire d'inscription au vin d'honneur"
-   git branch -M main
-   git remote add origin https://github.com/<ton-pseudo>/mariage-rsvp.git
-   git push -u origin main
-   ```
-
-3. Sur GitHub : **Settings → Pages → Build and deployment → Source : Deploy from a branch**, branche `main`, dossier `/ (root)` → **Save**.
-4. Après une ou deux minutes, la page est en ligne à l'adresse
-   `https://<ton-pseudo>.github.io/mariage-rsvp/`.
+La clé publique peut figurer dans la page : la base ne lui permet qu'une seule chose, enregistrer une réponse.
+Elle ne peut ni lire ni supprimer les réponses des autres.
 
 ## Lire les réponses
 
-Tout arrive dans l'onglet **Réponses** de la feuille Google : prénom, nom, présence, contact, message, date de réception et date de modification.
-Pour compter les présents, dans une cellule libre : `=NB.SI(D:D;"Présent(e)")`.
+Dans Supabase : **Table Editor** → vue **reponses**. Les réponses y sont triées par nom, avec les dates en heure de Paris.
+Le bouton **Export → CSV** télécharge la liste.
+
+Pour compter, dans **SQL Editor** :
+
+```sql
+select count(*) filter (where attending) as presents,
+       count(*) filter (where not attending) as absents,
+       count(*) as total
+from rsvps;
+```
+
+Pour supprimer une réponse de test : **Table Editor** → table **rsvps** → cocher la ligne → **Delete**.
 
 ## Bon à savoir
 
-- **Modifier une réponse** : « Reçue le » garde la date du premier envoi, « Modifiée le » celle du dernier. L'invité revient sur la page depuis le même appareil et le même navigateur, clique sur « Modifier ma réponse », et sa ligne est mise à jour (pas de doublon). Depuis un autre appareil, une nouvelle ligne est créée : il suffit de supprimer l'ancienne dans la feuille.
-- **Confidentialité** : la page est publique, mais les réponses ne sont visibles que dans ta feuille Google. La balise `noindex` demande aux moteurs de recherche de ne pas référencer la page.
-- **Robots** : un champ invisible piège les robots qui remplissent automatiquement les formulaires ; leurs envois sont ignorés.
+- **Mise en pause** : Supabase met en pause les projets gratuits après 7 jours sans activité. Le workflow
+  `keepalive.yml` appelle la base tous les 3 jours pour l'éviter. GitHub désactive les workflows planifiés
+  d'un dépôt public après 60 jours sans commit : il prévient par e-mail, et il suffit alors de cliquer sur
+  **Enable workflow** dans l'onglet **Actions** du dépôt. Si le projet est malgré tout en pause, le
+  réactiver depuis le tableau de bord Supabase (**Restore project**).
+- **Modifier une réponse** : l'invité revient sur la page depuis le même appareil et le même navigateur,
+  clique sur « Modifier ma réponse », et sa réponse est mise à jour (pas de doublon). « Reçue le » garde
+  la date du premier envoi, « Modifiée le » celle du dernier. Depuis un autre appareil, une nouvelle
+  réponse est créée : il suffit de supprimer l'ancienne.
+- **Robots** : un champ invisible piège les robots qui remplissent automatiquement les formulaires ;
+  leurs envois sont ignorés.
+- **Confidentialité** : la balise `noindex` demande aux moteurs de recherche de ne pas référencer la page.
 - **Date limite** : le 31 mai 2027 est affiché, mais le formulaire reste ouvert après cette date.

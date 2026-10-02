@@ -258,7 +258,7 @@
   <section class="card" id="form-card" aria-labelledby="form-title">
     <h2 id="form-title">Votre réponse</h2>
     <p class="lede">Merci de répondre au plus tard le 31 mai 2027. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
-    <p class="notice" id="setup-note" hidden>Le formulaire n'est pas encore relié à la feuille de réponses. Il sera ouvert très bientôt.</p>
+    <p class="notice" id="setup-note" hidden>Le formulaire n'est pas encore ouvert. Il le sera très bientôt.</p>
 
     <form id="rsvp" novalidate>
       <div class="row">
@@ -334,8 +334,10 @@
 </div>
 
 <script>
-/* Adresse de l'application Web Google Apps Script (voir README.md, étape 2). */
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM_QhsJEIsJZfDpW3B3-nc-e9n9K4oaOaomzfNN8SrSDi5WUD1ZIUtK5rDS-yn7HPjmg/exec';
+/* Projet Supabase (voir README.md, étape 3). La clé publique peut figurer ici :
+   la base n'autorise qu'une seule action, enregistrer une réponse. */
+const SUPABASE_URL = 'https://bvmkoijthojntwgkiqzr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
 (function(){
   const STORAGE_KEY = 'rsvp-marine-jeremy';
@@ -346,13 +348,17 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM_QhsJEIsJZfDpW3B3
 
   function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch(e){ return null; } }
   function save(d){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e){} }
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   function newId(){
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-    return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    const b = crypto.getRandomValues(new Uint8Array(16));
+    b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+    const h = Array.from(b, function(x){ return x.toString(16).padStart(2, '0'); }).join('');
+    return h.slice(0,8) + '-' + h.slice(8,12) + '-' + h.slice(12,16) + '-' + h.slice(16,20) + '-' + h.slice(20);
   }
   function setStatus(text, kind){ statusEl.textContent = text; statusEl.className = 'status' + (kind ? ' ' + kind : ''); }
 
-  // Camembert de chargement : Google ne donne pas d'avancement réel, la part avance
+  // Camembert de chargement : l'envoi ne donne pas d'avancement réel, la part avance
   // donc de plus en plus lentement vers 90 % puis se complète à la réception.
   const overlay = document.getElementById('overlay');
   const overlayTitle = document.getElementById('overlay-title');
@@ -430,11 +436,11 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM_QhsJEIsJZfDpW3B3
     if (!first || !last){ setStatus('Indiquez votre prénom et votre nom.', 'err'); return; }
     if (!att){ setStatus('Choisissez « Oui, je viendrai » ou « Non, je ne pourrai pas ».', 'err'); return; }
     if (!form.solo.checked){ setStatus('Cochez la case confirmant que vous venez sans accompagnant.', 'err'); return; }
-    if (!SCRIPT_URL){ setStatus("Le formulaire n'est pas encore ouvert. Réessayez un peu plus tard.", 'err'); return; }
+    if (!SUPABASE_URL || !SUPABASE_KEY){ setStatus("Le formulaire n'est pas encore ouvert. Réessayez un peu plus tard.", 'err'); return; }
 
     const previous = load();
     const data = {
-      id: (previous && previous.id) || newId(),
+      id: (previous && UUID_RE.test(previous.id)) ? previous.id : newId(),
       firstName: first, lastName: last, attending: att.value,
       contact: form.contact.value.trim(), message: form.message.value.trim(),
       website: form.website.value
@@ -461,32 +467,33 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM_QhsJEIsJZfDpW3B3
     }
   });
 
-  // Google renvoie parfois une erreur passagère : on réessaie. Sans risque de doublon,
-  // la feuille met à jour la ligne qui porte le même identifiant.
+  // Enregistre la réponse via la fonction submit_rsvp de la base. En cas d'erreur
+  // réseau ou serveur, on réessaie : sans risque de doublon, la base met à jour la
+  // réponse qui porte le même identifiant.
   async function send(data){
+    const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+    if (SUPABASE_KEY.indexOf('eyJ') === 0) headers['Authorization'] = 'Bearer ' + SUPABASE_KEY; // ancienne clé « anon »
+    const body = JSON.stringify({
+      p_id: data.id, p_first_name: data.firstName, p_last_name: data.lastName,
+      p_attending: data.attending, p_contact: data.contact, p_message: data.message,
+      p_website: data.website
+    });
     let lastError;
-    for (let attempt = 1; attempt <= 4; attempt++){
+    for (let attempt = 1; attempt <= 3; attempt++){
       try {
-        // text/plain évite la requête préalable CORS, que Google Apps Script ne gère pas.
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const out = await res.json();
-        if (out.ok) return out;
-        lastError = new Error(out.error || 'refus');
-        if (!/Lock|timed out|Service/i.test(lastError.message)) break; // refus définitif
+        const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/submit_rsvp', { method: 'POST', headers: headers, body: body });
+        if (res.ok) return;
+        lastError = new Error('HTTP ' + res.status);
+        if (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429) break; // refus définitif
       } catch(err){ lastError = err; }
-      if (attempt === 4) break;
+      if (attempt === 3) break;
       setOverlay(null, 'La connexion est lente, nouvel essai en cours…');
-      await new Promise(function(r){ setTimeout(r, 1500 * attempt); });
+      await new Promise(function(r){ setTimeout(r, 1000 * attempt); });
     }
     throw lastError;
   }
 
-  if (!SCRIPT_URL) document.getElementById('setup-note').hidden = false;
+  if (!SUPABASE_URL || !SUPABASE_KEY) document.getElementById('setup-note').hidden = false;
   const saved = load();
   if (saved){ fill(saved); showDone(saved); }
 })();
