@@ -94,6 +94,21 @@
   .rule p{ margin:0; font-size:.93rem; }
   .rule strong{ color:var(--rose-deep); }
 
+  /* ---------- informations pratiques ---------- */
+  .infos{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+  .info{ background:var(--paper-raised); border:1px solid var(--line); border-radius:12px; padding:16px 18px; display:grid; gap:8px; align-content:start; }
+  .info-head{ display:flex; align-items:center; gap:10px; }
+  .info h2{ font-size:1.3rem; }
+  .info p{ margin:0; font-size:.92rem; color:var(--ink-soft); }
+  .info strong{ color:var(--ink); font-weight:600; }
+  .swatches{ display:flex; flex:none; }
+  .swatches i{ width:24px; height:24px; border-radius:50%; border:2px solid var(--paper-raised); box-shadow:0 0 0 1px var(--line); }
+  .swatches i + i{ margin-left:-8px; }
+  .sw-beige{ background:#dcc7a6; }
+  .sw-gold{ background:linear-gradient(135deg, #e6c878, #b48a3c 60%, #d8b562); }
+  .info-glyph{ flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:.85rem; background:var(--gold-tint); color:var(--gold-ink); border:1px solid var(--gold); }
+  @media (max-width:520px){ .infos{ grid-template-columns:minmax(0,1fr); } }
+
   /* ---------- formulaire ---------- */
   .card{
     background:var(--paper-raised); border:1px solid var(--line); border-radius:16px;
@@ -257,6 +272,23 @@
     <p><strong>Les accompagnants ne sont pas autorisés.</strong> L'invitation est nominative : chaque invité remplit sa propre inscription, à son nom uniquement.</p>
   </div>
 
+  <section class="infos" aria-label="Informations pratiques">
+    <div class="info">
+      <div class="info-head">
+        <span class="swatches" aria-hidden="true"><i class="sw-beige"></i><i class="sw-gold"></i></span>
+        <h2>Dress code</h2>
+      </div>
+      <p>Pour le vin d'honneur, nous vous invitons à porter une tenue <strong>beige et/ou dorée</strong>.</p>
+    </div>
+    <div class="info">
+      <div class="info-head">
+        <span class="info-glyph" aria-hidden="true">✉</span>
+        <h2>Cadeaux</h2>
+      </div>
+      <p>Votre présence est notre plus beau cadeau. Si vous souhaitez nous gâter, nous souhaitons <strong>uniquement une participation financière</strong> : une urne sera à disposition pendant le vin d'honneur.</p>
+    </div>
+  </section>
+
   <section class="card" id="form-card" aria-labelledby="form-title">
     <h2 id="form-title">Votre réponse</h2>
     <p class="lede">Merci de répondre au plus tard le 31 mai 2027. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
@@ -319,7 +351,7 @@
       <div class="mark" aria-hidden="true">✓</div>
       <h2 id="done-title">Merci !</h2>
       <p id="done-text"></p>
-      <p class="urn" id="done-urn" hidden>Votre présence est notre plus beau cadeau. Pour ceux qui le souhaiteraient, une urne sera à disposition pendant le vin d'honneur.</p>
+      <p class="urn" id="done-urn" hidden>Pour rappel : tenue beige et/ou dorée. Côté cadeaux, nous souhaitons uniquement une participation financière, une urne sera à disposition pendant le vin d'honneur.</p>
       <button type="button" class="link-btn" id="edit-btn">Modifier ma réponse</button>
     </div>
   </section>
