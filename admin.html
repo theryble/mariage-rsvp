@@ -107,6 +107,39 @@
   .empty{ color:var(--ink-soft); text-align:center; padding:28px 0; margin:0; }
   .meta:empty, #dash-error:empty{ display:none; }
 
+  /* ---------- invitation ---------- */
+  details.invite{ margin-top:16px; padding:0; }
+  details.invite > summary{
+    list-style:none; cursor:pointer; padding:18px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    font-family:'Cormorant Garamond',Georgia,serif; font-size:1.35rem; font-weight:600;
+  }
+  details.invite > summary::-webkit-details-marker{ display:none; }
+  details.invite > summary::after{ content:"+"; font-family:'Marcellus',serif; font-size:1.4rem; color:var(--gold); }
+  details.invite[open] > summary::after{ content:"–"; }
+  details.invite > summary:focus-visible{ outline:2px solid var(--rose); outline-offset:-2px; border-radius:16px; }
+  .invite-body{ display:grid; gap:14px; padding:0 24px 24px; }
+  .invite-body > p{ margin:0; color:var(--ink-soft); font-size:.9rem; }
+  .invite-fields{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+  .invite-body input[type=text], .invite-body input[type=tel], .invite-body input[type=email], .invite-body textarea{
+    width:100%; font:inherit; font-size:.95rem; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+  }
+  .invite-body textarea{ min-height:190px; resize:vertical; line-height:1.5; }
+  .invite-body .hint{ font-size:.8rem; color:var(--ink-soft); margin:0; }
+  .send{ display:flex; flex-wrap:wrap; gap:8px; }
+  .send .btn{ display:inline-flex; align-items:center; gap:8px; }
+  .send .dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  .dot.wa{ background:#25d366; } .dot.ms{ background:#0a7cff; } .dot.mail{ background:var(--gold); }
+  .toast{ font-size:.88rem; color:var(--ok); margin:0; min-height:1.3em; }
+  .link-reset{ background:none; border:0; padding:0; color:var(--ink-soft); font-size:.8rem; font-weight:500; text-decoration:underline; text-underline-offset:3px; cursor:pointer; justify-self:start; }
+  @media (max-width:640px){
+    details.invite > summary{ padding:16px; }
+    .invite-body{ padding:0 16px 16px; }
+    .invite-fields{ grid-template-columns:minmax(0,1fr); }
+    .send .btn{ flex:1 1 100%; justify-content:center; }
+  }
+
   @media (max-width:640px){
     .card{ padding:16px; }
     .stat{ padding:12px; } .stat .n{ font-size:1.9rem; }
@@ -163,6 +196,40 @@
       <div class="stat no"><span class="n" id="n-no">–</span><span class="l">Absents</span></div>
       <div class="stat"><span class="n" id="n-all">–</span><span class="l">Réponses</span></div>
     </div>
+
+    <details class="card invite" id="invite">
+      <summary>Envoyer une invitation</summary>
+      <div class="invite-body">
+        <p>Saisissez le prénom de l'invité, vérifiez le message, puis choisissez comment l'envoyer. Le téléphone et l'e-mail sont facultatifs : sans eux, vous choisirez le contact dans l'application.</p>
+        <div class="invite-fields">
+          <div class="field">
+            <label for="inv-name">Prénom</label>
+            <input type="text" id="inv-name" autocomplete="off" placeholder="Camille">
+          </div>
+          <div class="field">
+            <label for="inv-phone">Téléphone WhatsApp</label>
+            <input type="tel" id="inv-phone" autocomplete="off" placeholder="06 12 34 56 78">
+          </div>
+          <div class="field">
+            <label for="inv-email">E-mail</label>
+            <input type="email" id="inv-email" autocomplete="off" placeholder="camille@exemple.fr">
+          </div>
+        </div>
+        <div class="field">
+          <label for="inv-text">Message</label>
+          <textarea id="inv-text"></textarea>
+        </div>
+        <p class="hint">« {prénom} » est remplacé par le prénom saisi. Vos modifications du message sont gardées sur cet appareil.</p>
+        <button type="button" class="link-reset" id="inv-reset">Revenir au message d'origine</button>
+        <div class="send">
+          <button type="button" class="btn btn-ghost" id="send-wa"><span class="dot wa" aria-hidden="true"></span>WhatsApp</button>
+          <button type="button" class="btn btn-ghost" id="send-ms"><span class="dot ms" aria-hidden="true"></span>Messenger</button>
+          <button type="button" class="btn btn-ghost" id="send-mail"><span class="dot mail" aria-hidden="true"></span>E-mail</button>
+          <button type="button" class="btn btn-ghost" id="send-copy">Copier le message</button>
+        </div>
+        <p class="toast" id="inv-toast" role="status" aria-live="polite"></p>
+      </div>
+    </details>
 
     <section class="card" style="margin-top:16px; display:grid; gap:14px;">
       <div class="tools">
@@ -355,6 +422,91 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     a.download = 'reponses-vin-honneur-' + new Date().toISOString().slice(0, 10) + '.csv';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+
+  // ---------- Invitation ----------
+  const FORM_URL = 'https://theryble.github.io/mariage-rsvp/';
+  const TEMPLATE_KEY = 'rsvp-invite-template';
+  const DEFAULT_TEMPLATE =
+    "Bonjour {prénom},\n\n" +
+    "Nous serions très heureux de vous compter parmi nous pour le vin d'honneur de notre mariage, " +
+    "le dimanche 22 août 2027 de 17h15 à 19h, au Manoir des Lys à Auchel.\n\n" +
+    "Merci de nous confirmer votre présence avant le 31 mai 2027 sur ce formulaire :\n" + FORM_URL + "\n\n" +
+    "L'invitation est nominative, sans accompagnant.\n\n" +
+    "À très bientôt,\nMarine & Jeremy";
+
+  const invText = $('inv-text');
+  try { invText.value = localStorage.getItem(TEMPLATE_KEY) || DEFAULT_TEMPLATE; } catch(e){ invText.value = DEFAULT_TEMPLATE; }
+  invText.addEventListener('input', function(){
+    try { localStorage.setItem(TEMPLATE_KEY, invText.value); } catch(e){}
+  });
+  $('inv-reset').addEventListener('click', function(){
+    invText.value = DEFAULT_TEMPLATE;
+    try { localStorage.removeItem(TEMPLATE_KEY); } catch(e){}
+    toast('Message d\'origine rétabli.');
+  });
+
+  function message(){
+    const name = $('inv-name').value.trim();
+    return invText.value.replace(/\{prénom\}/g, name).replace(/Bonjour ,/g, 'Bonjour,').trim();
+  }
+
+  let toastTimer = null;
+  function toast(text){
+    $('inv-toast').textContent = text;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ $('inv-toast').textContent = ''; }, 6000);
+  }
+
+  async function copy(text){
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch(e){
+      const t = document.createElement('textarea');
+      t.value = text; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch(_){}
+      t.remove(); return ok;
+    }
+  }
+
+  // 06 12 34 56 78 → 33612345678 (format attendu par wa.me)
+  function waNumber(raw){
+    let d = raw.replace(/[^\d+]/g, '');
+    if (d.indexOf('+') === 0) d = d.slice(1);
+    else if (d.indexOf('00') === 0) d = d.slice(2);
+    else if (d.length === 10 && d.charAt(0) === '0') d = '33' + d.slice(1);
+    return d.replace(/\D/g, '');
+  }
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  $('send-wa').addEventListener('click', function(){
+    const phone = waNumber($('inv-phone').value);
+    if ($('inv-phone').value.trim() && phone.length < 8){ toast('Le numéro de téléphone semble incomplet.'); return; }
+    window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(message()), '_blank', 'noopener');
+  });
+
+  // Messenger ne permet pas de pré-remplir un message : on le copie, puis on ouvre Messenger.
+  $('send-ms').addEventListener('click', async function(){
+    const text = message();
+    const copied = await copy(text);
+    if (isMobile && navigator.share){
+      try { await navigator.share({ text: text }); return; } catch(e){ if (e && e.name === 'AbortError') return; }
+    }
+    window.open(isMobile ? 'fb-messenger://' : 'https://www.messenger.com/', '_blank', 'noopener');
+    toast(copied ? 'Message copié. Ouvrez la conversation dans Messenger et collez-le.' : 'Copiez le message ci-dessus, puis collez-le dans Messenger.');
+  });
+
+  $('send-mail').addEventListener('click', function(){
+    const to = $('inv-email').value.trim();
+    const subject = "Invitation au vin d'honneur de Marine & Jeremy — 22 août 2027";
+    location.href = 'mailto:' + encodeURIComponent(to).replace(/%40/g, '@') +
+      '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(message());
+  });
+
+  $('send-copy').addEventListener('click', async function(){
+    toast((await copy(message())) ? 'Message copié.' : 'La copie a échoué : sélectionnez le texte et copiez-le.');
   });
 
   session = loadSession();
