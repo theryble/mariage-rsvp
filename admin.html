@@ -102,6 +102,8 @@
   .pill{ display:inline-block; font-size:.78rem; font-weight:600; padding:3px 10px; border-radius:999px; white-space:nowrap; }
   .pill.yes{ background:var(--ok-tint); color:var(--ok); }
   .pill.no{ background:var(--no-tint); color:var(--no); }
+  .pill.cancel{ background:var(--no); color:var(--on-accent); }
+  td.msg{ white-space:pre-line; }
   .del{ background:none; border:0; color:var(--ink-soft); padding:4px 6px; font-weight:500; font-size:.82rem; text-decoration:underline; text-underline-offset:3px; }
   .del:hover{ color:var(--no); }
   .del.confirm{ color:var(--no); font-weight:700; }
@@ -449,10 +451,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       const tr = document.createElement('tr');
       tr.appendChild(td('name', r.first_name + ' ' + r.last_name));
       const att = td('att'); const pill = document.createElement('span');
-      pill.className = 'pill ' + (r.attending ? 'yes' : 'no'); pill.textContent = r.attending ? 'Présent(e)' : 'Absent(e)';
+      pill.className = 'pill ' + (r.attending ? 'yes' : (r.cancelled_at ? 'cancel' : 'no'));
+      pill.textContent = r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)');
+      if (r.cancelled_at) pill.title = 'Empêchement signalé le ' + fmt(r.cancelled_at);
       att.appendChild(pill); tr.appendChild(att);
       tr.appendChild(td('contact', r.contact));
-      tr.appendChild(td('msg', r.message));
+      tr.appendChild(td('msg', [r.message, r.cancel_message ? 'Empêchement : ' + r.cancel_message : ''].filter(Boolean).join('\n')));
       const date = td('date', fmt(r.created_at));
       if (r.updated_at && Math.abs(new Date(r.updated_at) - new Date(r.created_at)) > 60000) date.title = 'Modifiée le ' + fmt(r.updated_at);
       tr.appendChild(date);
@@ -494,8 +498,9 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   $('export').addEventListener('click', function(){
     const esc = function(v){ v = String(v == null ? '' : v); return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-    const lines = [['Prénom','Nom','Présence','Contact','Message','Reçue le','Modifiée le'].join(';')].concat(rows.map(function(r){
-      return [r.first_name, r.last_name, r.attending ? 'Présent(e)' : 'Absent(e)', r.contact, r.message, fmt(r.created_at), fmt(r.updated_at)].map(esc).join(';');
+    const lines = [['Prénom','Nom','Présence','Contact','Message','Empêchement','Reçue le','Modifiée le'].join(';')].concat(rows.map(function(r){
+      return [r.first_name, r.last_name, r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)'), r.contact, r.message,
+       r.cancelled_at ? fmt(r.cancelled_at) + (r.cancel_message ? ' - ' + r.cancel_message : '') : '', fmt(r.created_at), fmt(r.updated_at)].map(esc).join(';');
     }));
     // BOM + point-virgule : Excel en français ouvre le fichier avec les accents et les colonnes.
     const blob = new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' });

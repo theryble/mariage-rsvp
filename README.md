@@ -13,6 +13,7 @@ supabase/admin.sql                 accès des mariés au tableau (à exécuter u
 supabase/notifications.sql         e-mail aux mariés à chaque réponse (à exécuter une fois)
 supabase/rappel.sql                modèle du mail de rappel, partagé entre mariés (à exécuter une fois)
 supabase/date-limite.sql           blocage des modifications après le 31 mai 2027 (à exécuter une fois)
+supabase/empechement.sql           signalement d'un empêchement après le 31 mai (à exécuter une fois)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 

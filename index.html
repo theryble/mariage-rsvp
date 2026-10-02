@@ -220,6 +220,16 @@
     border:1.5px solid var(--gold); color:var(--gold); background:var(--gold-tint);
   }
   .done p{ margin:0; color:var(--ink-soft); max-width:44ch; }
+  .btn-cancel{ background:transparent; color:var(--no); border:1.5px solid var(--no); margin-top:4px; }
+  .btn-cancel:hover{ background:var(--no-tint); filter:none; }
+  :root[data-theme="dark"] .btn-cancel{ color:var(--no); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn-cancel{ color:var(--no); } }
+  .absence{ width:100%; display:grid; gap:8px; text-align:left; background:var(--no-tint); border:1px solid var(--no); border-radius:12px; padding:16px; margin-top:6px; }
+  .done .absence p{ max-width:none; color:var(--ink); font-size:.9rem; }
+  .absence label{ font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .absence textarea{ width:100%; min-height:80px; font:inherit; font-size:.95rem; color:var(--ink); background:var(--paper-raised); border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; }
+  .absence-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; }
+  #absence-confirm{ background:var(--no); }
   .done p.closed-note{ font-size:.88rem; background:var(--card); border:1px dashed var(--line); border-radius:10px; padding:10px 14px; margin-top:6px; }
   .done p.urn{
     font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:1.08rem;
@@ -360,7 +370,18 @@
       <p id="done-text"></p>
       <p class="urn" id="done-urn" hidden>Pour rappel : tenue beige et/ou dorée. Côté cadeaux, nous souhaitons uniquement une participation financière, une urne sera à disposition pendant le vin d'honneur.</p>
       <button type="button" class="link-btn" id="edit-btn">Modifier ma réponse</button>
-      <p class="closed-note" id="done-closed" hidden>La date limite du 31 mai 2027 est passée : votre réponse ne peut plus être modifiée. Pour tout changement, contactez directement Marine ou Jeremy.</p>
+      <p class="closed-note" id="done-closed" hidden>La date limite du 31 mai 2027 est passée : votre réponse ne peut plus être modifiée. Pour tout autre changement, contactez directement Marine ou Jeremy.</p>
+      <button type="button" class="btn-cancel" id="absence-btn" hidden>Prévenir d'un empêchement</button>
+      <div class="absence" id="absence" hidden>
+        <p>Vous ne pourrez finalement pas venir ? Prévenez-nous ici : votre réponse passera en absence.</p>
+        <label for="absence-msg">Un mot pour les mariés <span class="opt">(facultatif)</span></label>
+        <textarea id="absence-msg" maxlength="600"></textarea>
+        <div class="absence-actions">
+          <button type="button" id="absence-confirm">Confirmer mon absence</button>
+          <button type="button" class="link-btn" id="absence-cancel">Annuler</button>
+        </div>
+        <p class="status err" id="absence-status" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </section>
 
@@ -455,7 +476,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     document.getElementById('done-closed').hidden = !closed();
     const name = data.firstName || '';
     document.getElementById('done-urn').hidden = data.attending !== 'yes';
-    if (data.attending === 'yes'){
+    document.getElementById('absence-btn').hidden = !(closed() && data.attending === 'yes' && !data.cancelled);
+    document.getElementById('absence').hidden = true;
+    if (data.cancelled){
+      document.getElementById('done-title').textContent = 'Merci ' + name + '.';
+      document.getElementById('done-text').textContent = "Votre empêchement est bien noté. Merci de nous avoir prévenus, vous nous manquerez !";
+    } else if (data.attending === 'yes'){
       document.getElementById('done-title').textContent = 'Merci ' + name + ' !';
       document.getElementById('done-text').textContent = "Votre présence au vin d'honneur est bien notée pour le dimanche 22 août 2027, de 17h15 à 19h, au Manoir des Lys. Nous avons hâte de vous y retrouver.";
     } else {
@@ -550,6 +576,47 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     }
     throw lastError;
   }
+
+  // ---------- Empêchement après la date limite ----------
+  document.getElementById('absence-btn').addEventListener('click', function(){
+    document.getElementById('absence-btn').hidden = true;
+    document.getElementById('absence').hidden = false;
+    document.getElementById('absence-msg').focus();
+  });
+  document.getElementById('absence-cancel').addEventListener('click', function(){
+    document.getElementById('absence').hidden = true;
+    document.getElementById('absence-btn').hidden = false;
+    document.getElementById('absence-status').textContent = '';
+  });
+  document.getElementById('absence-confirm').addEventListener('click', async function(){
+    const saved = load();
+    const status = document.getElementById('absence-status');
+    const btn = document.getElementById('absence-confirm');
+    if (!saved || !UUID_RE.test(saved.id)){
+      status.textContent = 'Votre réponse est introuvable sur cet appareil. Contactez directement Marine ou Jeremy.';
+      return;
+    }
+    const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+    if (SUPABASE_KEY.indexOf('eyJ') === 0) headers['Authorization'] = 'Bearer ' + SUPABASE_KEY;
+    btn.disabled = true; status.textContent = '';
+    startProgress();
+    setOverlay('Envoi de votre message', 'Merci de patienter quelques secondes.');
+    try {
+      const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/report_absence', {
+        method: 'POST', headers: headers,
+        body: JSON.stringify({ p_id: saved.id, p_message: document.getElementById('absence-msg').value.trim() })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      saved.attending = 'no'; saved.cancelled = true;
+      save(saved);
+      await finishProgress();
+      stopProgress();
+      showDone(saved);
+    } catch(err){
+      stopProgress();
+      status.textContent = "Le message n'a pas pu être envoyé. Vérifiez votre connexion Internet puis réessayez, ou contactez directement Marine ou Jeremy.";
+    } finally { btn.disabled = false; }
+  });
 
   if (!SUPABASE_URL || !SUPABASE_KEY) document.getElementById('setup-note').hidden = false;
   if (closed()) document.getElementById('lede').textContent = "La date limite de réponse était le 31 mai 2027. Les réponses déjà envoyées ne peuvent plus être modifiées.";

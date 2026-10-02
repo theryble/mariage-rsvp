@@ -30,6 +30,7 @@ declare
   recipients text[];
   recipient  text;
   is_new     boolean := (tg_op = 'INSERT');
+  is_cancel  boolean := false;
   subject    text;
   body       text;
   presents   int;
@@ -47,15 +48,20 @@ begin
     select count(*) filter (where attending), count(*) filter (where not attending)
       into presents, absents from public.rsvps;
 
-    subject := (case when is_new then 'Nouvelle réponse : ' else 'Réponse modifiée : ' end)
+    is_cancel := (to_jsonb(new) ->> 'cancelled_at') is not null
+                 and (is_new or (to_jsonb(old) ->> 'cancelled_at') is null);
+
+    subject := (case when is_cancel then 'Empêchement : '
+                     when is_new then 'Nouvelle réponse : ' else 'Réponse modifiée : ' end)
                || new.first_name || ' ' || new.last_name
-               || (case when new.attending then ' sera présent(e)' else ' ne viendra pas' end);
+               || (case when is_cancel then ' ne pourra finalement pas venir'
+                        when new.attending then ' sera présent(e)' else ' ne viendra pas' end);
 
     body :=
       '<div style="font-family:Georgia,serif;color:#3a2e28;max-width:520px">'
       || '<p style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#a98249;margin:0 0 6px">Vin d''honneur · 22.08.2027</p>'
       || '<h1 style="font-size:24px;font-weight:600;margin:0 0 16px">'
-      ||   (case when is_new then 'Nouvelle réponse' else 'Réponse modifiée' end) || '</h1>'
+      ||   (case when is_cancel then 'Empêchement signalé' when is_new then 'Nouvelle réponse' else 'Réponse modifiée' end) || '</h1>'
       || '<table style="font-family:Arial,sans-serif;font-size:15px;border-collapse:collapse">'
       || '<tr><td style="padding:4px 16px 4px 0;color:#6b5c53">Invité</td><td style="padding:4px 0"><b>'
       ||   public.html_escape(new.first_name || ' ' || new.last_name) || '</b></td></tr>'
@@ -65,6 +71,9 @@ begin
            || public.html_escape(new.contact) || '</td></tr>' else '' end)
       || (case when new.message <> '' then '<tr><td style="padding:4px 16px 4px 0;color:#6b5c53;vertical-align:top">Message</td><td style="padding:4px 0">'
            || replace(public.html_escape(new.message), E'\n', '<br>') || '</td></tr>' else '' end)
+      || (case when is_cancel and coalesce(to_jsonb(new) ->> 'cancel_message', '') <> ''
+           then '<tr><td style="padding:4px 16px 4px 0;color:#6b5c53;vertical-align:top">Mot de l''invité</td><td style="padding:4px 0">'
+             || replace(public.html_escape(to_jsonb(new) ->> 'cancel_message'), E'\n', '<br>') || '</td></tr>' else '' end)
       || '<tr><td style="padding:4px 16px 4px 0;color:#6b5c53">Reçue le</td><td style="padding:4px 0">'
       ||   to_char(now() at time zone 'Europe/Paris', 'DD/MM/YYYY à HH24:MI') || '</td></tr>'
       || '</table>'
