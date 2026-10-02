@@ -118,7 +118,7 @@
     box-shadow:var(--shadow); overflow-x:auto;
   }
   .tab{
-    flex:1 0 auto; background:transparent; color:var(--ink-soft); border:0;
+    flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:transparent; color:var(--ink-soft); border:0;
     padding:10px 18px; font-weight:600; font-size:.92rem; border-radius:999px;
   }
   .tab:hover{ color:var(--ink); background:var(--card); }
@@ -127,6 +127,12 @@
   .tab-panel{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
   .tab-panel > *{ margin-top:0 !important; }
   .list-card{ display:grid; gap:14px; }
+  .tab-panel > *, .deadline-card > *, .dl-head > *{ min-width:0; }
+  .dl-head .pill{ white-space:normal; }
+  @media (max-width:400px){
+    .tabs{ padding:4px; gap:2px; }
+    .tab{ padding:9px 6px; font-size:.84rem; }
+  }
 
   /* ---------- date limite ---------- */
   .deadline-card{ margin-top:16px; display:grid; gap:10px; }
