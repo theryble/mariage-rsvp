@@ -55,6 +55,9 @@
   .btn-primary{ background:var(--rose-deep); color:var(--on-accent); }
   .btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
   .btn-ghost:hover{ border-color:var(--rose); }
+  a.btn{ display:inline-block; text-decoration:none; }
+  .header-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+  .btn:focus-visible{ outline:2px solid var(--rose); outline-offset:2px; }
   .btn-primary:hover{ filter:brightness(1.06); }
   button:focus-visible, input:focus-visible{ outline:2px solid var(--rose); outline-offset:2px; }
   button[disabled]{ opacity:.55; cursor:default; }
@@ -133,7 +136,10 @@
         <h1>Marine <span class="amp">&amp;</span> Jeremy</h1>
       </div>
     </div>
-    <button type="button" class="btn-ghost" id="logout" hidden>Se déconnecter</button>
+    <nav class="header-actions">
+      <a class="btn btn-ghost" href="./">Voir le formulaire</a>
+      <button type="button" class="btn-ghost" id="logout" hidden>Se déconnecter</button>
+    </nav>
   </header>
 
   <form class="card login" id="login" novalidate>

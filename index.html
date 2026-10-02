@@ -212,7 +212,9 @@
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .link-btn{ color:var(--rose-deep); } }
 
 
-  footer{ text-align:center; font-family:'Marcellus',serif; color:var(--ink-soft); font-size:.9rem; letter-spacing:.04em; }
+  footer{ text-align:center; font-family:'Marcellus',serif; color:var(--ink-soft); font-size:.9rem; letter-spacing:.04em; line-height:2; }
+  .admin-link{ font-family:'Inter',sans-serif; font-size:.75rem; letter-spacing:.02em; color:var(--ink-soft); opacity:.7; text-underline-offset:3px; }
+  .admin-link:hover, .admin-link:focus-visible{ opacity:1; color:var(--rose-deep); }
 
   .seal{ max-width:100%; }
   .date-line, .intro{ max-width:100%; }
@@ -322,7 +324,7 @@
     </div>
   </section>
 
-  <footer>JMPP · Vin d'honneur · Manoir des Lys · 22.08.2027</footer>
+  <footer>JMPP · Vin d'honneur · Manoir des Lys · 22.08.2027<br><a class="admin-link" href="admin.html">Espace mariés</a></footer>
 </div>
 
 <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title" aria-describedby="overlay-text" hidden>
