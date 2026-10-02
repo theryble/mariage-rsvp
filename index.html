@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Inscription au vin d'honneur du mariage de Marine & Jeremy, le 22 août 2027.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/logo-clair.png">
+<title>Marine &amp; Jeremy — Vin d'honneur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Marcellus&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#3a2e28; --ink-soft:#6b5c53; --paper:#fdf8f4; --paper-raised:#ffffff;
+    --card:#f6ede6; --line:#e6d8cd; --rose:#c98a9c; --rose-deep:#a85f76;
+    --rose-tint:#f4e3e8; --gold:#a98249; --gold-tint:#efe0c2; --gold-ink:#7d5f2c;
+    --ok:#5d8a6a; --ok-tint:#e4efe6; --no:#a0585a; --no-tint:#f5e2e1;
+    --shadow:0 1px 2px rgba(58,46,40,.06), 0 10px 30px -14px rgba(58,46,40,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --ink:#f1e6dc; --ink-soft:#c9b9ac; --paper:#241c18; --paper-raised:#2d2420;
+      --card:#2f2621; --line:#4a3c33; --rose:#e0a8b8; --rose-deep:#eec2d0;
+      --rose-tint:#3a2a2e; --gold:#d3b378; --gold-tint:#3a3020; --gold-ink:#e2c78f;
+      --ok:#9cc7a7; --ok-tint:#24332a; --no:#e3a2a3; --no-tint:#3a2626;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --ink:#f1e6dc; --ink-soft:#c9b9ac; --paper:#241c18; --paper-raised:#2d2420;
+    --card:#2f2621; --line:#4a3c33; --rose:#e0a8b8; --rose-deep:#eec2d0;
+    --rose-tint:#3a2a2e; --gold:#d3b378; --gold-tint:#3a3020; --gold-ink:#e2c78f;
+    --ok:#9cc7a7; --ok-tint:#24332a; --no:#e3a2a3; --no-tint:#3a2626;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.55);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding-inline:16px;
+  }
+  h1,h2{ font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; margin:0; text-wrap:balance; }
+
+  .page{ max-width:620px; margin:0 auto; padding-block:48px 72px; display:grid; grid-template-columns:minmax(0,1fr); gap:28px; }
+  .page > *, .field, form, fieldset, .choices > *, .row > *{ min-width:0; }
+  p, h1, h2, label, span, b, small{ overflow-wrap:break-word; }
+
+  /* ---------- en-tête ---------- */
+  header{ text-align:center; display:grid; justify-items:center; gap:12px; }
+  .seal{ width:min(78%, 300px); }
+  .seal img{ width:100%; height:auto; display:block; }
+  .seal .logo-dark{ display:none; }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .seal .logo-light{ display:none; }
+    :root:not([data-theme="light"]) .seal .logo-dark{ display:block; }
+  }
+  :root[data-theme="dark"] .seal .logo-light{ display:none; }
+  :root[data-theme="dark"] .seal .logo-dark{ display:block; }
+
+  .kicker{ font-family:'Marcellus',serif; font-size:.82rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); }
+  h1{ font-size:clamp(2.4rem, 8vw, 3.4rem); line-height:1.02; }
+  h1 .amp{ font-style:italic; color:var(--rose-deep); font-weight:500; padding-inline:.08em; }
+  .date-line{
+    display:inline-flex; flex-wrap:wrap; justify-content:center; gap:4px 10px;
+    font-family:'Marcellus',serif; font-size:1rem;
+    padding:9px 20px; border:1px solid var(--gold); border-radius:999px; background:var(--gold-tint);
+  }
+  .date-line .sep{ color:var(--gold); }
+
+  .intro{ font-size:1rem; color:var(--ink-soft); max-width:52ch; margin:4px auto 0; text-align:center; }
+  .intro strong{ color:var(--ink); font-weight:600; }
+
+  .deadline{
+    margin:0; font-family:'Marcellus',serif; font-size:.95rem; letter-spacing:.03em; color:var(--gold-ink);
+  }
+  .deadline strong{ font-weight:400; color:var(--rose-deep); border-bottom:1px solid var(--rose); padding-bottom:1px; }
+
+  /* ---------- règle accompagnant ---------- */
+  .rule{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--rose-tint); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+  }
+  .rule .glyph{
+    flex:none; width:34px; height:34px; border-radius:50%;
+    display:grid; place-items:center;
+    border:1.5px solid var(--rose-deep); color:var(--rose-deep);
+    font-family:'Marcellus',serif; font-size:1rem;
+  }
+  .rule p{ margin:0; font-size:.93rem; }
+  .rule strong{ color:var(--rose-deep); }
+
+  /* ---------- formulaire ---------- */
+  .card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:16px;
+    padding:28px 28px 26px; box-shadow:var(--shadow);
+  }
+  .card h2{ font-size:1.6rem; margin-bottom:4px; }
+  .card .lede{ margin:0 0 22px; color:var(--ink-soft); font-size:.92rem; }
+
+  form{ display:grid; gap:18px; }
+  .row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .field{ display:grid; gap:6px; }
+  .field > label, .legend{
+    font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .opt{ font-weight:500; letter-spacing:.02em; text-transform:none; color:var(--ink-soft); opacity:.8; }
+  input[type=text], input[type=email], input[type=tel], textarea{
+    width:100%; font:inherit; font-size:.98rem; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+  }
+  textarea{ min-height:84px; resize:vertical; }
+  input:focus-visible, textarea:focus-visible{ outline:2px solid var(--rose); outline-offset:1px; border-color:var(--rose); }
+
+  fieldset{ border:0; margin:0; padding:0; display:grid; gap:8px; }
+  .choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .choice input{ position:absolute; opacity:0; pointer-events:none; }
+  .choice span{
+    display:grid; gap:2px; cursor:pointer; height:100%;
+    border:1.5px solid var(--line); border-radius:12px; padding:14px 16px; background:var(--paper);
+    transition:border-color .15s, background .15s;
+  }
+  .choice b{ font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:600; }
+  .choice small{ font-size:.82rem; color:var(--ink-soft); }
+  .choice span:hover{ border-color:var(--rose); }
+  .choice input:focus-visible + span{ outline:2px solid var(--rose); outline-offset:2px; }
+  .choice.yes input:checked + span{ border-color:var(--ok); background:var(--ok-tint); }
+  .choice.yes input:checked + span b{ color:var(--ok); }
+  .choice.no input:checked + span{ border-color:var(--no); background:var(--no-tint); }
+  .choice.no input:checked + span b{ color:var(--no); }
+
+  .check{ display:flex; gap:10px; align-items:flex-start; font-size:.9rem; cursor:pointer; }
+  .check input{ margin-top:3px; accent-color:var(--rose-deep); width:16px; height:16px; flex:none; }
+
+  .actions{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; }
+  button{
+    font:inherit; font-weight:600; font-size:.95rem; cursor:pointer;
+    color:#fff; background:var(--rose-deep); border:0; border-radius:999px; padding:12px 26px;
+  }
+  :root[data-theme="dark"] button{ color:#241c18; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) button{ color:#241c18; } }
+  button:hover{ filter:brightness(1.06); }
+  button:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+  button[disabled]{ opacity:.55; cursor:default; }
+  .status{ font-size:.88rem; color:var(--ink-soft); }
+  .status.err{ color:var(--no); }
+  .status.ok{ color:var(--ok); }
+
+  /* ---------- fenêtre d'envoi ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:100;
+    display:grid; place-items:center;
+    padding:24px 16px;
+    background:rgba(36,28,24,.55);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    animation:fade .2s ease-out;
+  }
+  .overlay-card{
+    width:min(100%, 340px);
+    display:grid; justify-items:center; gap:10px; text-align:center;
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:18px;
+    padding:30px 24px 26px; box-shadow:0 24px 60px -20px rgba(0,0,0,.5);
+    animation:pop .25s ease-out;
+  }
+  .overlay-title{ font-family:'Cormorant Garamond',Georgia,serif; font-size:1.5rem; font-weight:600; margin:6px 0 0; }
+  .overlay-text{ margin:0; font-size:.92rem; color:var(--ink-soft); min-height:2.9em; }
+  @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes pop{ from{ opacity:0; transform:translateY(8px) scale(.97); } to{ opacity:1; transform:none; } }
+
+  /* Camembert : la part rose grandit avec --p (0 à 100). */
+  @property --p{ syntax:'<number>'; inherits:false; initial-value:0; }
+  .pie{
+    --p:0;
+    position:relative; width:96px; height:96px; border-radius:50%;
+    background:conic-gradient(var(--rose-deep) calc(var(--p) * 1%), var(--rose-tint) 0);
+    border:3px solid var(--gold);
+    box-shadow:0 0 0 5px var(--paper-raised) inset;
+    transition:--p .3s ease-out, background-color .3s;
+  }
+  .pie::after{
+    content:"✓"; position:absolute; inset:0; display:grid; place-items:center;
+    font-size:2.6rem; color:#fff; opacity:0; transform:scale(.6);
+    transition:opacity .25s, transform .25s;
+  }
+  .pie.full{ background:var(--ok); border-color:var(--ok); }
+  .pie.full::after{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion:reduce){ .overlay, .overlay-card{ animation:none; } }
+
+  .notice{
+    font-size:.88rem; color:var(--ink-soft); background:var(--card);
+    border:1px dashed var(--line); border-radius:10px; padding:12px 14px; margin:0 0 18px;
+  }
+
+  /* ---------- confirmation ---------- */
+  .done{ text-align:center; display:grid; gap:10px; justify-items:center; }
+  .done .mark{
+    width:54px; height:54px; border-radius:50%; display:grid; place-items:center;
+    font-family:'Marcellus',serif; font-size:1.5rem;
+    border:1.5px solid var(--gold); color:var(--gold); background:var(--gold-tint);
+  }
+  .done p{ margin:0; color:var(--ink-soft); max-width:44ch; }
+  .done p.urn{
+    font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:1.08rem;
+    color:var(--ink-soft); border-top:1px solid var(--line); padding-top:12px; margin-top:4px;
+  }
+  .link-btn{ background:none; color:var(--rose-deep); padding:6px 4px; text-decoration:underline; text-underline-offset:3px; font-weight:500; }
+  :root[data-theme="dark"] .link-btn{ color:var(--rose-deep); }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .link-btn{ color:var(--rose-deep); } }
+
+
+  footer{ text-align:center; font-family:'Marcellus',serif; color:var(--ink-soft); font-size:.9rem; letter-spacing:.04em; }
+
+  .seal{ max-width:100%; }
+  .date-line, .intro{ max-width:100%; }
+
+  @media (max-width:520px){
+    .page{ padding-block:28px 56px; gap:20px; }
+    .card{ padding:22px 18px; }
+    .row, .choices{ grid-template-columns:minmax(0,1fr); }
+    .seal{ width:min(70%, 240px); }
+    .kicker{ font-size:.7rem; letter-spacing:.18em; }
+    .date-line{ display:grid; justify-items:center; gap:2px; font-size:.92rem; padding:10px 22px; border-radius:14px; }
+    .date-line .sep{ display:none; }
+    .date-line .dl{ display:block; }
+    .intro{ font-size:.95rem; }
+    .rule{ padding:14px; gap:12px; }
+    .actions button{ width:100%; }
+  }
+  @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+  .trap{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  [hidden]{ display:none !important; }
+  img{ max-width:100%; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="seal">
+      <img class="logo-light" src="assets/logo-clair.png" width="1160" height="912" alt="Sceau JMPP de Marine et Jeremy">
+      <img class="logo-dark" src="assets/logo-sombre.png" width="1160" height="912" alt="" aria-hidden="true">
+    </div>
+    <div class="kicker">Inscription au vin d'honneur</div>
+    <h1>Marine <span class="amp">&amp;</span> Jeremy</h1>
+    <div class="date-line"><span class="dl">Dimanche 22 août 2027</span><span class="sep" aria-hidden="true">·</span><span class="dl">17h15 → 19h</span><span class="sep" aria-hidden="true">·</span><span class="dl">Manoir des Lys, Auchel</span></div>
+    <p class="intro">Ce formulaire sert à vous inscrire pour participer au mariage de <strong>Marine &amp; Jeremy</strong>, le <strong>dimanche 22 août 2027, de 17h15 à 19h</strong>. Vous êtes invité(e) au <strong>vin d'honneur</strong>. Merci de nous indiquer si vous serez présent(e).</p>
+    <p class="deadline">Réponse souhaitée avant le <strong>31 mai 2027</strong></p>
+  </header>
+
+  <div class="rule" role="note">
+    <div class="glyph" aria-hidden="true">1</div>
+    <p><strong>Les accompagnants ne sont pas autorisés.</strong> L'invitation est nominative : chaque invité remplit sa propre inscription, à son nom uniquement.</p>
+  </div>
+
+  <section class="card" id="form-card" aria-labelledby="form-title">
+    <h2 id="form-title">Votre réponse</h2>
+    <p class="lede">Merci de répondre au plus tard le 31 mai 2027. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
+    <p class="notice" id="setup-note" hidden>Le formulaire n'est pas encore relié à la feuille de réponses. Il sera ouvert très bientôt.</p>
+
+    <form id="rsvp" novalidate>
+      <div class="row">
+        <div class="field">
+          <label for="firstName">Prénom</label>
+          <input type="text" id="firstName" name="firstName" autocomplete="given-name" required maxlength="60">
+        </div>
+        <div class="field">
+          <label for="lastName">Nom</label>
+          <input type="text" id="lastName" name="lastName" autocomplete="family-name" required maxlength="60">
+        </div>
+      </div>
+
+      <fieldset>
+        <div class="legend" id="attend-legend">Serez-vous présent·e ?</div>
+        <div class="choices" role="radiogroup" aria-labelledby="attend-legend">
+          <label class="choice yes" for="attend-yes">
+            <input type="radio" id="attend-yes" name="attending" value="yes">
+            <span><b>Oui, je viendrai</b><small>Au vin d'honneur, le 22 août de 17h15 à 19h</small></span>
+          </label>
+          <label class="choice no" for="attend-no">
+            <input type="radio" id="attend-no" name="attending" value="no">
+            <span><b>Non, je ne pourrai pas</b><small>Je serai avec vous en pensée</small></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="contact">Téléphone ou e-mail <span class="opt">(facultatif)</span></label>
+        <input type="text" id="contact" name="contact" autocomplete="email" maxlength="120" placeholder="Pour vous joindre si besoin">
+      </div>
+
+      <div class="field">
+        <label for="message">Un mot pour les mariés <span class="opt">(facultatif)</span></label>
+        <textarea id="message" name="message" maxlength="600"></textarea>
+      </div>
+
+      <!-- Champ piège anti-robots : invisible pour les invités -->
+      <div class="trap" aria-hidden="true">
+        <label for="website">Ne pas remplir</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <label class="check" for="solo">
+        <input type="checkbox" id="solo" name="solo" required>
+        <span>J'ai bien noté que l'inscription est individuelle et que je viens <strong>sans accompagnant</strong>.</span>
+      </label>
+
+      <div class="actions">
+        <button type="submit" id="submit-btn">Envoyer ma réponse</button>
+        <span class="status" id="status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    <div class="done" id="done" hidden>
+      <div class="mark" aria-hidden="true">✓</div>
+      <h2 id="done-title">Merci !</h2>
+      <p id="done-text"></p>
+      <p class="urn" id="done-urn" hidden>Votre présence est notre plus beau cadeau. Pour ceux qui le souhaiteraient, une urne sera à disposition pendant le vin d'honneur.</p>
+      <button type="button" class="link-btn" id="edit-btn">Modifier ma réponse</button>
+    </div>
+  </section>
+
+  <footer>JMPP · Vin d'honneur · Manoir des Lys · 22.08.2027</footer>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title" aria-describedby="overlay-text" hidden>
+  <div class="overlay-card">
+    <div class="pie" id="progress" role="progressbar" aria-label="Envoi de votre réponse" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    <p class="overlay-title" id="overlay-title">Envoi de votre réponse</p>
+    <p class="overlay-text" id="overlay-text" aria-live="polite">Merci de patienter, cela peut prendre quelques secondes.</p>
+  </div>
+</div>
+
+<script>
+/* Adresse de l'application Web Google Apps Script (voir README.md, étape 2). */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzM_QhsJEIsJZfDpW3B3-nc-e9n9K4oaOaomzfNN8SrSDi5WUD1ZIUtK5rDS-yn7HPjmg/exec';
+
+(function(){
+  const STORAGE_KEY = 'rsvp-marine-jeremy';
+  const form = document.getElementById('rsvp');
+  const statusEl = document.getElementById('status');
+  const btn = document.getElementById('submit-btn');
+  const done = document.getElementById('done');
+
+  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch(e){ return null; } }
+  function save(d){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e){} }
+  function newId(){
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+  function setStatus(text, kind){ statusEl.textContent = text; statusEl.className = 'status' + (kind ? ' ' + kind : ''); }
+
+  // Camembert de chargement : Google ne donne pas d'avancement réel, la part avance
+  // donc de plus en plus lentement vers 90 % puis se complète à la réception.
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlay-title');
+  const overlayText = document.getElementById('overlay-text');
+  const progress = document.getElementById('progress');
+  let progressValue = 0, progressTimer = null;
+  function setOverlay(title, text){
+    if (title) overlayTitle.textContent = title;
+    if (text) overlayText.textContent = text;
+  }
+  function setProgress(v){
+    progressValue = v;
+    progress.style.setProperty('--p', v.toFixed(1));
+    progress.setAttribute('aria-valuenow', String(Math.round(v)));
+  }
+  function startProgress(){
+    clearInterval(progressTimer);
+    progress.classList.remove('full');
+    setOverlay('Envoi de votre réponse', 'Merci de patienter, cela peut prendre quelques secondes.');
+    setProgress(0);
+    overlay.hidden = false;
+    requestAnimationFrame(function(){ setProgress(8); });
+    progressTimer = setInterval(function(){ setProgress(progressValue + (90 - progressValue) * 0.05); }, 200);
+  }
+  function finishProgress(){
+    clearInterval(progressTimer);
+    setProgress(100);
+    return new Promise(function(r){
+      setTimeout(function(){
+        progress.classList.add('full');
+        setOverlay('Réponse enregistrée', 'Merci !');
+        setTimeout(r, 900);
+      }, 300);
+    });
+  }
+  function stopProgress(){
+    clearInterval(progressTimer);
+    overlay.hidden = true;
+    progress.classList.remove('full');
+    setProgress(0);
+  }
+
+  function showDone(data){
+    form.hidden = true;
+    done.hidden = false;
+    const name = data.firstName || '';
+    document.getElementById('done-urn').hidden = data.attending !== 'yes';
+    if (data.attending === 'yes'){
+      document.getElementById('done-title').textContent = 'Merci ' + name + ' !';
+      document.getElementById('done-text').textContent = "Votre présence au vin d'honneur est bien notée pour le dimanche 22 août 2027, de 17h15 à 19h, au Manoir des Lys. Nous avons hâte de vous y retrouver.";
+    } else {
+      document.getElementById('done-title').textContent = 'Merci ' + name + '.';
+      document.getElementById('done-text').textContent = "Votre absence est bien notée. Merci d'avoir pris le temps de nous répondre.";
+    }
+  }
+
+  function fill(data){
+    form.firstName.value = data.firstName || '';
+    form.lastName.value = data.lastName || '';
+    form.contact.value = data.contact || '';
+    form.message.value = data.message || '';
+    if (data.attending) document.getElementById(data.attending === 'no' ? 'attend-no' : 'attend-yes').checked = true;
+    form.solo.checked = true;
+  }
+
+  document.getElementById('edit-btn').addEventListener('click', function(){
+    done.hidden = true; form.hidden = false; setStatus('');
+    form.firstName.focus();
+  });
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const first = form.firstName.value.trim(), last = form.lastName.value.trim();
+    const att = form.querySelector('input[name=attending]:checked');
+    if (!first || !last){ setStatus('Indiquez votre prénom et votre nom.', 'err'); return; }
+    if (!att){ setStatus('Choisissez « Oui, je viendrai » ou « Non, je ne pourrai pas ».', 'err'); return; }
+    if (!form.solo.checked){ setStatus('Cochez la case confirmant que vous venez sans accompagnant.', 'err'); return; }
+    if (!SCRIPT_URL){ setStatus("Le formulaire n'est pas encore ouvert. Réessayez un peu plus tard.", 'err'); return; }
+
+    const previous = load();
+    const data = {
+      id: (previous && previous.id) || newId(),
+      firstName: first, lastName: last, attending: att.value,
+      contact: form.contact.value.trim(), message: form.message.value.trim(),
+      website: form.website.value
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
+    setStatus('');
+    startProgress();
+    try {
+      await send(data);
+      delete data.website;
+      save(data);
+      await finishProgress();
+      stopProgress();
+      setStatus('');
+      showDone(data);
+    } catch(err){
+      stopProgress();
+      setStatus("La réponse n'a pas été enregistrée. Vérifiez votre connexion Internet puis réessayez.", 'err');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Envoyer ma réponse';
+    }
+  });
+
+  // Google renvoie parfois une erreur passagère : on réessaie. Sans risque de doublon,
+  // la feuille met à jour la ligne qui porte le même identifiant.
+  async function send(data){
+    let lastError;
+    for (let attempt = 1; attempt <= 4; attempt++){
+      try {
+        // text/plain évite la requête préalable CORS, que Google Apps Script ne gère pas.
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const out = await res.json();
+        if (out.ok) return out;
+        lastError = new Error(out.error || 'refus');
+        if (!/Lock|timed out|Service/i.test(lastError.message)) break; // refus définitif
+      } catch(err){ lastError = err; }
+      if (attempt === 4) break;
+      setOverlay(null, 'La connexion est lente, nouvel essai en cours…');
+      await new Promise(function(r){ setTimeout(r, 1500 * attempt); });
+    }
+    throw lastError;
+  }
+
+  if (!SCRIPT_URL) document.getElementById('setup-note').hidden = false;
+  const saved = load();
+  if (saved){ fill(saved); showDone(saved); }
+})();
+</script>
+</body>
+</html>
