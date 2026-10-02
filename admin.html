@@ -97,7 +97,7 @@
   th{ font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; white-space:nowrap; }
   td.name{ font-weight:600; }
   td.msg{ color:var(--ink-soft); min-width:24ch; max-width:36ch; overflow-wrap:anywhere; }
-  td.contact{ max-width:24ch; overflow-wrap:anywhere; }
+  td.contact{ max-width:32ch; overflow-wrap:anywhere; }
   td.date{ white-space:nowrap; font-variant-numeric:tabular-nums; color:var(--ink-soft); font-size:.84rem; }
   .pill{ display:inline-block; font-size:.78rem; font-weight:600; padding:3px 10px; border-radius:999px; white-space:nowrap; }
   .pill.yes{ background:var(--ok-tint); color:var(--ok); }
@@ -155,6 +155,27 @@
     .invite-fields{ grid-template-columns:minmax(0,1fr); }
     .send .btn{ flex:1 1 100%; justify-content:center; }
   }
+
+  /* ---------- rappel (bandeau rose, même mécanique que l'invitation) ---------- */
+  details.rappel{ border-color:var(--rose); }
+  details.rappel > summary{ background:var(--rose-tint); color:var(--rose-deep); }
+  details.rappel[open] > summary{ border-bottom-color:var(--rose); }
+  details.rappel > summary::before{ display:none; }
+  details.rappel > summary::after{ background:var(--gold); }
+  .sum-icon{
+    flex:none; width:38px; height:38px; border-radius:50%; display:grid; place-items:center;
+    background:var(--rose-deep); color:var(--on-accent); margin-right:-2px;
+  }
+  .sum-icon svg{ width:20px; height:20px; }
+  .recap{ display:grid; gap:8px; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .recap p{ margin:0; font-size:.9rem; }
+  .recap .count{ font-weight:700; color:var(--ok); }
+  .recap .warn{ font-weight:700; color:var(--no); }
+  .recap ul{ margin:0; padding-left:1.2em; font-size:.86rem; color:var(--ink-soft); }
+  .recap li{ margin:2px 0; }
+  .saved{ font-size:.8rem; color:var(--ink-soft); margin:0; }
+  .saved.dirty{ color:var(--rose-deep); font-weight:600; }
+  .send .btn-primary{ display:inline-flex; align-items:center; gap:8px; }
 
   /* Liste en cartes tant que le tableau n'a pas la place (téléphones et tablettes). */
   @media (max-width:860px){
@@ -256,6 +277,36 @@
       </div>
     </details>
 
+    <details class="card invite rappel" id="rappel">
+      <summary>
+        <span class="sum-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z"/><path d="M10.3 19a1.9 1.9 0 0 0 3.4 0"/></svg></span>
+        <span class="sum-text">Envoyer un rappel aux présents</span>
+      </summary>
+      <div class="invite-body">
+        <p>Le rappel s'ouvre dans votre messagerie, avec votre adresse en destinataire et les invités présents en copie cachée (Cci) : ils ne voient pas les adresses des autres. Il ne reste qu'à cliquer sur « Envoyer ».</p>
+        <div class="recap" id="rap-recap"></div>
+        <div class="field">
+          <label for="rap-subject">Objet</label>
+          <input type="text" id="rap-subject" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="rap-body">Message</label>
+          <textarea id="rap-body" style="min-height:320px"></textarea>
+        </div>
+        <p class="saved" id="rap-saved" aria-live="polite"></p>
+        <div class="send">
+          <button type="button" class="btn btn-ghost" id="rap-save">Enregistrer le modèle</button>
+          <button type="button" class="link-reset" id="rap-reset">Revenir au modèle par défaut</button>
+        </div>
+        <div class="send">
+          <button type="button" class="btn btn-primary" id="rap-open">Ouvrir dans ma messagerie</button>
+          <button type="button" class="btn btn-ghost" id="rap-copy-emails">Copier les adresses</button>
+          <button type="button" class="btn btn-ghost" id="rap-copy-text">Copier le message</button>
+        </div>
+        <p class="toast" id="rap-toast" role="status" aria-live="polite"></p>
+      </div>
+    </details>
+
     <section class="card" style="margin-top:16px; display:grid; gap:14px;">
       <div class="tools">
         <input type="search" id="search" placeholder="Rechercher un nom…" aria-label="Rechercher un nom">
@@ -298,7 +349,8 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     });
     const out = await res.json().catch(function(){ return {}; });
     if (!res.ok) throw Object.assign(new Error(out.error_description || out.msg || 'refus'), { status:res.status });
-    return { access_token:out.access_token, refresh_token:out.refresh_token, expires_at:Date.now() + (out.expires_in - 60) * 1000 };
+    return { access_token:out.access_token, refresh_token:out.refresh_token, expires_at:Date.now() + (out.expires_in - 60) * 1000,
+             email:(out.user && out.user.email) || (session && session.email) || '' };
   }
 
   async function token(){
@@ -310,10 +362,13 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   async function api(path, opts){
     const t = await token();
     const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, Object.assign({}, opts, {
-      headers:{ 'apikey':SUPABASE_KEY, 'Authorization':'Bearer ' + t, 'Content-Type':'application/json', 'Prefer':'return=representation' }
+      headers:Object.assign({ 'apikey':SUPABASE_KEY, 'Authorization':'Bearer ' + t, 'Content-Type':'application/json', 'Prefer':'return=representation' }, opts && opts.headers)
     }));
     if (res.status === 401) throw Object.assign(new Error('session'), { status:401 });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok){
+      const body = await res.json().catch(function(){ return {}; });
+      throw Object.assign(new Error('HTTP ' + res.status), { status:res.status, code:body.code });
+    }
     return res.status === 204 ? null : res.json();
   }
 
@@ -353,6 +408,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       rows = await api('rsvps?select=*&order=last_name.asc,first_name.asc');
       $('meta').textContent = 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
       render();
+      rapLoad();
       if (!rows.length && !(await isAdmin())){
         $('dash-error').textContent = "Ce compte n'est pas autorisé à voir les réponses. Ajoutez-le avec le script supabase/admin.sql.";
       }
@@ -409,6 +465,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     });
     $('empty').hidden = list.length > 0;
     $('empty').textContent = rows.length ? 'Aucune réponse ne correspond à la recherche.' : "Aucune réponse pour l'instant.";
+    rapRenderRecap();
   }
 
   async function onDelete(id){
@@ -533,6 +590,152 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   $('send-copy').addEventListener('click', async function(){
     toast((await copy(message())) ? 'Message copié.' : 'La copie a échoué : sélectionnez le texte et copiez-le.');
   });
+
+
+  // ---------- Rappel aux présents ----------
+  const RAPPEL_DEFAULT = {
+    subject: "Rappel : vin d'honneur de Marine & Jeremy, dimanche 22 août 2027",
+    body:
+      "Bonjour,\n\n" +
+      "Le grand jour approche ! Voici un petit rappel pour le vin d'honneur de notre mariage :\n\n" +
+      "• Date : dimanche 22 août 2027\n" +
+      "• Horaire : de 17h15 à 19h\n" +
+      "• Lieu : Manoir des Lys, Auchel\n" +
+      "• Dress code : tenue beige et/ou dorée\n" +
+      "• Cadeaux : nous souhaitons uniquement une participation financière, une urne sera à disposition sur place\n\n" +
+      "Pour rappel, l'invitation est nominative, sans accompagnant.\n\n" +
+      "En cas d'empêchement, merci de nous prévenir ou de modifier votre réponse sur le formulaire :\n" +
+      "https://theryble.github.io/mariage-rsvp/\n\n" +
+      "Nous avons hâte de vous retrouver !\n\n" +
+      "Marine & Jeremy"
+  };
+  const EMAIL_RE = /[^\s@<>,;:"']+@[^\s@<>,;:"']+\.[a-z]{2,}/i;
+  let rappelSaved = null;      // dernière version enregistrée dans la base
+  let rappelLoaded = false;
+
+  function rapToast(text){
+    $('rap-toast').textContent = text;
+    setTimeout(function(){ if ($('rap-toast').textContent === text) $('rap-toast').textContent = ''; }, 7000);
+  }
+  function rapCurrent(){ return { subject:$('rap-subject').value, body:$('rap-body').value }; }
+  function rapFill(t){ $('rap-subject').value = t.subject; $('rap-body').value = t.body; }
+  function rapDirty(){
+    const ref = rappelSaved || RAPPEL_DEFAULT, cur = rapCurrent();
+    return cur.subject !== ref.subject || cur.body !== ref.body;
+  }
+  function rapStatus(info){
+    const el = $('rap-saved');
+    if (rapDirty()){ el.textContent = 'Modifications non enregistrées.'; el.className = 'saved dirty'; return; }
+    el.className = 'saved';
+    el.textContent = info || (rappelSaved ? 'Modèle enregistré, partagé avec les autres administrateurs.' : 'Modèle par défaut.');
+  }
+
+  function rapRecipients(){
+    const withEmail = [], without = [];
+    rows.filter(function(r){ return r.attending; }).forEach(function(r){
+      const m = (r.contact || '').match(EMAIL_RE);
+      if (m) withEmail.push({ name:r.first_name + ' ' + r.last_name, email:m[0].toLowerCase() });
+      else without.push({ name:r.first_name + ' ' + r.last_name, contact:r.contact });
+    });
+    const seen = {};
+    return { withEmail: withEmail.filter(function(x){ return seen[x.email] ? false : (seen[x.email] = true); }), without: without };
+  }
+
+  function rapRenderRecap(){
+    const box = $('rap-recap'), r = rapRecipients();
+    box.textContent = '';
+    const p = document.createElement('p');
+    const c = document.createElement('span'); c.className = 'count';
+    c.textContent = r.withEmail.length + ' présent' + (r.withEmail.length > 1 ? 's' : '') + ' avec une adresse e-mail';
+    p.appendChild(c); p.appendChild(document.createTextNode(' recevront le rappel.'));
+    box.appendChild(p);
+    if (r.without.length){
+      const p2 = document.createElement('p');
+      const w = document.createElement('span'); w.className = 'warn';
+      w.textContent = r.without.length + ' présent' + (r.without.length > 1 ? 's' : '') + ' sans adresse e-mail';
+      p2.appendChild(w); p2.appendChild(document.createTextNode(' : à prévenir autrement (WhatsApp, Messenger…).'));
+      box.appendChild(p2);
+      const ul = document.createElement('ul');
+      r.without.forEach(function(x){
+        const li = document.createElement('li');
+        li.textContent = x.name + (x.contact ? ' — ' + x.contact : ' — pas de contact');
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    }
+  }
+
+  async function rapLoad(){
+    try {
+      const res = await api('settings?key=eq.rappel&select=value');
+      rappelSaved = (res && res[0] && res[0].value && res[0].value.body) ? res[0].value : null;
+      if (!rappelLoaded || !rapDirty()) rapFill(rappelSaved || RAPPEL_DEFAULT);
+      rappelLoaded = true;
+      rapStatus();
+    } catch(err){
+      if (!rappelLoaded){ rapFill(RAPPEL_DEFAULT); rappelLoaded = true; }
+      rapStatus(err.status === 404 || err.code === 'PGRST205' || err.code === '42P01'
+        ? "Modèle par défaut. Pour pouvoir enregistrer vos modifications, exécutez supabase/rappel.sql dans Supabase."
+        : "Modèle par défaut (le modèle enregistré n'a pas pu être chargé).");
+    }
+  }
+
+  $('rap-subject').addEventListener('input', function(){ rapStatus(); });
+  $('rap-body').addEventListener('input', function(){ rapStatus(); });
+
+  $('rap-save').addEventListener('click', async function(){
+    const btn = $('rap-save'); btn.disabled = true;
+    try {
+      const value = rapCurrent();
+      await api('settings', {
+        method:'POST',
+        headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
+        body:JSON.stringify({ key:'rappel', value:value, updated_at:new Date().toISOString() })
+      });
+      rappelSaved = value;
+      rapStatus('Modèle enregistré, partagé avec les autres administrateurs.');
+      rapToast('Modèle enregistré.');
+    } catch(err){
+      rapToast(err.status === 404 || err.code === 'PGRST205' || err.code === '42P01'
+        ? "Enregistrement impossible : exécutez d'abord supabase/rappel.sql dans Supabase."
+        : "L'enregistrement n'a pas abouti. Réessayez.");
+    } finally { btn.disabled = false; }
+  });
+
+  $('rap-reset').addEventListener('click', function(){
+    rapFill(RAPPEL_DEFAULT);
+    rapStatus();
+    rapToast("Modèle par défaut rétabli. Cliquez sur « Enregistrer le modèle » pour le garder.");
+  });
+
+  $('rap-open').addEventListener('click', function(){
+    const r = rapRecipients();
+    if (!r.withEmail.length){ rapToast("Aucun invité présent n'a laissé d'adresse e-mail."); return; }
+    const t = rapCurrent();
+    const enc = function(s){ return encodeURIComponent(s.replace(/\r?\n/g, '\r\n')); };
+    const to = (session && session.email) || '';
+    const url = 'mailto:' + encodeURIComponent(to).replace(/%40/g, '@') +
+      '?bcc=' + r.withEmail.map(function(x){ return encodeURIComponent(x.email).replace(/%40/g, '@'); }).join(',') +
+      '&subject=' + enc(t.subject) + '&body=' + enc(t.body);
+    location.href = url;
+    rapToast(url.length > 1900
+      ? "Si le message apparaît incomplet dans votre messagerie, utilisez « Copier les adresses » (à coller dans Cci) et « Copier le message »."
+      : "Votre messagerie s'ouvre : vérifiez le message puis cliquez sur « Envoyer ».");
+  });
+
+  $('rap-copy-emails').addEventListener('click', async function(){
+    const r = rapRecipients();
+    if (!r.withEmail.length){ rapToast("Aucun invité présent n'a laissé d'adresse e-mail."); return; }
+    rapToast((await copy(r.withEmail.map(function(x){ return x.email; }).join('; ')))
+      ? r.withEmail.length + ' adresse(s) copiée(s). Collez-les dans le champ Cci.'
+      : 'La copie a échoué.');
+  });
+
+  $('rap-copy-text').addEventListener('click', async function(){
+    const t = rapCurrent();
+    rapToast((await copy(t.subject + '\n\n' + t.body)) ? 'Objet et message copiés.' : 'La copie a échoué.');
+  });
+
 
   session = loadSession();
   if (session){ showDash(); refresh(); } else showLogin();

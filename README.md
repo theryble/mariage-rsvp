@@ -11,6 +11,7 @@ assets/                            logos (clair et sombre)
 supabase/schema.sql                création de la base (à exécuter une fois)
 supabase/admin.sql                 accès des mariés au tableau (à exécuter une fois)
 supabase/notifications.sql         e-mail aux mariés à chaque réponse (à exécuter une fois)
+supabase/rappel.sql                modèle du mail de rappel, partagé entre mariés (à exécuter une fois)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
