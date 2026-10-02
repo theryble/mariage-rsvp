@@ -101,12 +101,14 @@
   .info h2{ font-size:1.3rem; }
   .info p{ margin:0; font-size:.92rem; color:var(--ink-soft); }
   .info strong{ color:var(--ink); font-weight:600; }
-  .swatches{ display:flex; flex:none; }
-  .swatches i{ width:24px; height:24px; border-radius:50%; border:2px solid var(--paper-raised); box-shadow:0 0 0 1px var(--line); }
-  .swatches i + i{ margin-left:-8px; }
-  .sw-beige{ background:#dcc7a6; }
-  .sw-gold{ background:linear-gradient(135deg, #e6c878, #b48a3c 60%, #d8b562); }
-  .info-glyph{ flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:.85rem; background:var(--gold-tint); color:var(--gold-ink); border:1px solid var(--gold); }
+  .info-icons{ display:flex; gap:6px; flex:none; }
+  .info-glyph{ flex:none; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:var(--gold-tint); color:var(--gold-ink); border:1px solid var(--gold); }
+  .info-glyph svg{ width:22px; height:22px; }
+  .swatch-row{ display:flex; flex-wrap:wrap; gap:16px; }
+  .sw{ display:flex; align-items:center; gap:10px; font-size:.88rem; font-weight:600; color:var(--ink); }
+  .sw i{ width:44px; height:44px; border-radius:50%; flex:none; border:3px solid var(--paper-raised); box-shadow:0 0 0 1px var(--line), 0 4px 10px -6px rgba(0,0,0,.4); }
+  .sw-beige{ background:radial-gradient(circle at 35% 30%, #efe1c8, #d6bf9a 70%); }
+  .sw-gold{ background:radial-gradient(circle at 35% 30%, #f3dc95, #c9a14e 55%, #9c7630); }
   @media (max-width:520px){ .infos{ grid-template-columns:minmax(0,1fr); } }
 
   /* ---------- formulaire ---------- */
@@ -275,14 +277,18 @@
   <section class="infos" aria-label="Informations pratiques">
     <div class="info">
       <div class="info-head">
-        <span class="swatches" aria-hidden="true"><i class="sw-beige"></i><i class="sw-gold"></i></span>
+        <span class="info-icons"><span class="info-glyph" title="Costume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3 4 5.5V21h16V5.5L16 3"/><path d="M8 3l4 8 4-8"/><path d="M12 11l-1.2 2.6L12 17l1.2-3.4z"/><path d="M8 3 6.5 9l2.5 1.5"/><path d="M16 3l1.5 6L15 10.5"/><path d="M12 17v4"/></svg></span><span class="info-glyph" title="Robe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.5 3l.8 3.5L8.6 9.5 5 21h14L15.4 9.5l-1.7-3L14.5 3"/><path d="M10.3 6.5c.6.5 1.1.7 1.7.7s1.1-.2 1.7-.7"/><path d="M8.6 9.5h6.8"/><path d="M10 13.5 8.5 21M14 13.5l1.5 7.5"/></svg></span></span>
         <h2>Dress code</h2>
       </div>
       <p>Pour le vin d'honneur, nous vous invitons à porter une tenue <strong>beige et/ou dorée</strong>.</p>
+      <div class="swatch-row" aria-label="Couleurs du dress code">
+        <span class="sw"><i class="sw-beige" aria-hidden="true"></i>Beige</span>
+        <span class="sw"><i class="sw-gold" aria-hidden="true"></i>Doré</span>
+      </div>
     </div>
     <div class="info">
       <div class="info-head">
-        <span class="info-glyph" aria-hidden="true">✉</span>
+        <span class="info-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7.5"/><path d="M12 8.5V21"/><path d="M12 8.5C10.8 5.2 7.2 4.4 7.2 6.6c0 1.6 2.6 1.9 4.8 1.9z"/><path d="M12 8.5c1.2-3.3 4.8-4.1 4.8-1.9 0 1.6-2.6 1.9-4.8 1.9z"/></svg></span>
         <h2>Cadeaux</h2>
       </div>
       <p>Votre présence est notre plus beau cadeau. Si vous souhaitez nous gâter, nous souhaitons <strong>uniquement une participation financière</strong> : une urne sera à disposition pendant le vin d'honneur.</p>
