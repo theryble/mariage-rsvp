@@ -10,6 +10,7 @@ admin.html                         le tableau des réponses, réservé aux mari�
 assets/                            logos (clair et sombre)
 supabase/schema.sql                création de la base (à exécuter une fois)
 supabase/admin.sql                 accès des mariés au tableau (à exécuter une fois)
+supabase/notifications.sql         e-mail aux mariés à chaque réponse (à exécuter une fois)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
@@ -76,6 +77,38 @@ from rsvps;
 ```
 
 Pour supprimer une réponse de test : **Table Editor** → table **rsvps** → cocher la ligne → **Delete**.
+
+## Notifications par e-mail
+
+À chaque réponse (nouvelle ou modifiée), chaque compte de `public.admins` reçoit un e-mail avec le nom,
+la réponse, le contact, le message et le total des présents et absents. L'envoi passe par
+[Resend](https://resend.com) (gratuit jusqu'à 3 000 e-mails par mois).
+
+1. Créer un compte sur <https://resend.com> **avec la même adresse e-mail que ton compte admin Supabase**.
+2. **API Keys → Create API Key** : nom `mariage-rsvp`, permission *Sending access*. Copier la clé (`re_…`).
+   Elle ne s'affiche qu'une fois.
+3. Supabase → **SQL Editor**, exécuter (en remplaçant la clé) :
+
+   ```sql
+   select vault.create_secret('re_ta_cle', 'resend_api_key');
+   ```
+
+4. Exécuter ensuite tout le contenu de `supabase/notifications.sql`.
+5. Envoyer une réponse depuis le formulaire : l'e-mail arrive en quelques secondes (vérifier les spams la
+   première fois).
+
+Sans nom de domaine, Resend n'envoie que depuis `onboarding@resend.dev` et seulement vers l'adresse du
+compte Resend. Pour prévenir plusieurs administrateurs avec des adresses différentes, il faut vérifier
+un nom de domaine dans Resend, puis changer l'adresse dans la fonction `notify_sender()`.
+
+En cas de problème, voir les derniers appels à Resend dans **SQL Editor** :
+
+```sql
+select created, status_code, content from net._http_response order by created desc limit 5;
+```
+
+Pour changer la clé : `select vault.update_secret((select id from vault.secrets where name = 'resend_api_key'), 're_nouvelle_cle');`
+Pour couper les notifications : `drop trigger rsvps_notify on public.rsvps;`
 
 ## Bon à savoir
 
