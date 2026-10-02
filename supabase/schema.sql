@@ -42,6 +42,11 @@ begin
   if p_attending not in ('yes', 'no') then
     raise exception 'présence invalide';
   end if;
+  -- Date limite : après le 31 mai 2027 (heure de Paris), une réponse déjà envoyée ne peut plus être modifiée.
+  if now() >= timestamptz '2027-06-01 00:00 Europe/Paris'
+     and exists (select 1 from public.rsvps where id = p_id) then
+    raise exception 'modifications_closes';
+  end if;
 
   insert into public.rsvps (id, first_name, last_name, attending, contact, message)
   values (

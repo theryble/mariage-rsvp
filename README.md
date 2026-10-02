@@ -12,6 +12,7 @@ supabase/schema.sql                création de la base (à exécuter une fois)
 supabase/admin.sql                 accès des mariés au tableau (à exécuter une fois)
 supabase/notifications.sql         e-mail aux mariés à chaque réponse (à exécuter une fois)
 supabase/rappel.sql                modèle du mail de rappel, partagé entre mariés (à exécuter une fois)
+supabase/date-limite.sql           blocage des modifications après le 31 mai 2027 (à exécuter une fois)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
@@ -125,4 +126,4 @@ Pour couper les notifications : `drop trigger rsvps_notify on public.rsvps;`
 - **Robots** : un champ invisible piège les robots qui remplissent automatiquement les formulaires ;
   leurs envois sont ignorés.
 - **Confidentialité** : la balise `noindex` demande aux moteurs de recherche de ne pas référencer la page.
-- **Date limite** : le 31 mai 2027 est affiché, mais le formulaire reste ouvert après cette date.
+- **Date limite** : après le 31 mai 2027 à 23h59 (heure de Paris), une réponse déjà envoyée ne peut plus être modifiée (bloqué par la base, pas seulement par la page). Les nouvelles réponses restent acceptées.

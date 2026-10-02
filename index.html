@@ -220,6 +220,7 @@
     border:1.5px solid var(--gold); color:var(--gold); background:var(--gold-tint);
   }
   .done p{ margin:0; color:var(--ink-soft); max-width:44ch; }
+  .done p.closed-note{ font-size:.88rem; background:var(--card); border:1px dashed var(--line); border-radius:10px; padding:10px 14px; margin-top:6px; }
   .done p.urn{
     font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-size:1.08rem;
     color:var(--ink-soft); border-top:1px solid var(--line); padding-top:12px; margin-top:4px;
@@ -297,7 +298,7 @@
 
   <section class="card" id="form-card" aria-labelledby="form-title">
     <h2 id="form-title">Votre réponse</h2>
-    <p class="lede">Merci de répondre au plus tard le 31 mai 2027. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
+    <p class="lede" id="lede">Merci de répondre au plus tard le 31 mai 2027. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
     <p class="notice" id="setup-note" hidden>Le formulaire n'est pas encore ouvert. Il le sera très bientôt.</p>
 
     <form id="rsvp" novalidate>
@@ -359,6 +360,7 @@
       <p id="done-text"></p>
       <p class="urn" id="done-urn" hidden>Pour rappel : tenue beige et/ou dorée. Côté cadeaux, nous souhaitons uniquement une participation financière, une urne sera à disposition pendant le vin d'honneur.</p>
       <button type="button" class="link-btn" id="edit-btn">Modifier ma réponse</button>
+      <p class="closed-note" id="done-closed" hidden>La date limite du 31 mai 2027 est passée : votre réponse ne peut plus être modifiée. Pour tout changement, contactez directement Marine ou Jeremy.</p>
     </div>
   </section>
 
@@ -441,9 +443,16 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     setProgress(0);
   }
 
+  // Date limite : après le 31 mai 2027 à 23h59 (heure de Paris), une réponse envoyée ne se modifie plus.
+  // La base applique la même règle, cette partie sert à l'afficher clairement.
+  const DEADLINE = new Date('2027-06-01T00:00:00+02:00');
+  function closed(){ return Date.now() >= DEADLINE.getTime(); }
+
   function showDone(data){
     form.hidden = true;
     done.hidden = false;
+    document.getElementById('edit-btn').hidden = closed();
+    document.getElementById('done-closed').hidden = !closed();
     const name = data.firstName || '';
     document.getElementById('done-urn').hidden = data.attending !== 'yes';
     if (data.attending === 'yes'){
@@ -465,6 +474,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   }
 
   document.getElementById('edit-btn').addEventListener('click', function(){
+    if (closed()) return;
     done.hidden = true; form.hidden = false; setStatus('');
     form.firstName.focus();
   });
@@ -500,7 +510,13 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       showDone(data);
     } catch(err){
       stopProgress();
-      setStatus("La réponse n'a pas été enregistrée. Vérifiez votre connexion Internet puis réessayez.", 'err');
+      if (err && err.closed){
+        const saved = load();
+        if (saved) showDone(saved);
+        else setStatus('La date limite du 31 mai 2027 est passée : cette réponse ne peut plus être modifiée.', 'err');
+      } else {
+        setStatus("La réponse n'a pas été enregistrée. Vérifiez votre connexion Internet puis réessayez.", 'err');
+      }
     } finally {
       btn.disabled = false;
       btn.textContent = 'Envoyer ma réponse';
@@ -523,7 +539,9 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       try {
         const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/submit_rsvp', { method: 'POST', headers: headers, body: body });
         if (res.ok) return;
+        const info = await res.json().catch(function(){ return {}; });
         lastError = new Error('HTTP ' + res.status);
+        if (String(info.message || '').indexOf('modifications_closes') >= 0) lastError.closed = true;
         if (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429) break; // refus définitif
       } catch(err){ lastError = err; }
       if (attempt === 3) break;
@@ -534,6 +552,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   }
 
   if (!SUPABASE_URL || !SUPABASE_KEY) document.getElementById('setup-note').hidden = false;
+  if (closed()) document.getElementById('lede').textContent = "La date limite de réponse était le 31 mai 2027. Les réponses déjà envoyées ne peuvent plus être modifiées.";
   const saved = load();
   if (saved){ fill(saved); showDone(saved); }
 })();
