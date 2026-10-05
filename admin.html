@@ -151,6 +151,12 @@
 
   /* ---------- partage ---------- */
   .share-card{ display:grid; gap:12px; }
+  dialog.share-card{ width:min(620px, calc(100% - 32px)); max-height:calc(100% - 32px); overflow:auto; color:var(--ink); margin:auto; }
+  dialog.share-card:not([open]){ display:none; }
+  dialog.share-card::backdrop{ background:rgba(36,28,24,.55); }
+  .share-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .share-close{ background:none; border:0; color:var(--ink-soft); font-size:1.6rem; line-height:1; padding:2px 8px; }
+  .share-close:hover{ color:var(--ink); }
   .share-card h2{ font-size:1.35rem; }
   .share-body{ display:flex; flex-wrap:wrap; align-items:center; gap:18px 24px; }
   .share-body > *{ min-width:0; }
@@ -278,6 +284,7 @@
     </div>
     <nav class="header-actions">
       <a class="btn btn-ghost" href="./">Voir le formulaire</a>
+      <button type="button" class="btn-ghost" id="share-open" hidden aria-haspopup="dialog">QR code et lien</button>
       <button type="button" class="btn-ghost" id="logout" hidden>Se déconnecter</button>
     </nav>
   </header>
@@ -417,24 +424,28 @@
         <p class="toast" id="dl-toast" role="status" aria-live="polite"></p>
       </section>
 
-      <section class="card share-card" aria-labelledby="share-title">
-        <h2 id="share-title">Partager le formulaire</h2>
-        <p class="dl-help">Faites scanner ce QR code avec l'appareil photo d'un téléphone pour ouvrir le formulaire, ou copiez le lien pour l'envoyer.</p>
-        <div class="share-body">
-          <div class="qr-box" id="qr" role="img" aria-label="QR code du formulaire d'inscription"></div>
-          <div class="share-side">
-            <input type="text" id="share-url" readonly aria-label="Adresse du formulaire">
-            <div class="share-actions">
-              <button type="button" class="btn-primary" id="share-copy">Copier l'URL</button>
-              <button type="button" class="btn-ghost" id="share-native" hidden>Partager…</button>
-              <button type="button" class="btn-ghost" id="share-dl">Télécharger le QR code</button>
-            </div>
-            <p class="toast" id="share-toast" role="status" aria-live="polite"></p>
-          </div>
-        </div>
-      </section>
     </div>
   </main>
+
+  <dialog class="card share-card" id="share-dialog" aria-labelledby="share-title">
+    <div class="share-head">
+      <h2 id="share-title">Partager le formulaire</h2>
+      <button type="button" class="share-close" id="share-close" aria-label="Fermer">×</button>
+    </div>
+    <p class="dl-help">Faites scanner ce QR code avec l'appareil photo d'un téléphone pour ouvrir le formulaire, ou copiez le lien pour l'envoyer.</p>
+    <div class="share-body">
+      <div class="qr-box" id="qr" role="img" aria-label="QR code du formulaire d'inscription"></div>
+      <div class="share-side">
+        <input type="text" id="share-url" readonly aria-label="Adresse du formulaire">
+        <div class="share-actions">
+          <button type="button" class="btn-primary" id="share-copy">Copier l'URL</button>
+          <button type="button" class="btn-ghost" id="share-native" hidden>Partager…</button>
+          <button type="button" class="btn-ghost" id="share-dl">Télécharger le QR code</button>
+        </div>
+        <p class="toast" id="share-toast" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </dialog>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -482,11 +493,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   }
 
   function showLogin(msg){
-    $('dash').hidden = true; $('logout').hidden = true; $('login').hidden = false;
+    $('dash').hidden = true; $('logout').hidden = true; $('share-open').hidden = true;
+    if ($('share-dialog').open) $('share-dialog').close(); $('login').hidden = false;
     $('login-error').textContent = msg || '';
   }
   function showDash(){
-    $('login').hidden = true; $('dash').hidden = false; $('logout').hidden = false;
+    $('login').hidden = true; $('dash').hidden = false; $('logout').hidden = false; $('share-open').hidden = false;
   }
 
   $('login').addEventListener('submit', async function(e){
@@ -756,6 +768,9 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     clearTimeout(shareTimer);
     shareTimer = setTimeout(function(){ $('share-toast').textContent = ''; }, 5000);
   }
+  $('share-open').addEventListener('click', function(){ $('share-dialog').showModal(); });
+  $('share-close').addEventListener('click', function(){ $('share-dialog').close(); });
+  $('share-dialog').addEventListener('click', function(e){ if (e.target === this) this.close(); });
   $('share-url').value = FORM_URL;
   $('share-url').addEventListener('focus', function(){ this.select(); });
   if (window.QRCode){

@@ -66,8 +66,9 @@ Le tableau affiche les présents, les absents et le total, permet de chercher un
 supprimer une réponse (deux clics pour confirmer) et d'exporter en CSV pour Excel. La session reste
 ouverte sur l'appareil jusqu'à « Se déconnecter ».
 
-L'onglet **Réglages** affiche aussi un QR code qui ouvre le formulaire (à scanner avec l'appareil photo d'un
-téléphone ou à télécharger en PNG pour l'imprimer), et un bouton « Copier l'URL » pour envoyer le lien.
+Le bouton **QR code et lien**, en haut à côté de « Se déconnecter » (visible une fois connecté), affiche
+un QR code qui ouvre le formulaire (à scanner avec l'appareil photo d'un téléphone ou à télécharger en PNG
+pour l'imprimer) et un bouton « Copier l'URL » pour envoyer le lien.
 
 ### Dans Supabase
 
