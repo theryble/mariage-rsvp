@@ -149,6 +149,26 @@
   .pill.closed{ background:var(--no-tint); color:var(--no); }
   .deadline-card .toast:empty{ display:none; }
 
+  /* ---------- partage ---------- */
+  .share-card{ display:grid; gap:12px; }
+  .share-card h2{ font-size:1.35rem; }
+  .share-body{ display:flex; flex-wrap:wrap; align-items:center; gap:18px 24px; }
+  .share-body > *{ min-width:0; }
+  /* Fond blanc même en mode sombre : les lecteurs de QR code lisent mal le clair sur foncé. */
+  .qr-box{ flex:none; background:#fff; padding:12px; border-radius:12px; border:1px solid var(--line); line-height:0; }
+  .qr-box img, .qr-box canvas{ width:180px; height:180px; display:block; }
+  .share-side{ flex:1 1 260px; display:grid; gap:10px; }
+  .share-side input{
+    width:100%; font:inherit; font-size:.95rem; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  }
+  .share-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+  .share-card .toast:empty{ display:none; }
+  @media (max-width:640px){
+    .share-body{ justify-content:center; }
+    .share-actions button{ flex:1 1 auto; }
+  }
+
   /* ---------- invitation ---------- */
   details.invite{ margin-top:16px; padding:0; }
   details.invite > summary{
@@ -396,10 +416,28 @@
         </div>
         <p class="toast" id="dl-toast" role="status" aria-live="polite"></p>
       </section>
+
+      <section class="card share-card" aria-labelledby="share-title">
+        <h2 id="share-title">Partager le formulaire</h2>
+        <p class="dl-help">Faites scanner ce QR code avec l'appareil photo d'un téléphone pour ouvrir le formulaire, ou copiez le lien pour l'envoyer.</p>
+        <div class="share-body">
+          <div class="qr-box" id="qr" role="img" aria-label="QR code du formulaire d'inscription"></div>
+          <div class="share-side">
+            <input type="text" id="share-url" readonly aria-label="Adresse du formulaire">
+            <div class="share-actions">
+              <button type="button" class="btn-primary" id="share-copy">Copier l'URL</button>
+              <button type="button" class="btn-ghost" id="share-native" hidden>Partager…</button>
+              <button type="button" class="btn-ghost" id="share-dl">Télécharger le QR code</button>
+            </div>
+            <p class="toast" id="share-toast" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 const SUPABASE_URL = 'https://bvmkoijthojntwgkiqzr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
@@ -710,6 +748,39 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       t.remove(); return ok;
     }
   }
+
+  // ---------- Partage (QR code + lien) ----------
+  let shareTimer = null;
+  function shareToast(text){
+    $('share-toast').textContent = text;
+    clearTimeout(shareTimer);
+    shareTimer = setTimeout(function(){ $('share-toast').textContent = ''; }, 5000);
+  }
+  $('share-url').value = FORM_URL;
+  $('share-url').addEventListener('focus', function(){ this.select(); });
+  if (window.QRCode){
+    new QRCode($('qr'), { text:FORM_URL, width:360, height:360, colorDark:'#3a2e28', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M });
+  } else {
+    $('qr').hidden = true;
+    $('share-dl').hidden = true;
+  }
+  $('share-copy').addEventListener('click', async function(){
+    shareToast(await copy(FORM_URL) ? 'Lien copié. Collez-le dans un message.' : 'Copie impossible : sélectionnez le lien et copiez-le à la main.');
+  });
+  if (navigator.share){
+    $('share-native').hidden = false;
+    $('share-native').addEventListener('click', function(){
+      navigator.share({ title:"Vin d'honneur — Marine & Jeremy", url:FORM_URL }).catch(function(){});
+    });
+  }
+  $('share-dl').addEventListener('click', function(){
+    const canvas = $('qr').querySelector('canvas');
+    if (!canvas){ shareToast('Le QR code n\'est pas disponible.'); return; }
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'qrcode-mariage-rsvp.png';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
 
   // 06 12 34 56 78 → 33612345678 (format attendu par wa.me)
   function waNumber(raw){
