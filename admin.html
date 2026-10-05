@@ -150,6 +150,8 @@
   .deadline-card .toast:empty{ display:none; }
 
   /* ---------- partage ---------- */
+  #share-open:not([hidden]){ display:inline-flex; align-items:center; gap:7px; }
+  #share-open svg{ flex:none; }
   .share-card{ display:grid; gap:12px; }
   dialog.share-card{ width:min(620px, calc(100% - 32px)); max-height:calc(100% - 32px); overflow:auto; color:var(--ink); margin:auto; }
   dialog.share-card:not([open]){ display:none; }
@@ -284,7 +286,7 @@
     </div>
     <nav class="header-actions">
       <a class="btn btn-ghost" href="./">Voir le formulaire</a>
-      <button type="button" class="btn-ghost" id="share-open" hidden aria-haspopup="dialog">QR code et lien</button>
+      <button type="button" class="btn-ghost" id="share-open" hidden aria-haspopup="dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Partager</button>
       <button type="button" class="btn-ghost" id="logout" hidden>Se déconnecter</button>
     </nav>
   </header>
