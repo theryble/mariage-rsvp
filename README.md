@@ -15,6 +15,7 @@ supabase/rappel.sql                modèle du mail de rappel, partagé entre mar
 supabase/date-limite.sql           blocage des modifications après le 31 mai 2027 (à exécuter une fois)
 supabase/empechement.sql           signalement d'un empêchement après le 31 mai (à exécuter une fois)
 supabase/date-limite-reglable.sql  date limite réglable depuis l'espace mariés (à exécuter une fois)
+supabase/securite.sql              durcissement conseillé par le Security Advisor (à exécuter une fois)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
