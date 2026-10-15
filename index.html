@@ -598,6 +598,19 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   function pfDots(f){ return f.date.slice(8, 10) + '.' + f.date.slice(5, 7) + '.' + f.date.slice(0, 4); }
   function pfCap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function pfLower(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  // Prénoms et noms bien écrits : « marie-lise DUPONT » → « Marie-Lise Dupont », « d'artagnan » → « D'Artagnan »,
+  // « jean de la fontaine » → « Jean de la Fontaine » (particules en minuscules sauf en tête).
+  const NAME_PARTICLES = ['de', 'du', 'des', 'la', 'le', 'les', 'van', 'von', 'der', 'den', 'di', 'da', 'del', 'dos'];
+  function formatName(s){
+    return String(s || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('fr-FR').split(' ').map(function(word, i){
+      if (!word) return word;
+      if (i > 0 && NAME_PARTICLES.indexOf(word) >= 0) return word;
+      const head = i > 0 && /^d['’]./.test(word) ? word.slice(0, 2) : '';
+      return head + word.slice(head.length).replace(/(^|[-'’])(\p{L})/gu, function(m, sep, ch){ return sep + ch.toLocaleUpperCase('fr-FR'); });
+    }).join(' ');
+  }
+  // Mise en forme dès qu'on quitte un champ de prénom ou de nom.
+  function formatOnBlur(el){ if (el) el.addEventListener('blur', function(){ const v = formatName(el.value); if (v !== el.value) el.value = v; }); }
   // Repères remplacés dans les textes : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu}, {lieu court}.
   // Sans horaire, « , {horaire} » disparaît.
   function pfFill(f, text){
@@ -773,10 +786,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     form.firstName.focus();
   });
 
+  formatOnBlur(form.firstName); formatOnBlur(form.lastName);
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     if (PREVIEW){ setStatus("Aperçu : la réponse n'est pas envoyée.", 'err'); return; }
-    const first = form.firstName.value.trim(), last = form.lastName.value.trim();
+    form.firstName.value = formatName(form.firstName.value); form.lastName.value = formatName(form.lastName.value);
+    const first = form.firstName.value, last = form.lastName.value;
     const att = form.querySelector('input[name=attending]:checked');
     if (!first || !last){ setStatus('Indiquez votre prénom et votre nom.', 'err'); return; }
     if (!att){ setStatus('Choisissez « Oui, je viendrai » ou « Non, je ne pourrai pas ».', 'err'); return; }

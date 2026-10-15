@@ -1089,7 +1089,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     const list = scoped.filter(function(r){
       if (filter === 'yes' && !r.attending) return false;
       if (filter === 'no' && r.attending) return false;
-      return !q || (r.first_name + ' ' + r.last_name + ' ' + r.last_name + ' ' + r.first_name).toLowerCase().indexOf(q) >= 0;
+      return !q || (formatName(r.first_name) + ' ' + formatName(r.last_name) + ' ' + r.last_name + ' ' + r.first_name).toLowerCase().indexOf(q) >= 0;
     });
 
     // Un tableau par formulaire, pour bien distinguer les réponses de chaque fête.
@@ -1110,7 +1110,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       table.appendChild(tbody); wrap.appendChild(table); sec.appendChild(wrap); box.appendChild(sec);
       items.forEach(function(r){
         const tr = document.createElement('tr');
-        tr.appendChild(td('name', r.first_name + ' ' + r.last_name));
+        tr.appendChild(td('name', formatName(r.first_name) + ' ' + formatName(r.last_name)));
         const att = td('att'); const pill = document.createElement('span');
         pill.className = 'pill ' + (r.attending ? 'yes' : (r.cancelled_at ? 'cancel' : 'no'));
         pill.textContent = r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)');
@@ -1162,7 +1162,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     const esc = function(v){ v = String(v == null ? '' : v); return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const scoped = rows.filter(function(r){ return !respEvent || rowEvent(r) === respEvent; });
     const lines = [['Prénom','Nom','Présence','Fête','Contact','Message','Empêchement','Reçue le','Modifiée le'].join(';')].concat(scoped.map(function(r){
-      return [r.first_name, r.last_name, r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)'), eventName(rowEvent(r)), r.contact, r.message,
+      return [formatName(r.first_name), formatName(r.last_name), r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)'), eventName(rowEvent(r)), r.contact, r.message,
        r.cancelled_at ? fmt(r.cancelled_at) + (r.cancel_message ? ' - ' + r.cancel_message : '') : '', fmt(r.created_at), fmt(r.updated_at)].map(esc).join(';');
     }));
     // BOM + point-virgule : Excel en français ouvre le fichier avec les accents et les colonnes.
@@ -1261,7 +1261,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       return ((a.date || '9999-99-99') + (a.start || '99:99')).localeCompare((b.date || '9999-99-99') + (b.start || '99:99'));
     });
   }
-  function fullName(g){ return (g.first_name + ' ' + g.last_name).trim(); }
+  function fullName(g){ return (formatName(g.first_name) + ' ' + formatName(g.last_name)).trim(); }
   const AGE_LABEL = { adult:'Adulte', child:'Enfant', baby:'Bébé' };
   // Ancien format : un simple « child » vrai/faux.
   function ageOf(g){ return AGE_LABEL[g.age] ? g.age : (g.child ? 'child' : 'adult'); }
@@ -1348,6 +1348,19 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   function pfDots(f){ return f.date.slice(8, 10) + '.' + f.date.slice(5, 7) + '.' + f.date.slice(0, 4); }
   function pfCap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function pfLower(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  // Prénoms et noms bien écrits : « marie-lise DUPONT » → « Marie-Lise Dupont », « d'artagnan » → « D'Artagnan »,
+  // « jean de la fontaine » → « Jean de la Fontaine » (particules en minuscules sauf en tête).
+  const NAME_PARTICLES = ['de', 'du', 'des', 'la', 'le', 'les', 'van', 'von', 'der', 'den', 'di', 'da', 'del', 'dos'];
+  function formatName(s){
+    return String(s || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('fr-FR').split(' ').map(function(word, i){
+      if (!word) return word;
+      if (i > 0 && NAME_PARTICLES.indexOf(word) >= 0) return word;
+      const head = i > 0 && /^d['’]./.test(word) ? word.slice(0, 2) : '';
+      return head + word.slice(head.length).replace(/(^|[-'’])(\p{L})/gu, function(m, sep, ch){ return sep + ch.toLocaleUpperCase('fr-FR'); });
+    }).join(' ');
+  }
+  // Mise en forme dès qu'on quitte un champ de prénom ou de nom.
+  function formatOnBlur(el){ if (el) el.addEventListener('blur', function(){ const v = formatName(el.value); if (v !== el.value) el.value = v; }); }
   // Repères remplacés dans les textes : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu}, {lieu court}.
   // Sans horaire, « , {horaire} » disparaît.
   function pfFill(f, text){
@@ -1398,7 +1411,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
           } else {
             const evs = {}; evs[evId] = info.status;
             createdFor[info.id] = true;
-            await gCreate({ first_name:info.first.slice(0, 60), last_name:info.last.slice(0, 60), contact:info.contact.slice(0, 120),
+            await gCreate({ first_name:formatName(info.first).slice(0, 60), last_name:formatName(info.last).slice(0, 60), contact:info.contact.slice(0, 120),
               age:'adult', role:'guest', plus_of:null, witness:false, rsvp:link, events:evs });
           }
           changed = true;
@@ -1765,6 +1778,10 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     } finally { b.disabled = false; }
   });
 
+  ['ga-first', 'ga-last', 'gd-first', 'gd-last', 'cp-bride-first', 'cp-bride-last', 'cp-groom-first', 'cp-groom-last'].forEach(function(id){ formatOnBlur($(id)); });
+  $('cp-kids').addEventListener('focusout', function(e){
+    if (e.target.matches && e.target.matches('input[type=text]')){ const v = formatName(e.target.value); if (v !== e.target.value){ e.target.value = v; e.target.dispatchEvent(new Event('input')); } }
+  });
   // Aperçu avant enregistrement : le formulaire avec les réglages en cours (textes, logo, date limite).
   $('fm-draft').addEventListener('click', function(){ showDraftPreview(fmCurrent(), fmLogoShown()); });
   // Aperçu (dépôt) : les réglages en cours passent par ce navigateur à la page du formulaire (?apercu=1),
@@ -1822,7 +1839,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     const when = adminWhen();
     $('adm-kicker').textContent = 'Espace mariés' + (when ? ' · ' + when : '');
     if (!coupleSaved) return;
-    const names = [coupleSaved.bride.first_name, coupleSaved.groom.first_name].map(function(n){ return (n || '').trim(); }).filter(Boolean);
+    const names = [coupleSaved.bride.first_name, coupleSaved.groom.first_name].map(function(n){ return formatName(n); }).filter(Boolean);
     if (!names.length) return;
     const h1 = $('adm-title'); h1.textContent = '';
     names.forEach(function(n, i){
@@ -2183,7 +2200,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   $('ga-form').addEventListener('submit', async function(e){
     e.preventDefault();
-    const first = $('ga-first').value.trim(), last = $('ga-last').value.trim(), contact = $('ga-contact').value.trim(), age = ageChoice('ga'), role = roleChoice('ga'), plusOf = role === 'plus' ? $('ga-plus-of').value : null, witness = $('ga-witness').checked;
+    const first = formatName($('ga-first').value), last = formatName($('ga-last').value), contact = $('ga-contact').value.trim(), age = ageChoice('ga'), role = roleChoice('ga'), plusOf = role === 'plus' ? $('ga-plus-of').value : null, witness = $('ga-witness').checked;
     const ids = checkedIds($('ga-events'));
     if (role === 'plus' && !plusOf){ gaToast("Choisissez l'invité qu'il accompagne."); $('ga-plus-of').focus(); return; }
     if (!first && role !== 'plus'){ gaToast('Indiquez au moins le prénom.'); $('ga-first').focus(); return; }
@@ -2242,7 +2259,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   $('gd-form').addEventListener('submit', async function(e){
     e.preventDefault();
     const g = editing; if (!g) return;
-    const first = $('gd-first').value.trim(), last = $('gd-last').value.trim(), contact = $('gd-contact').value.trim(), age = ageChoice('gd'), role = roleChoice('gd'), plusOf = role === 'plus' ? $('gd-plus-of').value : null, witness = $('gd-witness').checked;
+    const first = formatName($('gd-first').value), last = formatName($('gd-last').value), contact = $('gd-contact').value.trim(), age = ageChoice('gd'), role = roleChoice('gd'), plusOf = role === 'plus' ? $('gd-plus-of').value : null, witness = $('gd-witness').checked;
     if (role === 'plus' && !plusOf){ $('gd-error').textContent = "Choisissez l'invité qu'il accompagne."; return; }
     if (!first && role !== 'plus'){ $('gd-error').textContent = 'Indiquez au moins le prénom.'; return; }
     // Les jours décochés sont retirés ; ceux qui restent gardent leur présence.
@@ -2430,7 +2447,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     catch(e){ /* réglage absent : valeurs par défaut */ }
   }
   $('cp-save').addEventListener('click', async function(){
-    const trim = function(p){ return { first_name:p.first_name.trim().slice(0, 60), last_name:p.last_name.trim().slice(0, 60) }; };
+    const trim = function(p){ return { first_name:formatName(p.first_name).slice(0, 60), last_name:formatName(p.last_name).slice(0, 60) }; };
     const value = {
       bride:trim(couple.bride), groom:trim(couple.groom),
       children:couple.children.map(function(k){ return Object.assign({ id:k.id, age:AGE_LABEL[k.age] ? k.age : 'child' }, trim(k)); })
@@ -2658,8 +2675,8 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     // Présents de la fête choisie dans l'onglet Réponses (toutes les fêtes si aucune n'est choisie).
     rows.filter(function(r){ return r.attending && (!respEvent || rowEvent(r) === respEvent); }).forEach(function(r){
       const m = (r.contact || '').match(EMAIL_RE);
-      if (m) withEmail.push({ name:r.first_name + ' ' + r.last_name, email:m[0].toLowerCase() });
-      else without.push({ name:r.first_name + ' ' + r.last_name, contact:r.contact });
+      if (m) withEmail.push({ name:formatName(r.first_name) + ' ' + formatName(r.last_name), email:m[0].toLowerCase() });
+      else without.push({ name:formatName(r.first_name) + ' ' + formatName(r.last_name), contact:r.contact });
     });
     const seen = {};
     return { withEmail: withEmail.filter(function(x){ return seen[x.email] ? false : (seen[x.email] = true); }), without: without };
