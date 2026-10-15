@@ -109,6 +109,7 @@
   .sw i{ width:44px; height:44px; border-radius:50%; flex:none; border:3px solid var(--paper-raised); box-shadow:0 0 0 1px var(--line), 0 4px 10px -6px rgba(0,0,0,.4); }
   .sw-beige{ background:radial-gradient(circle at 35% 30%, #efe1c8, #d6bf9a 70%); }
   .sw-gold{ background:radial-gradient(circle at 35% 30%, #f3dc95, #c9a14e 55%, #9c7630); }
+  .infos.single{ grid-template-columns:minmax(0,1fr); }
   @media (max-width:520px){ .infos{ grid-template-columns:minmax(0,1fr); } }
 
   /* ---------- formulaire ---------- */
@@ -261,6 +262,10 @@
     .actions button{ width:100%; }
   }
   @media (prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+  .preview-banner{
+    margin:0; text-align:center; font-size:.86rem; font-weight:600; color:var(--gold-ink);
+    background:var(--gold-tint); border:1px dashed var(--gold); border-radius:10px; padding:9px 14px;
+  }
   .trap{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
   [hidden]{ display:none !important; }
   img{ max-width:100%; }
@@ -268,41 +273,42 @@
 </head>
 <body>
 <div class="page">
+  <p class="preview-banner" id="pf-preview" hidden>Aperçu des réglages non enregistrés : rien n'est envoyé depuis cette page.</p>
   <header>
-    <div class="seal">
+    <div class="seal" id="pf-seal">
       <img class="logo-light" src="assets/logo-clair.png" width="1160" height="912" alt="Sceau JMPP de Marine et Jeremy">
       <img class="logo-dark" src="assets/logo-sombre.png" width="1160" height="912" alt="" aria-hidden="true">
     </div>
-    <div class="kicker">Inscription au vin d'honneur</div>
-    <h1>Marine <span class="amp">&amp;</span> Jeremy</h1>
-    <div class="date-line"><span class="dl">Dimanche 22 août 2027</span><span class="sep" aria-hidden="true">·</span><span class="dl">17h15 → 19h</span><span class="sep" aria-hidden="true">·</span><span class="dl">Manoir des Lys, Auchel</span></div>
-    <p class="intro">Ce formulaire sert à vous inscrire pour participer au mariage de <strong>Marine &amp; Jeremy</strong>, le <strong>dimanche 22 août 2027, de 17h15 à 19h</strong>. Vous êtes invité(e) au <strong>vin d'honneur</strong>. Merci de nous indiquer si vous serez présent(e).</p>
+    <div class="kicker" id="pf-kicker">Inscription · Vin d'honneur</div>
+    <h1 id="pf-title">Marine <span class="amp">&amp;</span> Jeremy</h1>
+    <div class="date-line" id="pf-dateline"><span class="dl">Dimanche 22 août 2027</span><span class="sep" aria-hidden="true">·</span><span class="dl">17h15 → 19h</span><span class="sep" aria-hidden="true">·</span><span class="dl">Manoir des Lys, Auchel</span></div>
+    <p class="intro" id="pf-intro">Ce formulaire sert à vous inscrire pour participer au mariage de <strong>Marine &amp; Jeremy</strong>, le <strong>dimanche 22 août 2027, de 17h15 à 19h</strong>. Vous êtes invité(e) au <strong>vin d'honneur</strong>. Merci de nous indiquer si vous serez présent(e).</p>
     <p class="deadline">Réponse souhaitée au plus tard le <strong class="dl-date">31 mai 2027</strong></p>
   </header>
 
-  <div class="rule" role="note">
+  <div class="rule" role="note" id="pf-rule">
     <div class="glyph" aria-hidden="true">1</div>
-    <p><strong>Les accompagnants ne sont pas autorisés.</strong> L'invitation est nominative : chaque invité remplit sa propre inscription, à son nom uniquement.</p>
+    <p id="pf-rule-text"><strong>Les accompagnants ne sont pas autorisés.</strong> L'invitation est nominative : chaque invité remplit sa propre inscription, à son nom uniquement.</p>
   </div>
 
-  <section class="infos" aria-label="Informations pratiques">
-    <div class="info">
+  <section class="infos" aria-label="Informations pratiques" id="pf-infos">
+    <div class="info" id="pf-dress">
       <div class="info-head">
         <span class="info-icons"><span class="info-glyph" title="Costume"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3 4 5.5V21h16V5.5L16 3"/><path d="M8 3l4 8 4-8"/><path d="M12 11l-1.2 2.6L12 17l1.2-3.4z"/><path d="M8 3 6.5 9l2.5 1.5"/><path d="M16 3l1.5 6L15 10.5"/><path d="M12 17v4"/></svg></span><span class="info-glyph" title="Robe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9.5 3l.8 3.5L8.6 9.5 5 21h14L15.4 9.5l-1.7-3L14.5 3"/><path d="M10.3 6.5c.6.5 1.1.7 1.7.7s1.1-.2 1.7-.7"/><path d="M8.6 9.5h6.8"/><path d="M10 13.5 8.5 21M14 13.5l1.5 7.5"/></svg></span></span>
-        <h2>Dress code</h2>
+        <h2 id="pf-dress-title">Dress code</h2>
       </div>
-      <p>Pour le vin d'honneur, nous vous invitons à porter une tenue <strong>beige et/ou dorée</strong>.</p>
-      <div class="swatch-row" aria-label="Couleurs du dress code">
-        <span class="sw"><i class="sw-beige" aria-hidden="true"></i>Beige</span>
-        <span class="sw"><i class="sw-gold" aria-hidden="true"></i>Doré</span>
+      <p id="pf-dress-text">Pour le vin d'honneur, nous vous invitons à porter une tenue <strong>beige et/ou dorée</strong>.</p>
+      <div class="swatch-row" aria-label="Couleurs du dress code" id="pf-swatches">
+        <span class="sw" id="pf-sw-beige"><i class="sw-beige" aria-hidden="true"></i>Beige</span>
+        <span class="sw" id="pf-sw-gold"><i class="sw-gold" aria-hidden="true"></i>Doré</span>
       </div>
     </div>
-    <div class="info">
+    <div class="info" id="pf-gift">
       <div class="info-head">
         <span class="info-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7.5"/><path d="M12 8.5V21"/><path d="M12 8.5C10.8 5.2 7.2 4.4 7.2 6.6c0 1.6 2.6 1.9 4.8 1.9z"/><path d="M12 8.5c1.2-3.3 4.8-4.1 4.8-1.9 0 1.6-2.6 1.9-4.8 1.9z"/></svg></span>
-        <h2>Cadeaux</h2>
+        <h2 id="pf-gift-title">Cadeaux</h2>
       </div>
-      <p>Votre présence est notre plus beau cadeau. Si vous souhaitez nous gâter, nous souhaitons <strong>uniquement une participation financière</strong> : une urne sera à disposition pendant le vin d'honneur.</p>
+      <p id="pf-gift-text">Votre présence est notre plus beau cadeau. Si vous souhaitez nous gâter, nous souhaitons <strong>uniquement une participation financière</strong> : une urne sera à disposition pendant le vin d'honneur.</p>
     </div>
   </section>
 
@@ -310,6 +316,8 @@
     <h2 id="form-title">Votre réponse</h2>
     <p class="lede" id="lede">Merci de répondre au plus tard le <span class="dl-date">31 mai 2027</span>. Vous pourrez modifier votre réponse jusqu'à cette date en revenant sur cette page depuis le même appareil.</p>
     <p class="notice" id="setup-note" hidden>Le formulaire n'est pas encore ouvert. Il le sera très bientôt.</p>
+
+    <p class="notice" id="pf-closed" hidden>Ce formulaire n'est pas ouvert pour le moment. Pour toute question, contactez directement Marine ou Jeremy.</p>
 
     <form id="rsvp" novalidate>
       <div class="row">
@@ -328,11 +336,11 @@
         <div class="choices" role="radiogroup" aria-labelledby="attend-legend">
           <label class="choice yes" for="attend-yes">
             <input type="radio" id="attend-yes" name="attending" value="yes">
-            <span><b>Oui, je viendrai</b><small>Au vin d'honneur, le 22 août de 17h15 à 19h</small></span>
+            <span><b id="pf-yes-label">Oui, je viendrai</b><small id="pf-yes-small">Vin d'honneur, le 22 août de 17h15 à 19h</small></span>
           </label>
           <label class="choice no" for="attend-no">
             <input type="radio" id="attend-no" name="attending" value="no">
-            <span><b>Non, je ne pourrai pas</b><small>Je serai avec vous en pensée</small></span>
+            <span><b id="pf-no-label">Non, je ne pourrai pas</b><small id="pf-no-small">Je serai avec vous en pensée</small></span>
           </label>
         </div>
       </fieldset>
@@ -343,7 +351,7 @@
       </div>
 
       <div class="field">
-        <label for="message">Un mot pour les mariés <span class="opt">(facultatif)</span></label>
+        <label for="message"><span id="pf-message-label">Un mot pour les mariés</span> <span class="opt">(facultatif)</span></label>
         <textarea id="message" name="message" maxlength="600"></textarea>
       </div>
 
@@ -353,9 +361,9 @@
         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
       </div>
 
-      <label class="check" for="solo">
+      <label class="check" for="solo" id="pf-solo">
         <input type="checkbox" id="solo" name="solo" required>
-        <span>J'ai bien noté que l'inscription est individuelle et que je viens <strong>sans accompagnant</strong>.</span>
+        <span id="pf-solo-text">J'ai bien noté que l'inscription est individuelle et que je viens <strong>sans accompagnant</strong>.</span>
       </label>
 
       <div class="actions">
@@ -385,7 +393,7 @@
     </div>
   </section>
 
-  <footer>JMPP · Vin d'honneur · Manoir des Lys · 22.08.2027<br><a class="admin-link" href="admin.html">Espace mariés</a></footer>
+  <footer><span id="pf-footer">JMPP · Vin d'honneur · Manoir des Lys · 22.08.2027</span><br><a class="admin-link" href="admin.html">Espace mariés</a></footer>
 </div>
 
 <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title" aria-describedby="overlay-text" hidden>
@@ -403,14 +411,21 @@ const SUPABASE_URL = 'https://bvmkoijthojntwgkiqzr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
 (function(){
-  const STORAGE_KEY = 'rsvp-marine-jeremy';
+  // Un formulaire par fête : ?fete=mariage ouvre celui du mariage ; sans précision, le formulaire principal
+  // (réglé dans l'espace mariés, le vin d'honneur par défaut). Une réponse par fête et par appareil.
+  const FETE = (function(){
+    const v = new URLSearchParams(location.search).get('fete');
+    return v && /^[A-Za-z0-9_-]{1,40}$/.test(v) ? v : '';
+  })();
+  let currentEvent = FETE || 'vin';
+  function storageKey(){ return 'rsvp-marine-jeremy' + (currentEvent === 'vin' ? '' : '-' + currentEvent); }
   const form = document.getElementById('rsvp');
   const statusEl = document.getElementById('status');
   const btn = document.getElementById('submit-btn');
   const done = document.getElementById('done');
 
-  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch(e){ return null; } }
-  function save(d){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch(e){} }
+  function load(){ try { return JSON.parse(localStorage.getItem(storageKey())) || null; } catch(e){ return null; } }
+  function save(d){ try { localStorage.setItem(storageKey(), JSON.stringify(d)); } catch(e){} }
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   function newId(){
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -466,7 +481,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   // Date limite : dernier jour où une réponse peut être modifiée (jusqu'à 23h59, heure de Paris).
   // Elle se règle dans l'espace mariés ; la base applique la même règle, la page l'affiche.
-  let DEADLINE_DAY = '2027-05-31';
+  let DEADLINE_DAY = '2027-05-31', GLOBAL_DAY = DEADLINE_DAY;
   let DEADLINE = closingInstant(DEADLINE_DAY);
   function closingInstant(day){
     // lendemain à minuit, heure de Paris (UTC+2 d'avril à octobre, UTC+1 sinon)
@@ -497,12 +512,9 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/get_deadline', { method:'POST', headers:headers, body:'{}' });
       if (!res.ok) return;
       const day = await res.json();
-      if (typeof day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(day) || day === DEADLINE_DAY) return;
-      DEADLINE_DAY = day;
-      DEADLINE = closingInstant(day);
-      updateDeadlineTexts();
-      const saved = load();
-      if (saved && !done.hidden) showDone(saved);
+      if (typeof day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+      GLOBAL_DAY = day;
+      applyDeadline();
     } catch(e){ /* on garde la date par défaut */ }
   }
   // Test : ?simuler-date=2027-06-02 affiche la page comme à cette date (affichage seulement,
@@ -513,6 +525,216 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     return d && !isNaN(d) ? d.getTime() : null;
   })();
   function closed(){ return (SIMULATED || Date.now()) >= DEADLINE.getTime(); }
+  // Date limite du formulaire affiché : la sienne si elle est réglée, sinon la date limite par défaut.
+  function applyDeadline(){
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(formCfg.deadline || '') ? formCfg.deadline : GLOBAL_DAY;
+    if (day === DEADLINE_DAY) return;
+    DEADLINE_DAY = day;
+    DEADLINE = closingInstant(day);
+    updateDeadlineTexts();
+    const saved = load();
+    if (saved && !done.hidden) showDone(saved);
+  }
+
+  // Contenu du formulaire public, réglé dans l'espace mariés (Réglages → Formulaires), fête par fête.
+  // Sans réglage enregistré, ce sont les textes d'origine du vin d'honneur.
+  // Textes modifiables : [clé, libellé dans les réglages, texte d'origine, groupe des réglages].
+  const FORM_TEXTS = [
+    ['pageTitle', "Titre de l'onglet du navigateur", 'Marine & Jeremy — {Fête}', 'head'],
+    ['kicker', 'Sur-titre', 'Inscription · {Fête}', 'head'],
+    ['title', 'Titre (le « & » est mis en valeur)', 'Marine & Jeremy', 'head'],
+    ['ruleText', 'Texte de la règle « sans accompagnant »', "**Les accompagnants ne sont pas autorisés.** L'invitation est nominative : chaque invité remplit sa propre inscription, à son nom uniquement.", 'intro'],
+    ['dressTitle', "Titre de l'encadré dress code", 'Dress code', 'intro'],
+    ['giftTitle', "Titre de l'encadré cadeaux", 'Cadeaux', 'intro'],
+    ['formTitle', 'Titre du formulaire', 'Votre réponse', 'form'],
+    ['yesLabel', 'Réponse « oui »', 'Oui, je viendrai', 'form'],
+    ['yesNote', 'Précision sous « oui »', '{Fête}, le {jour} {horaire}', 'form'],
+    ['noLabel', 'Réponse « non »', 'Non, je ne pourrai pas', 'form'],
+    ['noNote', 'Précision sous « non »', 'Je serai avec vous en pensée', 'form'],
+    ['messageLabel', 'Question du message libre', 'Un mot pour les mariés', 'form'],
+    ['soloText', 'Case à cocher « sans accompagnant »', "J'ai bien noté que l'inscription est individuelle et que je viens **sans accompagnant**.", 'form'],
+    ['submitLabel', "Bouton d'envoi", 'Envoyer ma réponse', 'form'],
+    ['doneYes', 'Confirmation pour un invité présent', 'Votre présence est bien notée : {Fête}, {date}, {horaire}, {lieu}. Nous avons hâte de vous y retrouver.', 'done'],
+    ['doneNo', 'Confirmation pour un invité absent', "Votre absence est bien notée. Merci d'avoir pris le temps de nous répondre.", 'done'],
+    ['footer', 'Bas de page', 'JMPP · {Fête} · {lieu court} · {date chiffres}', 'done']
+  ];
+  const FORM_DEFAULT = Object.assign({
+    event:'vin', name:"Vin d'honneur", date:'2027-08-22', start:'17:15', end:'19:00',
+    place:'Manoir des Lys, Auchel',
+    intro:"Ce formulaire sert à vous inscrire pour participer au mariage de **Marine & Jeremy**, le **{date}, {horaire}**. Vous êtes invité(e) au **{fête}**. Merci de nous indiquer si vous serez présent(e).",
+    solo:true, logoShow:true, deadline:'',
+    dressColors:[{ name:'Beige', color:'#d6bf9a' }, { name:'Doré', color:'#c9a14e' }],
+    dress:{ show:true, text:"Pour le {fête}, nous vous invitons à porter une tenue **beige et/ou dorée**." },
+    gift:{ show:true, text:"Votre présence est notre plus beau cadeau. Si vous souhaitez nous gâter, nous souhaitons **uniquement une participation financière** : une urne sera à disposition pendant le {fête}." }
+  }, FORM_TEXTS.reduce(function(o, t){ o[t[0]] = t[2]; return o; }, {}));
+  function formMerge(v){
+    v = v && typeof v === 'object' ? v : {};
+    const d = FORM_DEFAULT, box = function(x, def){ x = x && typeof x === 'object' ? x : {}; return { show:x.show !== false, text:typeof x.text === 'string' && x.text.trim() ? x.text : def.text }; };
+    const out = {
+      event:typeof v.event === 'string' ? v.event : d.event,
+      name:typeof v.name === 'string' && v.name.trim() ? v.name : d.name,
+      date:/^\d{4}-\d{2}-\d{2}$/.test(v.date || '') ? v.date : d.date,
+      start:typeof v.start === 'string' ? v.start : d.start,
+      end:typeof v.end === 'string' ? v.end : d.end,
+      place:typeof v.place === 'string' ? v.place : d.place,
+      intro:typeof v.intro === 'string' && v.intro.trim() ? v.intro : d.intro,
+      solo:v.solo !== false, logoShow:v.logoShow !== false,
+      deadline:/^\d{4}-\d{2}-\d{2}$/.test(v.deadline || '') ? v.deadline : '',
+      // Pastilles du dress code : une liste vide est un choix (aucune pastille).
+      dressColors:Array.isArray(v.dressColors)
+        ? v.dressColors.filter(function(c){ return c && /^#[0-9a-f]{6}$/i.test(c.color || ''); }).slice(0, 6)
+            .map(function(c){ return { name:String(c.name || '').slice(0, 30), color:c.color }; })
+        : d.dressColors.slice(),
+      dress:box(v.dress, d.dress), gift:box(v.gift, d.gift)
+    };
+    FORM_TEXTS.forEach(function(t){ out[t[0]] = typeof v[t[0]] === 'string' && v[t[0]].trim() ? v[t[0]] : t[2]; });
+    return out;
+  }
+  function pfTime(t){ return /^\d{2}:\d{2}$/.test(t || '') ? Number(t.slice(0, 2)) + 'h' + (t.slice(3) === '00' ? '' : t.slice(3)) : ''; }
+  function pfHours(f){ const s = pfTime(f.start), e = pfTime(f.end); return s && e ? 'de ' + s + ' à ' + e : s ? 'à partir de ' + s : e ? "jusqu'à " + e : ''; }
+  function pfArrow(f){ const s = pfTime(f.start), e = pfTime(f.end); return s && e ? s + ' → ' + e : s ? 'dès ' + s : e ? "jusqu'à " + e : ''; }
+  function pfLongDate(f){ return new Date(f.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+  function pfShortDate(f){ return new Date(f.date + 'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'long' }); }
+  function pfDots(f){ return f.date.slice(8, 10) + '.' + f.date.slice(5, 7) + '.' + f.date.slice(0, 4); }
+  function pfCap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function pfLower(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  // Repères remplacés dans les textes : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu}, {lieu court}.
+  // Sans horaire, « , {horaire} » disparaît.
+  function pfFill(f, text){
+    return text.replace(/\{Fête\}/g, f.name).replace(/\{fête\}/g, pfLower(f.name))
+      .replace(/\{date chiffres\}/g, pfDots(f)).replace(/\{date\}/g, pfLongDate(f)).replace(/\{jour\}/g, pfShortDate(f))
+      .replace(/\{lieu court\}/g, f.place.split(',')[0].trim()).replace(/\{lieu\}/g, f.place)
+      .replace(/,?\s*\{horaire\}/g, function(m){ const h = pfHours(f); return h ? m.replace('{horaire}', h) : ''; });
+  }
+  // Même chose, puis on retire les séparateurs restés seuls quand un repère est vide (lieu absent…).
+  function pfText(f, text){
+    return pfFill(f, text).replace(/\s+,/g, ',').replace(/,\s*(?=[.,]|$)/g, '')
+      .replace(/(\s*·\s*){2,}/g, ' · ').replace(/^\s*·\s*|\s*·\s*$/g, '').trim();
+  }
+  // **mot** s'affiche en gras ; le reste est du texte simple.
+  function pfRich(el, text){
+    el.textContent = '';
+    text.split('**').forEach(function(part, i){
+      if (!part) return;
+      if (i % 2){ const b = document.createElement('strong'); b.textContent = part; el.appendChild(b); }
+      else el.appendChild(document.createTextNode(part));
+    });
+  }
+  const pfEl = function(id){ return document.getElementById(id); };
+  let formCfg = formMerge(null), pfLogo = null, pfOrigLogo = null;
+  function pfDoneText(){ return pfText(formCfg, formCfg.doneYes); }
+  function pfUrn(){
+    const f = formCfg, parts = [];
+    if (f.dress.show) parts.push(pfFill(f, f.dress.text));
+    if (f.gift.show) parts.push(pfFill(f, f.gift.text));
+    return parts.length ? ('Pour rappel : ' + pfLower(parts.join(' '))).replace(/\*\*/g, '') : '';
+  }
+  function applyFormCfg(){
+    const f = formCfg;
+    // Logo : celui de la fête s'il a été remplacé, sinon le logo d'origine (versions claire et sombre).
+    const seal = pfEl('pf-seal'), li = seal.querySelector('.logo-light'), ld = seal.querySelector('.logo-dark');
+    if (!pfOrigLogo) pfOrigLogo = { light:li.src, dark:ld.src };
+    seal.hidden = !f.logoShow;
+    li.src = pfLogo && pfLogo.light ? pfLogo.light : pfOrigLogo.light;
+    ld.src = pfLogo && pfLogo.light ? (pfLogo.dark || pfLogo.light) : pfOrigLogo.dark;
+    pfEl('pf-kicker').textContent = pfText(f, f.kicker);
+    // Titre : le « & » garde son style.
+    const h1 = pfEl('pf-title'), parts = pfText(f, f.title).split('&');
+    h1.textContent = '';
+    parts.forEach(function(p, i){
+      if (i){ const a = document.createElement('span'); a.className = 'amp'; a.textContent = '&'; h1.appendChild(a); }
+      h1.appendChild(document.createTextNode((i ? ' ' : '') + p.trim() + (i < parts.length - 1 ? ' ' : '')));
+    });
+    const dl = pfEl('pf-dateline'); dl.textContent = '';
+    [pfCap(pfLongDate(f)), pfArrow(f), f.place].filter(Boolean).forEach(function(t, i){
+      if (i){ const sep = document.createElement('span'); sep.className = 'sep'; sep.setAttribute('aria-hidden', 'true'); sep.textContent = '·'; dl.appendChild(sep); }
+      const s = document.createElement('span'); s.className = 'dl'; s.textContent = t; dl.appendChild(s);
+    });
+    pfRich(pfEl('pf-intro'), pfText(f, f.intro));
+    pfEl('pf-rule').hidden = !f.solo;
+    pfRich(pfEl('pf-rule-text'), pfText(f, f.ruleText));
+    pfEl('pf-solo').hidden = !f.solo;
+    pfRich(pfEl('pf-solo-text'), pfText(f, f.soloText));
+    pfEl('pf-dress').hidden = !f.dress.show;
+    pfEl('pf-dress-title').textContent = pfText(f, f.dressTitle);
+    pfRich(pfEl('pf-dress-text'), pfText(f, f.dress.text));
+    // Pastilles de couleur du dress code (réglées pour chaque formulaire).
+    const sw = pfEl('pf-swatches'); sw.textContent = '';
+    f.dressColors.forEach(function(c){
+      const s = document.createElement('span'); s.className = 'sw';
+      const i = document.createElement('i'); i.setAttribute('aria-hidden', 'true');
+      i.style.backgroundColor = c.color;
+      i.style.background = 'radial-gradient(circle at 35% 30%, color-mix(in srgb, ' + c.color + ' 45%, #ffffff), ' + c.color + ' 70%)';
+      s.appendChild(i); s.appendChild(document.createTextNode(c.name)); sw.appendChild(s);
+    });
+    sw.hidden = !f.dressColors.length;
+    pfEl('pf-gift').hidden = !f.gift.show;
+    pfEl('pf-gift-title').textContent = pfText(f, f.giftTitle);
+    pfRich(pfEl('pf-gift-text'), pfText(f, f.gift.text));
+    pfEl('pf-infos').hidden = !f.dress.show && !f.gift.show;
+    pfEl('pf-infos').classList.toggle('single', f.dress.show !== f.gift.show);
+    pfEl('form-title').textContent = pfText(f, f.formTitle);
+    pfEl('pf-yes-label').textContent = pfText(f, f.yesLabel);
+    pfEl('pf-yes-small').textContent = pfText(f, f.yesNote);
+    pfEl('pf-no-label').textContent = pfText(f, f.noLabel);
+    pfEl('pf-no-small').textContent = pfText(f, f.noNote);
+    pfEl('pf-message-label').textContent = pfText(f, f.messageLabel);
+    if (!pfEl('submit-btn').disabled) pfEl('submit-btn').textContent = pfText(f, f.submitLabel);
+    pfEl('pf-footer').textContent = pfText(f, f.footer);
+    pfAfterApply();
+  }
+  function pfAfterApply(){
+    document.title = pfText(formCfg, formCfg.pageTitle);
+    const s = load(); if (s && !done.hidden) showDone(s);
+  }
+  // Formulaire de la fête demandée (ou principal). Sans aucun réglage, seul le vin d'honneur existe.
+  async function loadFormCfg(){
+    try {
+      const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+      if (SUPABASE_KEY.indexOf('eyJ') === 0) headers['Authorization'] = 'Bearer ' + SUPABASE_KEY;
+      const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/get_form_config', {
+        method:'POST', headers:headers, body:JSON.stringify(FETE ? { p_event:FETE } : {})
+      });
+      if (!res.ok){ if (FETE && FETE !== 'vin') showFormClosed(); return; }
+      const v = await res.json();
+      if (!v || typeof v !== 'object') return;
+      const ev = typeof v.event === 'string' && v.event ? v.event : currentEvent;
+      let cfg = null;
+      if (!v.configured) cfg = ev === 'vin' ? formMerge(null) : null;
+      else if (v.form && v.form.open !== false) cfg = formMerge(v.form);
+      if (!cfg){ showFormClosed(); return; }
+      cfg.event = ev;
+      if (ev !== currentEvent){ currentEvent = ev; switchEvent(); }
+      formCfg = cfg; pfLogo = v.logo && v.logo.light ? v.logo : null; applyFormCfg(); applyDeadline();
+    } catch(e){ /* on garde les textes d'origine */ }
+    finally { revealPage(); }
+  }
+  // Aperçu (?apercu=1) : réglages non enregistrés transmis par l'espace mariés ; rien n'est envoyé.
+  const PREVIEW = new URLSearchParams(location.search).get('apercu') === '1', PREVIEW_KEY = 'rsvp-form-preview';
+  function loadPreview(){
+    let p = null;
+    try { p = JSON.parse(localStorage.getItem(PREVIEW_KEY)); } catch(e){}
+    if (!p || !p.cfg) return;
+    formCfg = formMerge(p.cfg); formCfg.event = p.cfg.event || 'vin';
+    pfLogo = p.logo && p.logo.light ? p.logo : null;
+    form.reset(); setStatus('');
+    done.hidden = true; form.hidden = false; document.getElementById('pf-closed').hidden = true;
+    applyFormCfg(); applyDeadline();
+  }
+  function showFormClosed(){
+    form.hidden = true; done.hidden = true;
+    document.getElementById('pf-closed').hidden = false;
+  }
+  // Le formulaire principal est une autre fête que le vin d'honneur : on reprend la réponse déjà donnée pour celle-ci.
+  function switchEvent(){
+    form.reset(); setStatus('');
+    const s = load();
+    if (s){ fill(s); showDone(s); } else { done.hidden = true; form.hidden = false; }
+  }
+  // Avec ?fete=, la page reste masquée le temps de charger les bons textes (au plus 4 secondes).
+  const page = document.querySelector('.page');
+  function revealPage(){ page.style.visibility = ''; }
+  if (FETE){ page.style.visibility = 'hidden'; setTimeout(revealPage, 4000); }
 
   function showDone(data){
     form.hidden = true;
@@ -520,7 +742,8 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     document.getElementById('edit-btn').hidden = closed();
     document.getElementById('done-closed').hidden = !closed();
     const name = data.firstName || '';
-    document.getElementById('done-urn').hidden = data.attending !== 'yes';
+    document.getElementById('done-urn').hidden = data.attending !== 'yes' || !pfUrn();
+    document.getElementById('done-urn').textContent = pfUrn();
     document.getElementById('absence-btn').hidden = !(closed() && data.attending === 'yes' && !data.cancelled);
     document.getElementById('absence').hidden = true;
     if (data.cancelled){
@@ -528,10 +751,10 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       document.getElementById('done-text').textContent = "Votre empêchement est bien noté. Merci de nous avoir prévenus, vous nous manquerez !";
     } else if (data.attending === 'yes'){
       document.getElementById('done-title').textContent = 'Merci ' + name + ' !';
-      document.getElementById('done-text').textContent = "Votre présence au vin d'honneur est bien notée pour le dimanche 22 août 2027, de 17h15 à 19h, au Manoir des Lys. Nous avons hâte de vous y retrouver.";
+      document.getElementById('done-text').textContent = pfDoneText();
     } else {
       document.getElementById('done-title').textContent = 'Merci ' + name + '.';
-      document.getElementById('done-text').textContent = "Votre absence est bien notée. Merci d'avoir pris le temps de nous répondre.";
+      document.getElementById('done-text').textContent = pfText(formCfg, formCfg.doneNo);
     }
   }
 
@@ -552,11 +775,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   form.addEventListener('submit', async function(e){
     e.preventDefault();
+    if (PREVIEW){ setStatus("Aperçu : la réponse n'est pas envoyée.", 'err'); return; }
     const first = form.firstName.value.trim(), last = form.lastName.value.trim();
     const att = form.querySelector('input[name=attending]:checked');
     if (!first || !last){ setStatus('Indiquez votre prénom et votre nom.', 'err'); return; }
     if (!att){ setStatus('Choisissez « Oui, je viendrai » ou « Non, je ne pourrai pas ».', 'err'); return; }
-    if (!form.solo.checked){ setStatus('Cochez la case confirmant que vous venez sans accompagnant.', 'err'); return; }
+    if (formCfg.solo && !form.solo.checked){ setStatus('Cochez la case confirmant que vous venez sans accompagnant.', 'err'); return; }
     if (!SUPABASE_URL || !SUPABASE_KEY){ setStatus("Le formulaire n'est pas encore ouvert. Réessayez un peu plus tard.", 'err'); return; }
 
     const previous = load();
@@ -590,7 +814,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       }
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Envoyer ma réponse';
+      btn.textContent = pfText(formCfg, formCfg.submitLabel);
     }
   });
 
@@ -600,11 +824,14 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   async function send(data){
     const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
     if (SUPABASE_KEY.indexOf('eyJ') === 0) headers['Authorization'] = 'Bearer ' + SUPABASE_KEY; // ancienne clé « anon »
-    const body = JSON.stringify({
+    const payload = {
       p_id: data.id, p_first_name: data.firstName, p_last_name: data.lastName,
       p_attending: data.attending, p_contact: data.contact, p_message: data.message,
       p_website: data.website
-    });
+    };
+    // La fête n'est envoyée que si ce n'est pas le vin d'honneur (valeur par défaut de la base).
+    if (currentEvent !== 'vin') payload.p_event = currentEvent;
+    const body = JSON.stringify(payload);
     let lastError;
     for (let attempt = 1; attempt <= 3; attempt++){
       try {
@@ -667,7 +894,14 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   updateDeadlineTexts();
   const saved = load();
   if (saved){ fill(saved); showDone(saved); }
-  if (SUPABASE_URL && SUPABASE_KEY) loadDeadline();
+  applyFormCfg();
+  if (PREVIEW){
+    // Aperçu ouvert depuis l'espace mariés : réglages non enregistrés, lus dans ce navigateur, mis à jour en direct.
+    document.getElementById('pf-preview').hidden = false;
+    loadPreview();
+    window.addEventListener('storage', function(e){ if (e.key === PREVIEW_KEY) loadPreview(); });
+    if (SUPABASE_URL && SUPABASE_KEY) loadDeadline();
+  } else if (SUPABASE_URL && SUPABASE_KEY){ loadDeadline(); loadFormCfg(); }
 })();
 </script>
 </body>

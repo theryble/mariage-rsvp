@@ -16,6 +16,7 @@ supabase/date-limite.sql           blocage des modifications après le 31 mai 20
 supabase/empechement.sql           signalement d'un empêchement après le 31 mai (à exécuter une fois)
 supabase/date-limite-reglable.sql  date limite réglable depuis l'espace mariés (à exécuter une fois)
 supabase/securite.sql              durcissement conseillé par le Security Advisor (à exécuter une fois)
+supabase/invites.sql               listes d'invités par jour de fête (à exécuter une fois)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
@@ -70,6 +71,99 @@ ouverte sur l'appareil jusqu'à « Se déconnecter ».
 Le bouton **Partager**, en haut à côté de « Se déconnecter » (visible une fois connecté), affiche
 un QR code qui ouvre le formulaire (à scanner avec l'appareil photo d'un téléphone ou à télécharger en PNG
 pour l'imprimer) et un bouton « Copier l'URL » pour envoyer le lien.
+
+### Listes d'invités par jour de fête
+
+L'onglet **Invités** de l'espace mariés range les invités par jour de fête (au départ : vin d'honneur,
+mariage du 14 août 2027, fête du 22 août 2027). Les jours sont classés par date, puis par heure de
+début, et sont repliés par défaut (le chevron les déplie).
+
+Chaque invité est une cellule : verte s'il est présent, rouge s'il est absent, neutre tant qu'on ne
+sait pas. Un clic sur le nom fait passer de « en attente » à « présent » puis « absent » ; le crayon
+permet de changer ses informations ou de le supprimer. Un même invité peut être présent un jour et
+absent un autre.
+
+En ajoutant un invité, on indique :
+- les jours où il est convié ;
+- un e-mail ou un téléphone (facultatif) ;
+- son âge : adulte (par défaut), enfant ou bébé ;
+- sa catégorie : Invité (par défaut), Famille, Amis, Travail, Accompagnant, Photographe ou Vidéaste.
+  Un accompagnant se rattache à un invité existant et s'affiche « Accompagnant 1 de Camille Dupont » ;
+  son prénom est facultatif ;
+- s'il est témoin des mariés.
+
+En tête de chaque jour, des tuiles donnent les présents, les absents, les personnes en attente et les
+repas à prévoir : adultes, enfants et prestataires (photographe, vidéaste) présents. Les bébés n'ont pas
+de repas et sont comptés à part.
+
+### Un formulaire par fête
+
+Chaque jour de fête peut avoir son formulaire, réglé dans **Réglages → Formulaires**. La fenêtre
+montre un compartiment par fête (nom, date, adresse, « Ouvert / Fermé », « Principal »), replié par
+défaut ; son chevron déplie tous les réglages de ce formulaire (un seul compartiment ouvert à la fois) :
+- ouvert ou fermé (un formulaire fermé affiche « Ce formulaire n'est pas ouvert ») ;
+- son adresse, tirée du nom de la fête et modifiable : `https://theryble.github.io/mariage-rsvp/?fete=mariage`,
+  `?fete=vin-d-honneur`, `?fete=fete-du-22-aout`… (bouton « Copier le lien » ; deux formulaires ne
+  peuvent pas avoir la même adresse) ;
+- l'**adresse simple** `theryble.github.io/mariage-rsvp` (celle des QR codes déjà envoyés) ouvre le
+  formulaire choisi en haut de la fenêtre, au réglage « Formulaire ouvert par l'adresse simple »
+  (bouton « Appliquer ») : le vin d'honneur par défaut, ou tout autre formulaire, ou aucun ;
+- tout ce que voit l'invité, rangé en groupes repliables :
+  - **Logo et en-tête** : logo (remplacé par une image PNG, JPEG ou SVG, réduite automatiquement, avec
+    une version facultative pour le mode sombre ; masqué ; ou logo d'origine), titre de l'onglet,
+    sur-titre, titre « Marine & Jeremy » ;
+  - **Présentation et encadrés** : texte de présentation, règle « sans accompagnant » (affichée ou non,
+    texte), encadrés Dress code et Cadeaux (affichés ou non, titres et textes), pastilles de couleur
+    du dress code (nom et couleur, jusqu'à 6, Beige et Doré par défaut, ou aucune) ;
+  - **Questions** : titre, réponses « oui » et « non » avec leurs précisions, question du message libre,
+    case « sans accompagnant », bouton d'envoi ;
+  - **Confirmation et bas de page** : messages pour un invité présent ou absent, bas de page.
+
+  Le nom, la date et les heures viennent de Réglages → Jours de fête. Dans les textes, ces repères sont
+  remplacés automatiquement : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu},
+  {lieu court} ; **mot** met un mot en gras. « Revenir aux textes d'origine » remet les textes du
+  vin d'honneur.
+
+Le bouton **« Voir le formulaire »** de l'en-tête ouvre la liste des formulaires ouverts (fête, date,
+adresse) pour choisir lequel voir.
+
+Le bouton **« Aperçu avant enregistrement »** ouvre le formulaire tel que l'invité le verra avec les
+réglages en cours (textes, logo, date limite), en taille téléphone ou ordinateur, sans rien enregistrer
+ni envoyer. « Voir le formulaire » montre la version enregistrée.
+
+Sans réglage enregistré, seul le formulaire d'origine du vin d'honneur existe. Une même personne peut
+répondre à plusieurs formulaires depuis le même appareil (une réponse par fête). Chaque formulaire a sa
+propre date limite des réponses (Réglages → Formulaires), pré-remplie avec l'ancienne date commune
+(31 mai 2027) ; la base applique la même règle que la page.
+
+Chaque réponse est ajoutée automatiquement à la liste de sa fête, ou rattachée à l'invité du même nom
+s'il existe déjà ; sa cellule porte la mention « Formulaire » et sa présence ce jour-là suit sa
+réponse. Pour la retirer de la liste, supprimer d'abord sa réponse dans l'onglet Réponses.
+
+L'onglet **Réponses** sépare les réponses de chaque formulaire : un bouton par formulaire (avec son
+nombre de réponses) et, en dessous, un tableau par fête avec son titre et ses chiffres (réponses,
+présents, absents). « Tous les formulaires » affiche tous les tableaux l'un sous l'autre ; un formulaire
+choisi limite aussi les chiffres du haut, l'export CSV et les destinataires du rappel. La fenêtre **Partager** propose un lien et un QR code par
+formulaire ouvert.
+
+**Avant de mettre en ligne cette version**, exécuter `supabase/invites.sql` (après
+`date-limite-reglable.sql`) : il ajoute la fête aux réponses et remplace `submit_rsvp`. Ne plus
+ré-exécuter `date-limite-reglable.sql` ensuite, il remettrait l'ancienne version de `submit_rsvp`.
+
+Dans chaque jour, les invités sont rangés par compartiment (Les mariés, Témoins, Famille, Amis, Travail,
+Accompagnants, Prestataires, Invités), puis par statut (présents, en attente, absents), puis par âge
+(adultes, enfants, bébés), puis par ordre alphabétique du prénom.
+
+Les jours de fête (nom, date, heures de début et de fin) se règlent dans **Réglages → Jours de fête** :
+on peut en ajouter jusqu'à 6, les renommer, changer leur date et leurs heures, ou en retirer. Les heures
+sont facultatives et s'affichent sous le titre de chaque jour dans l'onglet Invités.
+
+**Réglages → Les mariés** garde le prénom et le nom de la mariée et du marié, ainsi que ceux de leurs
+enfants (bouton « Ajouter un enfant », jusqu'à 10, avec leur âge : enfant, adulte ou bébé). Ils
+apparaissent d'office, présents, dans le compartiment « Les mariés » en tête de chaque jour de fête,
+et comptent dans les chiffres et les repas.
+
+Avant la première utilisation, exécuter `supabase/invites.sql` dans **SQL Editor**.
 
 ### Dans Supabase
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Réponses — Marine &amp; Jeremy</title>
+<title>Espace mariés — Marine &amp; Jeremy</title>
 <link rel="icon" href="assets/logo-clair.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -141,7 +141,7 @@
   .dl-help{ margin:0; font-size:.88rem; color:var(--ink-soft); max-width:70ch; }
   .dl-row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
   .dl-row .field{ flex:0 1 220px; }
-  .dl-row input[type=date]{
+  .dl-row input[type=date], .dl-row select{
     width:100%; font:inherit; font-size:.98rem; color:var(--ink);
     background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
   }
@@ -246,6 +246,244 @@
   .saved.dirty{ color:var(--rose-deep); font-weight:600; }
   .send .btn-primary{ display:inline-flex; align-items:center; gap:8px; }
 
+  /* ---------- invités par jour de fête ---------- */
+  .guest-add, .g-event{ display:grid; gap:14px; }
+  .guest-add h2, .g-event h2{ font-size:1.35rem; }
+  .ga-row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+  .ga-row .field{ flex:1 1 160px; }
+  .guest-add input[type=text], .ev-row input, .g-dialog input[type=text], .guest-add select, .g-dialog select, .ev-row select{
+    width:100%; font:inherit; font-size:.95rem; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  }
+  fieldset.checks-box{ border:0; margin:0; padding:0; min-width:0; display:grid; gap:6px; flex:1 1 100%; }
+  fieldset.checks-box legend{ padding:0; margin-bottom:6px; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .checks{ display:flex; flex-wrap:wrap; gap:8px; }
+  .checks label{
+    display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+    text-transform:none; letter-spacing:0; font-size:.9rem; font-weight:500; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:7px 14px;
+  }
+  .checks label:has(input:checked){ background:var(--rose-tint); border-color:var(--rose); color:var(--rose-deep); font-weight:600; }
+  .checks input{ accent-color:var(--rose-deep); margin:0; }
+  .g-tools{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; }
+  .g-tools input[type=search]{ flex:1 1 220px; }
+  .legend{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:.82rem; color:var(--ink-soft); }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend i{ width:12px; height:12px; border-radius:4px; display:inline-block; border:1px solid var(--line); background:var(--paper); }
+  .legend i.yes{ background:var(--ok); border-color:var(--ok); }
+  .legend i.no{ background:var(--no); border-color:var(--no); }
+  .g-sections{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+  .g-head{ display:flex; align-items:center; gap:12px; }
+  .g-titles{ flex:1; min-width:0; cursor:pointer; }
+  .g-toggle{
+    flex:none; width:36px; height:36px; padding:0; border-radius:50%; display:grid; place-items:center;
+    background:var(--card); color:var(--ink); border:1px solid var(--line);
+  }
+  .g-toggle:hover{ border-color:var(--rose); }
+  .g-toggle svg{ width:18px; height:18px; transition:transform .2s ease; }
+  .g-toggle[aria-expanded="false"] svg{ transform:rotate(-90deg); }
+  .g-body{ display:grid; grid-template-columns:minmax(0,1fr); gap:14px; }
+  .g-mini{ margin:2px 0 0; font-size:.82rem; font-weight:600; color:var(--ok); }
+  @media (prefers-reduced-motion:reduce){ .g-toggle svg{ transition:none; } }
+  .g-head > *{ min-width:0; }
+  .g-date{ margin:2px 0 0; font-size:.88rem; color:var(--ink-soft); }
+  .g-date:first-letter{ text-transform:uppercase; }
+  .pill.wait{ background:var(--card); color:var(--ink-soft); }
+  .plus-box, .witness-box{ flex:1 1 100%; }
+  .plus-box select{ max-width:420px; }
+  .plus-hint{ margin:0; font-size:.8rem; color:var(--ink-soft); }
+  .g-group{ display:grid; gap:6px; }
+  .g-group-title{
+    margin:0; padding-bottom:4px; display:flex; align-items:baseline; gap:10px; border-bottom:1px solid var(--line);
+    font-family:'Inter',system-ui,sans-serif; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--rose-deep);
+  }
+  .g-group-count{ font-size:.78rem; font-weight:500; letter-spacing:0; text-transform:none; color:var(--ink-soft); }
+  .cells{ display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap:6px; }
+  .cell{
+    display:flex; align-items:stretch; min-width:0; overflow:hidden;
+    border:1px solid var(--line); border-left-width:4px; border-radius:10px; background:var(--paper);
+  }
+  .cell.yes{ background:var(--ok-tint); border-color:var(--ok); }
+  .cell.no{ background:var(--no-tint); border-color:var(--no); }
+  .cell button{ border-radius:0; border:0; background:none; }
+  .cell-main{ flex:1; min-width:0; display:flex; align-items:center; gap:8px; text-align:left; padding:7px 4px 7px 10px; color:var(--ink); }
+  .cell-text{ flex:1; min-width:0; display:grid; }
+  .cell-name, .cell-meta{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cell-name{ font-weight:600; font-size:.9rem; line-height:1.3; }
+  .cell-meta{ font-size:.74rem; line-height:1.35; color:var(--ink-soft); }
+  .cell-meta .tag-age{ color:var(--gold-ink); font-weight:600; }
+  .cell-meta .tag-role{ color:var(--rose-deep); font-weight:600; }
+  .cell-meta .tag-form{ color:var(--ok); font-weight:600; }
+  .cell-ico{
+    flex:none; width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
+    font-size:.72rem; font-weight:700; color:var(--ink-soft); border:1px solid var(--line);
+  }
+  .cell.yes .cell-ico{ background:var(--ok); border-color:var(--ok); color:var(--paper-raised); }
+  .cell.no .cell-ico{ background:var(--no); border-color:var(--no); color:var(--paper-raised); }
+  .cell-main:hover .cell-name{ text-decoration:underline; text-underline-offset:3px; }
+  .cell-edit{ flex:none; width:34px; display:grid; place-items:center; padding:0; color:var(--ink-soft); }
+  .cell-edit svg{ width:15px; height:15px; }
+  .cell-edit:hover{ color:var(--ink); background:var(--card); }
+  /* Résumé d'un jour de fête : 3 tuiles de présence + 1 tuile repas plus large. */
+  .g-summary{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)) minmax(0,1.7fr); gap:8px; }
+  .g-stat{ display:grid; gap:2px; align-content:start; min-width:0; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+  .g-stat .n{ font-family:'Cormorant Garamond',Georgia,serif; font-size:2.2rem; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; }
+  .g-stat .l{ font-size:.7rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); overflow-wrap:anywhere; }
+  .g-stat .s{ font-size:.76rem; color:var(--ink-soft); }
+  .g-stat.yes{ border-color:var(--ok); background:var(--ok-tint); } .g-stat.yes .n{ color:var(--ok); }
+  .g-stat.no{ border-color:var(--no); background:var(--no-tint); } .g-stat.no .n{ color:var(--no); }
+  .g-stat.total{
+    grid-template-columns:auto minmax(0,1fr); column-gap:14px; align-items:center; align-content:center;
+    border-color:var(--gold); background:var(--gold-tint);
+  }
+  .g-stat.total .n{ grid-row:1 / span 3; font-size:2.8rem; color:var(--gold-ink); }
+  .g-stat.total .l{ color:var(--gold-ink); }
+  .g-stat.total .s{ color:var(--ink); }
+  @media (max-width:720px){
+    .g-summary{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+    .g-stat.total{ grid-column:1 / -1; }
+    .g-stat .n{ font-size:1.9rem; }
+  }
+  .guest-add .opt, .g-dialog .opt{ font-weight:500; letter-spacing:.02em; text-transform:none; opacity:.8; }
+  .cell button:focus-visible{ outline-offset:-3px; }
+  .g-sections .empty{ padding:6px 0; text-align:left; font-size:.9rem; }
+
+  /* ---------- réponses par formulaire ---------- */
+  .resp-tabs{ display:flex; flex-wrap:wrap; gap:6px; }
+  .resp-tab{ background:var(--paper); color:var(--ink-soft); border:1px solid var(--line); padding:8px 14px; font-weight:500; }
+  .resp-tab:hover{ border-color:var(--rose); color:var(--ink); }
+  .resp-tab[aria-pressed="true"]{ background:var(--rose-deep); border-color:var(--rose-deep); color:var(--on-accent); font-weight:600; }
+  .resp-tab .count{ margin-left:7px; opacity:.75; font-variant-numeric:tabular-nums; }
+  .resp-groups{ display:grid; grid-template-columns:minmax(0,1fr); gap:22px; }
+  .resp-group{ display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }
+  .resp-title{
+    margin:0; padding-bottom:6px; border-bottom:1px solid var(--line);
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 12px;
+    font-family:'Cormorant Garamond',Georgia,serif; font-size:1.35rem; font-weight:600; color:var(--rose-deep);
+  }
+  .resp-count{ font-family:'Inter',system-ui,sans-serif; font-size:.8rem; font-weight:500; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  /* ---------- Réglages : fenêtres repliables ---------- */
+  .set-head{ justify-content:flex-start; flex-wrap:nowrap; }
+  .set-head h2{ flex:1; min-width:0; cursor:pointer; }
+  .set-head .pill{ flex:none; max-width:45%; }
+  .set-body{ display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+  .deadline-card.set-closed{ gap:0; }
+  @media (max-width:520px){ .set-head{ flex-wrap:wrap; } .set-head .pill{ max-width:none; } }
+  /* ---------- aperçu du formulaire ---------- */
+  dialog.pv-dialog{ width:min(1100px, calc(100% - 32px)); }
+  .pv-stage{ display:grid; place-items:center; padding:12px; border-radius:12px; background:var(--card); }
+  .pv-stage iframe{ width:400px; max-width:100%; height:min(72vh, 820px); border:1px solid var(--line); border-radius:18px; background:var(--paper); }
+  .pv-stage.wide iframe{ width:100%; border-radius:12px; }
+  /* ---------- Formulaires : un compartiment par fête ---------- */
+  .fm-root-note{ margin:0; padding:10px 12px; border-radius:10px; background:var(--gold-tint); color:var(--gold-ink); font-size:.88rem; }
+  .fm-root-note strong{ overflow-wrap:anywhere; }
+  .fm-root{ display:grid; gap:6px; padding:12px 14px; border:1px solid var(--gold); border-radius:12px; background:var(--gold-tint); }
+  .fm-root label{ text-transform:none; letter-spacing:0; font-size:.92rem; font-weight:600; color:var(--ink); }
+  .fm-root-url{ font-weight:500; color:var(--gold-ink); overflow-wrap:anywhere; }
+  .fm-root select{ flex:1 1 240px; min-width:0; background:var(--paper-raised); }
+  .fm-list{ display:grid; gap:8px; }
+  .fm-item{ border:1px solid var(--line); border-radius:12px; background:var(--paper); overflow:hidden; }
+  .fm-item.open{ border-color:var(--rose); }
+  .fm-item-head{
+    width:100%; display:flex; align-items:center; gap:12px; text-align:left;
+    background:none; border:0; border-radius:0; padding:12px 14px; color:var(--ink); font-weight:500;
+  }
+  .fm-item-head:hover{ background:var(--card); }
+  .fm-item-head:focus-visible{ outline:2px solid var(--rose); outline-offset:-2px; }
+  .fm-item-head .chev{ flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:var(--card); border:1px solid var(--line); }
+  .fm-item-head .chev svg{ width:16px; height:16px; transform:rotate(-90deg); transition:transform .2s ease; }
+  .fm-item-head[aria-expanded="true"] .chev svg{ transform:none; }
+  .fm-item-text{ flex:1; min-width:0; display:grid; gap:1px; }
+  .fm-item-name{ font-weight:600; font-size:.98rem; }
+  .fm-item-meta{ font-size:.78rem; color:var(--ink-soft); overflow-wrap:anywhere; }
+  .fm-item-tags{ flex:none; display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-end; }
+  .pill.main{ background:var(--gold-tint); color:var(--gold-ink); }
+  .fm-editor{ display:grid; grid-template-columns:minmax(0,1fr); gap:12px; padding:14px 14px 16px; border-top:1px solid var(--line); background:var(--paper-raised); }
+  .fm-editor details.fm-group{ background:var(--paper); }
+  @media (max-width:520px){ .fm-item-head{ flex-wrap:wrap; } .fm-item-tags{ width:100%; justify-content:flex-start; padding-left:42px; } }
+  @media (prefers-reduced-motion:reduce){ .fm-item-head .chev svg{ transition:none; } }
+  /* ---------- réglage du formulaire ---------- */
+  .form-card input[type=text], .form-card input[type=date], .form-card textarea, .form-card select{
+    width:100%; font:inherit; font-size:.95rem; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  }
+  .form-card textarea{ resize:vertical; line-height:1.5; }
+  .fm-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap:12px; }
+  .fm-check{ display:flex; gap:8px; align-items:flex-start; cursor:pointer; text-transform:none; letter-spacing:0; font-size:.9rem; font-weight:500; color:var(--ink); }
+  .fm-check input{ margin-top:3px; accent-color:var(--rose-deep); }
+  details.fm-group{ border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+  details.fm-group > summary{
+    list-style:none; cursor:pointer; padding:12px 14px; font-weight:600;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  details.fm-group > summary::-webkit-details-marker{ display:none; }
+  details.fm-group > summary::after{ content:"+"; font-size:1.1rem; color:var(--rose-deep); }
+  details.fm-group[open] > summary::after{ content:"–"; }
+  details.fm-group > summary:focus-visible{ outline:2px solid var(--rose); outline-offset:-2px; border-radius:12px; }
+  .fm-group-body, .fm-texts{ display:grid; gap:12px; }
+  .fm-group-body{ padding:0 14px 14px; }
+  .form-card .fm-group-body input[type=text], .form-card .fm-group-body textarea{ background:var(--paper-raised); }
+  .fm-logo{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; }
+  .fm-logo-preview{
+    flex:none; width:128px; height:100px; padding:6px; display:grid; place-items:center;
+    border:1px dashed var(--line); border-radius:10px; background:var(--paper-raised);
+  }
+  .fm-logo-preview img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .fm-logo-side{ flex:1 1 220px; display:grid; gap:8px; justify-items:start; }
+  .fm-file{
+    position:relative; display:inline-flex; align-items:center; cursor:pointer;
+    text-transform:none; letter-spacing:0; font-size:.86rem; font-weight:600; color:var(--rose-deep);
+    border:1px solid var(--line); border-radius:999px; padding:7px 14px; background:var(--paper-raised);
+  }
+  .fm-file:hover{ border-color:var(--rose); }
+  .fm-file input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .fm-file:focus-within{ outline:2px solid var(--rose); outline-offset:2px; }
+  .fm-link-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .fm-link-row input{ flex:1 1 260px; min-width:0; }
+  /* ---------- adresses et choix du formulaire ---------- */
+  .fm-link-row{ align-items:center; }
+  .fm-url-base{ font-size:.85rem; color:var(--ink-soft); overflow-wrap:anywhere; }
+  .fm-link-row #fm-slug{ flex:1 1 160px; }
+  .pick-list{ display:grid; gap:8px; }
+  .pick-item{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+  .pick-text{ flex:1 1 240px; min-width:0; display:grid; gap:2px; }
+  .pick-name{ font-weight:600; }
+  .pick-meta{ font-size:.8rem; color:var(--ink-soft); overflow-wrap:anywhere; }
+  .pick-main{ margin-left:8px; font-size:.68rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--gold-ink); background:var(--gold-tint); border-radius:999px; padding:2px 8px; vertical-align:2px; }
+  .pick-empty{ margin:0; color:var(--ink-soft); font-size:.9rem; }
+  .tools select, .share-side select{
+    font:inherit; font-size:.92rem; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:8px 10px; max-width:100%;
+  }
+  .fm-deadline input{ max-width:220px; }
+  .fm-label{ font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .fm-colors{ display:grid; gap:6px; }
+  .fm-color{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .fm-color input[type=color]{ width:46px; height:38px; padding:2px; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); cursor:pointer; }
+  .form-card .fm-color input[type=text]{ flex:1 1 160px; width:auto; max-width:260px; }
+  .fm-hint{ margin:0; font-size:.8rem; color:var(--ink-soft); }
+
+  /* ---------- réglage des jours de fête ---------- */
+  .ev-list{ display:grid; gap:10px; }
+  .ev-row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 12px; padding:12px 14px; background:var(--paper); border:1px solid var(--line); border-radius:12px; }
+  .ev-row .field{ flex:1 1 200px; }
+  .ev-row .field.date{ flex:0 1 190px; }
+  .ev-row .field.time{ flex:0 1 120px; }
+  .ev-row .del{ padding-bottom:10px; }
+  .cp-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap:12px; }
+  fieldset.cp-person{ margin:0; min-width:0; display:grid; gap:10px; padding:12px 14px 14px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
+  fieldset.cp-person legend{ padding:0 6px; font-family:'Cormorant Garamond',Georgia,serif; font-size:1.1rem; font-weight:600; color:var(--rose-deep); }
+  .cp-person input{
+    width:100%; font:inherit; font-size:.95rem; color:var(--ink);
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  }
+  .cp-kids-title{ margin:4px 0 0; font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .cp-empty{ margin:0; font-size:.88rem; color:var(--ink-soft); }
+  .ev-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+
+  /* ---------- fiche invité ---------- */
+  dialog.g-dialog{ width:min(520px, calc(100% - 32px)); }
+  .g-dialog .ga-row{ align-items:stretch; }
+
   /* Liste en cartes tant que le tableau n'a pas la place (téléphones et tablettes). */
   @media (max-width:860px){
     thead{ display:none; }
@@ -255,7 +493,8 @@
     td{ border:0; padding:0; min-width:0; }
     td.name{ grid-column:1; font-size:1rem; }
     td.att{ grid-column:2; grid-row:1; text-align:right; }
-    td.contact, td.msg, td.date, td.actions{ grid-column:1 / -1; }
+    td.fete, td.contact, td.msg, td.date, td.actions{ grid-column:1 / -1; }
+    td.fete{ font-size:.8rem; color:var(--ink-soft); }
     td.contact{ overflow-wrap:anywhere; max-width:none; }
     td.msg{ max-width:none; }
     td.msg:empty, td.contact:empty{ display:none; }
@@ -280,12 +519,12 @@
         <img src="assets/logo-clair.png" width="1160" height="912" alt="">
       </picture>
       <div>
-        <div class="kicker">Vin d'honneur · 22.08.2027</div>
-        <h1>Marine <span class="amp">&amp;</span> Jeremy</h1>
+        <div class="kicker" id="adm-kicker">Espace mariés</div>
+        <h1 id="adm-title">Marine <span class="amp">&amp;</span> Jeremy</h1>
       </div>
     </div>
     <nav class="header-actions">
-      <a class="btn btn-ghost" href="./">Voir le formulaire</a>
+      <button type="button" class="btn-ghost" id="pick-open" aria-haspopup="dialog">Voir le formulaire</button>
       <button type="button" class="btn-ghost" id="share-open" hidden aria-haspopup="dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Partager</button>
       <button type="button" class="btn-ghost" id="logout" hidden>Se déconnecter</button>
     </nav>
@@ -309,6 +548,7 @@
   <main id="dash" hidden>
     <nav class="tabs" role="tablist" aria-label="Sections de l'espace mariés">
       <button type="button" role="tab" class="tab" id="tab-reponses" aria-controls="panel-reponses" data-tab="reponses">Réponses</button>
+      <button type="button" role="tab" class="tab" id="tab-invites" aria-controls="panel-invites" data-tab="invites">Invités</button>
       <button type="button" role="tab" class="tab" id="tab-messages" aria-controls="panel-messages" data-tab="messages">Messages</button>
       <button type="button" role="tab" class="tab" id="tab-reglages" aria-controls="panel-reglages" data-tab="reglages">Réglages</button>
     </nav>
@@ -321,6 +561,7 @@
       </div>
 
       <section class="card list-card">
+        <div class="resp-tabs" id="resp-tabs" role="group" aria-label="Formulaire"></div>
         <div class="tools">
           <input type="search" id="search" placeholder="Rechercher un nom…" aria-label="Rechercher un nom">
           <div class="chips" role="group" aria-label="Filtrer">
@@ -333,14 +574,71 @@
         </div>
         <p class="meta" id="meta"></p>
         <p class="error" id="dash-error" role="alert"></p>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Invité</th><th>Présence</th><th>Contact</th><th>Message</th><th>Reçue le</th><th></th></tr></thead>
-            <tbody id="rows"></tbody>
-          </table>
-        </div>
+        <div class="resp-groups" id="resp-groups"></div>
         <p class="empty" id="empty" hidden>Aucune réponse pour l'instant.</p>
       </section>
+    </div>
+
+    <div class="tab-panel" role="tabpanel" id="panel-invites" aria-labelledby="tab-invites" hidden>
+      <section class="card guest-add" aria-labelledby="ga-title">
+        <h2 id="ga-title">Ajouter un invité</h2>
+        <form class="ga-row" id="ga-form" novalidate>
+          <div class="field">
+            <label for="ga-first">Prénom</label>
+            <input type="text" id="ga-first" maxlength="60" autocomplete="off" placeholder="Camille">
+          </div>
+          <div class="field">
+            <label for="ga-last">Nom</label>
+            <input type="text" id="ga-last" maxlength="60" autocomplete="off" placeholder="Dupont">
+          </div>
+          <div class="field">
+            <label for="ga-contact">E-mail ou téléphone <span class="opt">(facultatif)</span></label>
+            <input type="text" id="ga-contact" maxlength="120" autocomplete="off" placeholder="camille@exemple.fr">
+          </div>
+          <fieldset class="checks-box">
+            <legend>Catégorie</legend>
+            <div class="checks" role="radiogroup" aria-label="Catégorie">
+              <label><input type="radio" name="ga-role" id="ga-guest" value="guest" checked>Invité</label>
+              <label><input type="radio" name="ga-role" id="ga-family" value="family">Famille</label>
+              <label><input type="radio" name="ga-role" id="ga-friend" value="friend">Amis</label>
+              <label><input type="radio" name="ga-role" id="ga-work" value="work">Travail</label>
+              <label><input type="radio" name="ga-role" id="ga-plus" value="plus">Accompagnant</label>
+              <label><input type="radio" name="ga-role" id="ga-photo" value="photo">Photographe</label>
+              <label><input type="radio" name="ga-role" id="ga-video" value="video">Vidéaste</label>
+            </div>
+          </fieldset>
+          <div class="checks witness-box"><label><input type="checkbox" id="ga-witness">Témoin des mariés</label></div>
+          <div class="field plus-box" id="ga-plus-box" hidden>
+            <label for="ga-plus-of">Accompagnant de</label>
+            <select id="ga-plus-of"></select>
+            <p class="plus-hint">Le prénom et le nom de l'accompagnant sont facultatifs.</p>
+          </div>
+          <fieldset class="checks-box">
+            <legend>Âge</legend>
+            <div class="checks" role="radiogroup" aria-label="Âge">
+              <label><input type="radio" name="ga-age" id="ga-adult" value="adult" checked>Adulte</label>
+              <label><input type="radio" name="ga-age" id="ga-child" value="child">Enfant</label>
+            <label><input type="radio" name="ga-age" id="ga-baby" value="baby">Bébé</label>
+            </div>
+          </fieldset>
+          <fieldset class="checks-box">
+            <legend>Invité pour</legend>
+            <div class="checks" id="ga-events"></div>
+          </fieldset>
+          <button type="submit" class="btn-primary" id="ga-submit">Ajouter l'invité</button>
+        </form>
+        <p class="toast" id="ga-toast" role="status" aria-live="polite"></p>
+      </section>
+
+      <div class="g-tools">
+        <input type="search" id="g-search" placeholder="Rechercher un invité…" aria-label="Rechercher un invité">
+        <div class="legend" aria-hidden="true">
+          <span><i class="yes"></i>Présent</span><span><i class="no"></i>Absent</span><span><i></i>En attente</span>
+        </div>
+      </div>
+      <p class="dl-help">Touchez un nom pour changer sa présence : en attente → présent → absent. « Modifier » permet de changer le nom ou les jours où l'invité est convié.</p>
+      <p class="error" id="g-error" role="alert"></p>
+      <div class="g-sections" id="g-sections"></div>
     </div>
 
     <div class="tab-panel" role="tabpanel" id="panel-messages" aria-labelledby="tab-messages" hidden>
@@ -410,24 +708,185 @@
     </div>
 
     <div class="tab-panel" role="tabpanel" id="panel-reglages" aria-labelledby="tab-reglages" hidden>
-      <section class="card deadline-card" aria-labelledby="dl-title">
+      <section class="card deadline-card" aria-labelledby="cp-title">
         <div class="dl-head">
-          <h2 id="dl-title">Date limite des réponses</h2>
-          <span class="pill" id="dl-state"></span>
+          <h2 id="cp-title">Les mariés</h2>
         </div>
-        <p class="dl-help">Dernier jour où les invités peuvent modifier leur réponse (jusqu'à 23h59). Le lendemain, la modification est bloquée et les présents voient le bouton « Prévenir d'un empêchement ». La date s'affiche aussi sur le formulaire et dans le message d'invitation.</p>
-        <div class="dl-row">
-          <div class="field">
-            <label for="dl-date">Dernier jour</label>
-            <input type="date" id="dl-date">
-          </div>
-          <button type="button" class="btn-primary" id="dl-save">Enregistrer la date</button>
+        <p class="dl-help">Prénom et nom de la mariée et du marié, et de leurs enfants s'ils en ont.</p>
+        <div class="cp-grid">
+          <fieldset class="cp-person">
+            <legend>La mariée</legend>
+            <div class="field">
+              <label for="cp-bride-first">Prénom</label>
+              <input type="text" id="cp-bride-first" maxlength="60" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="cp-bride-last">Nom</label>
+              <input type="text" id="cp-bride-last" maxlength="60" autocomplete="off">
+            </div>
+          </fieldset>
+          <fieldset class="cp-person">
+            <legend>Le marié</legend>
+            <div class="field">
+              <label for="cp-groom-first">Prénom</label>
+              <input type="text" id="cp-groom-first" maxlength="60" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="cp-groom-last">Nom</label>
+              <input type="text" id="cp-groom-last" maxlength="60" autocomplete="off">
+            </div>
+          </fieldset>
         </div>
-        <p class="toast" id="dl-toast" role="status" aria-live="polite"></p>
+        <p class="cp-kids-title">Enfants</p>
+        <div class="ev-list" id="cp-kids"></div>
+        <p class="cp-empty" id="cp-kids-empty">Aucun enfant pour l'instant.</p>
+        <div class="ev-actions">
+          <button type="button" class="btn-ghost" id="cp-add-kid">Ajouter un enfant</button>
+          <button type="button" class="btn-primary" id="cp-save">Enregistrer les mariés</button>
+        </div>
+        <p class="toast" id="cp-toast" role="status" aria-live="polite"></p>
       </section>
 
+
+      <section class="card deadline-card" aria-labelledby="ev-title">
+        <div class="dl-head">
+          <h2 id="ev-title">Jours de fête</h2>
+        </div>
+        <p class="dl-help">Chaque jour de fête a sa propre liste d'invités dans l'onglet « Invités ». Vous pouvez en ajouter (jusqu'à 6), les renommer, changer leur date et indiquer leurs heures de début et de fin (facultatives).</p>
+        <div class="ev-list" id="ev-list"></div>
+        <div class="ev-actions">
+          <button type="button" class="btn-ghost" id="ev-add">Ajouter un jour de fête</button>
+          <button type="button" class="btn-primary" id="ev-save">Enregistrer les jours de fête</button>
+        </div>
+        <p class="toast" id="ev-toast" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card deadline-card form-card" aria-labelledby="fm-title">
+        <div class="dl-head">
+          <h2 id="fm-title">Formulaires</h2>
+          <span class="pill" id="fm-state"></span>
+        </div>
+        <p class="dl-help">Chaque jour de fête peut avoir son formulaire, avec son propre lien, et tout ce que voit l'invité se règle ici. Le nom, la date et les heures viennent de Réglages → Jours de fête. Chaque personne qui répond est ajoutée automatiquement à la liste de ce jour avec sa réponse ; si un invité du même nom y figure déjà, la réponse lui est rattachée.</p>
+        <div class="fm-root">
+          <label for="fm-root">Formulaire ouvert par l'adresse simple <span class="fm-root-url">theryble.github.io/mariage-rsvp</span></label>
+          <div class="fm-link-row">
+            <select id="fm-root"></select>
+            <button type="button" class="btn-primary" id="fm-root-save">Appliquer</button>
+          </div>
+          <p class="fm-hint" id="fm-root-hint"></p>
+        </div>
+        <div class="fm-list" id="fm-list"></div>
+        <div class="fm-editor" id="fm-editor" hidden>
+        <div class="field">
+          <label for="fm-place">Lieu</label>
+          <input type="text" id="fm-place" maxlength="120" autocomplete="off">
+        </div>
+        <label class="fm-check"><input type="checkbox" id="fm-open">Formulaire ouvert : les invités peuvent répondre</label>
+        <p class="fm-root-note" id="fm-root-note" hidden>Ce formulaire s'ouvre avec l'adresse simple <strong>theryble.github.io/mariage-rsvp</strong> (choisie en haut de la fenêtre).</p>
+        <div class="field" id="fm-slug-field">
+          <label for="fm-slug">Adresse du formulaire</label>
+          <div class="fm-link-row">
+            <span class="fm-url-base">theryble.github.io/mariage-rsvp/?fete=</span>
+            <input type="text" id="fm-slug" maxlength="40" autocomplete="off" spellcheck="false">
+            <button type="button" class="btn-ghost" id="fm-copy">Copier le lien</button>
+          </div>
+          <p class="fm-hint" id="fm-link-hint"></p>
+        </div>
+
+        <div class="field fm-deadline">
+          <label for="fm-deadline">Date limite des réponses à ce formulaire</label>
+          <input type="date" id="fm-deadline">
+          <p class="fm-hint" id="fm-deadline-hint"></p>
+        </div>
+
+        <details class="fm-group" open>
+          <summary>Logo et en-tête</summary>
+          <div class="fm-group-body">
+            <div class="fm-logo">
+              <div class="fm-logo-preview"><img id="fm-logo-img" alt="Logo du formulaire"></div>
+              <div class="fm-logo-side">
+                <label class="fm-check"><input type="checkbox" id="fm-logo-show">Afficher le logo</label>
+                <label class="fm-file">Remplacer le logo<input type="file" id="fm-logo-file" accept="image/*"></label>
+                <label class="fm-file">Version pour le mode sombre (facultatif)<input type="file" id="fm-logo-dark-file" accept="image/*"></label>
+                <button type="button" class="link-reset" id="fm-logo-reset">Revenir au logo d'origine</button>
+                <p class="fm-hint" id="fm-logo-note"></p>
+              </div>
+            </div>
+            <div class="fm-texts" id="fm-group-head"></div>
+          </div>
+        </details>
+
+        <details class="fm-group">
+          <summary>Présentation et encadrés</summary>
+          <div class="fm-group-body">
+            <div class="field">
+              <label for="fm-introtext">Texte de présentation</label>
+              <textarea id="fm-introtext" rows="4"></textarea>
+            </div>
+            <label class="fm-check"><input type="checkbox" id="fm-solo">Accompagnants non autorisés (règle affichée et case à cocher pour les invités)</label>
+            <div class="fm-texts" id="fm-group-intro"></div>
+            <label class="fm-check"><input type="checkbox" id="fm-dress-show">Afficher l'encadré « Dress code »</label>
+            <div class="field">
+              <label for="fm-dress-text">Texte du dress code</label>
+              <textarea id="fm-dress-text" rows="2"></textarea>
+            </div>
+            <div class="field">
+              <span class="fm-label">Pastilles de couleur du dress code</span>
+              <div class="fm-colors" id="fm-colors"></div>
+              <button type="button" class="link-reset" id="fm-color-add">Ajouter une couleur</button>
+            </div>
+            <label class="fm-check"><input type="checkbox" id="fm-gift-show">Afficher l'encadré « Cadeaux »</label>
+            <div class="field">
+              <label for="fm-gift-text">Texte des cadeaux</label>
+              <textarea id="fm-gift-text" rows="3"></textarea>
+            </div>
+          </div>
+        </details>
+
+        <details class="fm-group">
+          <summary>Questions du formulaire</summary>
+          <div class="fm-group-body"><div class="fm-texts" id="fm-group-form"></div></div>
+        </details>
+
+        <details class="fm-group">
+          <summary>Confirmation et bas de page</summary>
+          <div class="fm-group-body"><div class="fm-texts" id="fm-group-done"></div></div>
+        </details>
+
+        <p class="fm-hint">Dans les textes, ces repères sont remplacés automatiquement : {Fête} ou {fête} (le nom, avec ou sans majuscule), {date} (dimanche 22 août 2027), {jour} (22 août), {date chiffres} (22.08.2027), {horaire}, {lieu}, {lieu court}. **mot** met un mot en gras.</p>
+        <div class="ev-actions">
+          <button type="button" class="btn-primary" id="fm-save">Enregistrer ce formulaire</button>
+          <button type="button" class="btn-ghost" id="fm-draft">Aperçu avant enregistrement</button>
+          <a class="btn btn-ghost" href="./" target="_blank" rel="noopener" id="fm-preview">Voir le formulaire</a>
+          <button type="button" class="link-reset" id="fm-reset">Revenir aux textes d'origine</button>
+        </div>
+        </div>
+        <p class="toast" id="fm-toast" role="status" aria-live="polite"></p>
+      </section>
     </div>
   </main>
+
+<dialog class="card share-card pv-dialog" id="pv-dialog" aria-labelledby="pv-title">
+    <div class="share-head">
+      <h2 id="pv-title">Aperçu du formulaire</h2>
+      <button type="button" class="share-close" id="pv-close" aria-label="Fermer">×</button>
+    </div>
+    <p class="dl-help">Réglages non enregistrés : rien n'est enregistré ni envoyé depuis cet aperçu. Fermez-le pour continuer vos réglages, puis cliquez sur « Enregistrer ce formulaire ».</p>
+    <div class="resp-tabs" role="group" aria-label="Taille de l'aperçu">
+      <button type="button" class="resp-tab" id="pv-phone" aria-pressed="true">Téléphone</button>
+      <button type="button" class="resp-tab" id="pv-wide" aria-pressed="false">Ordinateur</button>
+    </div>
+    <div class="pv-stage" id="pv-stage"><iframe id="pv-frame" title="Aperçu du formulaire"></iframe></div>
+  </dialog>
+
+  <dialog class="card share-card" id="pick-dialog" aria-labelledby="pick-title">
+    <div class="share-head">
+      <h2 id="pick-title">Quel formulaire voir ?</h2>
+      <button type="button" class="share-close" id="pick-close" aria-label="Fermer">×</button>
+    </div>
+    <p class="dl-help">Les formulaires ouverts aux invités. Les autres se règlent dans Réglages → Formulaires.</p>
+    <div class="pick-list" id="pick-list"></div>
+  </dialog>
 
   <dialog class="card share-card" id="share-dialog" aria-labelledby="share-title">
     <div class="share-head">
@@ -438,6 +897,7 @@
     <div class="share-body">
       <div class="qr-box" id="qr" role="img" aria-label="QR code du formulaire d'inscription"></div>
       <div class="share-side">
+        <select id="share-event" aria-label="Formulaire à partager"></select>
         <input type="text" id="share-url" readonly aria-label="Adresse du formulaire">
         <div class="share-actions">
           <button type="button" class="btn-primary" id="share-copy">Copier l'URL</button>
@@ -447,6 +907,65 @@
         <p class="toast" id="share-toast" role="status" aria-live="polite"></p>
       </div>
     </div>
+  </dialog>
+
+  <dialog class="card share-card g-dialog" id="g-dialog" aria-labelledby="gd-title">
+    <form method="dialog" class="share-card" id="gd-form" novalidate>
+      <div class="share-head">
+        <h2 id="gd-title">Modifier l'invité</h2>
+        <button type="button" class="share-close" id="gd-close" aria-label="Fermer">×</button>
+      </div>
+      <div class="ga-row">
+        <div class="field">
+          <label for="gd-first">Prénom</label>
+          <input type="text" id="gd-first" maxlength="60" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="gd-last">Nom</label>
+          <input type="text" id="gd-last" maxlength="60" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="gd-contact">E-mail ou téléphone <span class="opt">(facultatif)</span></label>
+          <input type="text" id="gd-contact" maxlength="120" autocomplete="off">
+        </div>
+      </div>
+      <fieldset class="checks-box">
+        <legend>Catégorie</legend>
+        <div class="checks" role="radiogroup" aria-label="Catégorie">
+          <label><input type="radio" name="gd-role" id="gd-guest" value="guest" checked>Invité</label>
+          <label><input type="radio" name="gd-role" id="gd-family" value="family">Famille</label>
+          <label><input type="radio" name="gd-role" id="gd-friend" value="friend">Amis</label>
+          <label><input type="radio" name="gd-role" id="gd-work" value="work">Travail</label>
+          <label><input type="radio" name="gd-role" id="gd-plus" value="plus">Accompagnant</label>
+          <label><input type="radio" name="gd-role" id="gd-photo" value="photo">Photographe</label>
+          <label><input type="radio" name="gd-role" id="gd-video" value="video">Vidéaste</label>
+        </div>
+      </fieldset>
+      <div class="checks witness-box"><label><input type="checkbox" id="gd-witness">Témoin des mariés</label></div>
+      <div class="field plus-box" id="gd-plus-box" hidden>
+        <label for="gd-plus-of">Accompagnant de</label>
+        <select id="gd-plus-of"></select>
+        <p class="plus-hint">Le prénom et le nom de l'accompagnant sont facultatifs.</p>
+      </div>
+      <fieldset class="checks-box">
+        <legend>Âge</legend>
+        <div class="checks" role="radiogroup" aria-label="Âge">
+          <label><input type="radio" name="gd-age" id="gd-adult" value="adult" checked>Adulte</label>
+          <label><input type="radio" name="gd-age" id="gd-child" value="child">Enfant</label>
+        <label><input type="radio" name="gd-age" id="gd-baby" value="baby">Bébé</label>
+        </div>
+      </fieldset>
+      <fieldset class="checks-box">
+        <legend>Invité pour</legend>
+        <div class="checks" id="gd-events"></div>
+      </fieldset>
+      <p class="error" id="gd-error" role="alert"></p>
+      <div class="share-actions">
+        <button type="submit" class="btn-primary" id="gd-save">Enregistrer</button>
+        <button type="button" class="btn-ghost" id="gd-cancel">Annuler</button>
+        <button type="button" class="del" id="gd-delete">Supprimer l'invité</button>
+      </div>
+    </form>
   </dialog>
 </div>
 
@@ -521,7 +1040,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   });
 
   $('logout').addEventListener('click', function(){
-    saveSession(null); rows = []; render(); showLogin();
+    saveSession(null); rows = []; guests = []; render(); gRender(); showLogin();
   });
 
   async function refresh(){
@@ -533,6 +1052,9 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       render();
       rapLoad();
       dlLoad();
+      guestsLoad();
+      cpLoad();
+      fmLoad();
       if (!rows.length && !(await isAdmin())){
         $('dash-error').textContent = "Ce compte n'est pas autorisé à voir les réponses. Ajoutez-le avec le script supabase/admin.sql.";
       }
@@ -555,42 +1077,60 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   function td(cls, text){ const c = document.createElement('td'); c.className = cls; c.textContent = text || ''; return c; }
 
   function render(){
-    const yes = rows.filter(function(r){ return r.attending; }).length;
+    respTabs();
+    // Chiffres et liste de la fête choisie (« Toutes les fêtes » : tout).
+    const scoped = rows.filter(function(r){ return !respEvent || rowEvent(r) === respEvent; });
+    const yes = scoped.filter(function(r){ return r.attending; }).length;
     $('n-yes').textContent = yes;
-    $('n-no').textContent = rows.length - yes;
-    $('n-all').textContent = rows.length;
+    $('n-no').textContent = scoped.length - yes;
+    $('n-all').textContent = scoped.length;
 
     const q = $('search').value.trim().toLowerCase();
-    const list = rows.filter(function(r){
+    const list = scoped.filter(function(r){
       if (filter === 'yes' && !r.attending) return false;
       if (filter === 'no' && r.attending) return false;
       return !q || (r.first_name + ' ' + r.last_name + ' ' + r.last_name + ' ' + r.first_name).toLowerCase().indexOf(q) >= 0;
     });
 
-    const tbody = $('rows');
-    tbody.textContent = '';
-    list.forEach(function(r){
-      const tr = document.createElement('tr');
-      tr.appendChild(td('name', r.first_name + ' ' + r.last_name));
-      const att = td('att'); const pill = document.createElement('span');
-      pill.className = 'pill ' + (r.attending ? 'yes' : (r.cancelled_at ? 'cancel' : 'no'));
-      pill.textContent = r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)');
-      if (r.cancelled_at) pill.title = 'Empêchement signalé le ' + fmt(r.cancelled_at);
-      att.appendChild(pill); tr.appendChild(att);
-      tr.appendChild(td('contact', r.contact));
-      tr.appendChild(td('msg', [r.message, r.cancel_message ? 'Empêchement : ' + r.cancel_message : ''].filter(Boolean).join('\n')));
-      const date = td('date', fmt(r.created_at));
-      if (r.updated_at && Math.abs(new Date(r.updated_at) - new Date(r.created_at)) > 60000) date.title = 'Modifiée le ' + fmt(r.updated_at);
-      tr.appendChild(date);
-      const act = td('actions'); const del = document.createElement('button');
-      del.type = 'button'; del.className = 'del' + (pendingDelete === r.id ? ' confirm' : '');
-      del.textContent = pendingDelete === r.id ? 'Confirmer la suppression' : 'Supprimer';
-      del.addEventListener('click', function(){ onDelete(r.id); });
-      act.appendChild(del); tr.appendChild(act);
-      tbody.appendChild(tr);
+    // Un tableau par formulaire, pour bien distinguer les réponses de chaque fête.
+    const box = $('resp-groups'); box.textContent = '';
+    respOrder().forEach(function(ev){
+      const items = list.filter(function(r){ return rowEvent(r) === ev; });
+      if (!items.length) return;
+      const all = scoped.filter(function(r){ return rowEvent(r) === ev; }), y = all.filter(isYes).length;
+      const sec = document.createElement('section'); sec.className = 'resp-group';
+      const h = document.createElement('h3'); h.className = 'resp-title'; h.textContent = respTitle(ev);
+      const c = document.createElement('span'); c.className = 'resp-count';
+      c.textContent = plural(all.length, 'réponse') + ' · ' + plural(y, 'présent') + ' · ' + plural(all.length - y, 'absent');
+      h.appendChild(c); sec.appendChild(h);
+      const wrap = document.createElement('div'); wrap.className = 'table-wrap';
+      const table = document.createElement('table');
+      table.innerHTML = '<thead><tr><th>Invité</th><th>Présence</th><th>Contact</th><th>Message</th><th>Reçue le</th><th></th></tr></thead>';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody); wrap.appendChild(table); sec.appendChild(wrap); box.appendChild(sec);
+      items.forEach(function(r){
+        const tr = document.createElement('tr');
+        tr.appendChild(td('name', r.first_name + ' ' + r.last_name));
+        const att = td('att'); const pill = document.createElement('span');
+        pill.className = 'pill ' + (r.attending ? 'yes' : (r.cancelled_at ? 'cancel' : 'no'));
+        pill.textContent = r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)');
+        if (r.cancelled_at) pill.title = 'Empêchement signalé le ' + fmt(r.cancelled_at);
+        att.appendChild(pill); tr.appendChild(att);
+        tr.appendChild(td('contact', r.contact));
+        tr.appendChild(td('msg', [r.message, r.cancel_message ? 'Empêchement : ' + r.cancel_message : ''].filter(Boolean).join('\n')));
+        const date = td('date', fmt(r.created_at));
+        if (r.updated_at && Math.abs(new Date(r.updated_at) - new Date(r.created_at)) > 60000) date.title = 'Modifiée le ' + fmt(r.updated_at);
+        tr.appendChild(date);
+        const act = td('actions'); const del = document.createElement('button');
+        del.type = 'button'; del.className = 'del' + (pendingDelete === r.id ? ' confirm' : '');
+        del.textContent = pendingDelete === r.id ? 'Confirmer la suppression' : 'Supprimer';
+        del.addEventListener('click', function(){ onDelete(r.id); });
+        act.appendChild(del); tr.appendChild(act);
+        tbody.appendChild(tr);
+      });
     });
     $('empty').hidden = list.length > 0;
-    $('empty').textContent = rows.length ? 'Aucune réponse ne correspond à la recherche.' : "Aucune réponse pour l'instant.";
+    $('empty').textContent = scoped.length ? 'Aucune réponse ne correspond à la recherche.' : (respEvent ? "Aucune réponse à ce formulaire pour l'instant." : "Aucune réponse pour l'instant.");
     rapRenderRecap();
   }
 
@@ -620,15 +1160,16 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   $('export').addEventListener('click', function(){
     const esc = function(v){ v = String(v == null ? '' : v); return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-    const lines = [['Prénom','Nom','Présence','Contact','Message','Empêchement','Reçue le','Modifiée le'].join(';')].concat(rows.map(function(r){
-      return [r.first_name, r.last_name, r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)'), r.contact, r.message,
+    const scoped = rows.filter(function(r){ return !respEvent || rowEvent(r) === respEvent; });
+    const lines = [['Prénom','Nom','Présence','Fête','Contact','Message','Empêchement','Reçue le','Modifiée le'].join(';')].concat(scoped.map(function(r){
+      return [r.first_name, r.last_name, r.attending ? 'Présent(e)' : (r.cancelled_at ? 'Empêchement' : 'Absent(e)'), eventName(rowEvent(r)), r.contact, r.message,
        r.cancelled_at ? fmt(r.cancelled_at) + (r.cancel_message ? ' - ' + r.cancel_message : '') : '', fmt(r.created_at), fmt(r.updated_at)].map(esc).join(';');
     }));
     // BOM + point-virgule : Excel en français ouvre le fichier avec les accents et les colonnes.
     const blob = new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'reponses-vin-honneur-' + new Date().toISOString().slice(0, 10) + '.csv';
+    a.download = 'reponses-' + (respEvent || 'toutes-les-fetes') + '-' + new Date().toISOString().slice(0, 10) + '.csv';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   });
@@ -636,7 +1177,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   // ---------- Onglets ----------
   const TAB_KEY = 'rsvp-admin-tab';
-  const TABS = ['reponses', 'messages', 'reglages'];
+  const TABS = ['reponses', 'invites', 'messages', 'reglages'];
   function showTab(name, focus){
     if (TABS.indexOf(name) < 0) name = 'reponses';
     TABS.forEach(function(t){
@@ -679,44 +1220,1271 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     d.setDate(d.getDate() + 1);
     return d;
   }
-  function dlRender(){
-    $('dl-date').value = deadlineDay;
-    const isClosed = Date.now() >= dlClosingInstant(deadlineDay).getTime();
-    const st = $('dl-state');
-    st.className = 'pill ' + (isClosed ? 'closed' : 'open');
-    st.textContent = isClosed ? 'Modifications bloquées depuis le ' + dlLabel(deadlineDay) : 'Modifications ouvertes jusqu’au ' + dlLabel(deadlineDay);
-  }
-  function dlToast(text){
-    $('dl-toast').textContent = text;
-    setTimeout(function(){ if ($('dl-toast').textContent === text) $('dl-toast').textContent = ''; }, 7000);
-  }
+  // Plus de fenêtre « date limite par défaut » : cette date (réglage « deadline » de la base) sert seulement
+  // de date de départ aux formulaires (Réglages → Formulaires) et de secours dans la base.
   async function dlLoad(){
     try {
       const day = await api('rpc/get_deadline', { method:'POST', body:'{}' });
       if (typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)) deadlineDay = day;
-    } catch(e){ /* script non exécuté : on garde la date par défaut */ }
-    dlRender();
+    } catch(e){ /* script non exécuté : on garde la date de départ */ }
+    fmDeadlineRefresh();
   }
-  $('dl-save').addEventListener('click', async function(){
-    const v = $('dl-date').value;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)){ dlToast('Choisissez une date.'); return; }
-    const btn = $('dl-save'); btn.disabled = true;
+
+  // ---------- Invités par jour de fête ----------
+  const EVENTS_DEFAULT = [
+    { id:'vin', name:"Vin d'honneur", date:'2027-08-22', start:'17:15', end:'19:00' },
+    { id:'mariage', name:'Mariage', date:'2027-08-14' },
+    { id:'fete22', name:'Fête du 22 août', date:'2027-08-22' }
+  ];
+  const EVENTS_MAX = 6;
+  const NEXT_STATUS = { pending:'yes', yes:'no', no:'pending' };
+  const STATUS_LABEL = { pending:'… En attente', yes:'✓ Présent(e)', no:'✕ Absent(e)' };
+  let events = EVENTS_DEFAULT.slice(), guests = [], editing = null, pendingGuestDelete = false;
+  let evDraft = null, evDirty = false, evPendingRemove = null;
+
+  function notInstalled(err){ return err.status === 404 || err.code === 'PGRST205' || err.code === '42P01'; }
+  function dayLabel(day){
+    return /^\d{4}-\d{2}-\d{2}$/.test(day || '')
+      ? new Date(day + 'T12:00:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+      : 'Date à préciser';
+  }
+  // 17:15 → 17h15, 19:00 → 19h
+  function timeLabel(t){ return /^\d{2}:\d{2}$/.test(t || '') ? Number(t.slice(0, 2)) + 'h' + (t.slice(3) === '00' ? '' : t.slice(3)) : ''; }
+  function eventLabel(ev){
+    const s = timeLabel(ev.start), e = timeLabel(ev.end);
+    const hours = s && e ? 'de ' + s + ' à ' + e : s ? 'à partir de ' + s : e ? "jusqu'à " + e : '';
+    return dayLabel(ev.date) + (hours ? ', ' + hours : '');
+  }
+  // Onglet Invités : jours de fête dans l'ordre chronologique (date, puis heure de début).
+  function sortedEvents(){
+    return events.slice().sort(function(a, b){
+      return ((a.date || '9999-99-99') + (a.start || '99:99')).localeCompare((b.date || '9999-99-99') + (b.start || '99:99'));
+    });
+  }
+  function fullName(g){ return (g.first_name + ' ' + g.last_name).trim(); }
+  const AGE_LABEL = { adult:'Adulte', child:'Enfant', baby:'Bébé' };
+  // Ancien format : un simple « child » vrai/faux.
+  function ageOf(g){ return AGE_LABEL[g.age] ? g.age : (g.child ? 'child' : 'adult'); }
+  const ROLE_LABEL = { guest:'Invité', family:'Famille', friend:'Amis', work:'Travail', plus:'Accompagnant', photo:'Photographe', video:'Vidéaste' };
+  // Photographe et vidéaste sont des prestataires ; Famille, Amis, Travail et Accompagnant restent des invités.
+  function isVendor(g){ return roleOf(g) === 'photo' || roleOf(g) === 'video'; }
+  // Les mariés et leurs enfants (Réglages → Les mariés) figurent d'office, présents, à chaque jour de fête.
+  // Ce ne sont pas des invités enregistrés : on les recrée à chaque affichage depuis le dernier réglage enregistré.
+  let coupleSaved = null;
+  function coupleMembers(){
+    if (!coupleSaved) return [];
+    const all = {}; events.forEach(function(ev){ all[ev.id] = 'yes'; });
+    const m = [];
+    [['bride', 'La mariée'], ['groom', 'Le marié']].forEach(function(p){
+      const x = coupleSaved[p[0]];
+      if (x && x.first_name) m.push({ id:'couple-' + p[0], virtual:true, label:p[1], first_name:x.first_name, last_name:x.last_name, age:'adult', role:'couple', events:all });
+    });
+    coupleSaved.children.forEach(function(k){
+      if (k.first_name) m.push({ id:'couple-' + k.id, virtual:true, label:'Enfant des mariés', first_name:k.first_name, last_name:k.last_name, age:k.age || 'child', role:'couple', events:all });
+    });
+    return m;
+  }
+  function people(){ return coupleMembers().concat(guests); }
+
+  // Contenu du formulaire public, réglé dans l'espace mariés (Réglages → Formulaires), fête par fête.
+  // Sans réglage enregistré, ce sont les textes d'origine du vin d'honneur.
+  // Textes modifiables : [clé, libellé dans les réglages, texte d'origine, groupe des réglages].
+  const FORM_TEXTS = [
+    ['pageTitle', "Titre de l'onglet du navigateur", 'Marine & Jeremy — {Fête}', 'head'],
+    ['kicker', 'Sur-titre', 'Inscription · {Fête}', 'head'],
+    ['title', 'Titre (le « & » est mis en valeur)', 'Marine & Jeremy', 'head'],
+    ['ruleText', 'Texte de la règle « sans accompagnant »', "**Les accompagnants ne sont pas autorisés.** L'invitation est nominative : chaque invité remplit sa propre inscription, à son nom uniquement.", 'intro'],
+    ['dressTitle', "Titre de l'encadré dress code", 'Dress code', 'intro'],
+    ['giftTitle', "Titre de l'encadré cadeaux", 'Cadeaux', 'intro'],
+    ['formTitle', 'Titre du formulaire', 'Votre réponse', 'form'],
+    ['yesLabel', 'Réponse « oui »', 'Oui, je viendrai', 'form'],
+    ['yesNote', 'Précision sous « oui »', '{Fête}, le {jour} {horaire}', 'form'],
+    ['noLabel', 'Réponse « non »', 'Non, je ne pourrai pas', 'form'],
+    ['noNote', 'Précision sous « non »', 'Je serai avec vous en pensée', 'form'],
+    ['messageLabel', 'Question du message libre', 'Un mot pour les mariés', 'form'],
+    ['soloText', 'Case à cocher « sans accompagnant »', "J'ai bien noté que l'inscription est individuelle et que je viens **sans accompagnant**.", 'form'],
+    ['submitLabel', "Bouton d'envoi", 'Envoyer ma réponse', 'form'],
+    ['doneYes', 'Confirmation pour un invité présent', 'Votre présence est bien notée : {Fête}, {date}, {horaire}, {lieu}. Nous avons hâte de vous y retrouver.', 'done'],
+    ['doneNo', 'Confirmation pour un invité absent', "Votre absence est bien notée. Merci d'avoir pris le temps de nous répondre.", 'done'],
+    ['footer', 'Bas de page', 'JMPP · {Fête} · {lieu court} · {date chiffres}', 'done']
+  ];
+  const FORM_DEFAULT = Object.assign({
+    event:'vin', name:"Vin d'honneur", date:'2027-08-22', start:'17:15', end:'19:00',
+    place:'Manoir des Lys, Auchel',
+    intro:"Ce formulaire sert à vous inscrire pour participer au mariage de **Marine & Jeremy**, le **{date}, {horaire}**. Vous êtes invité(e) au **{fête}**. Merci de nous indiquer si vous serez présent(e).",
+    solo:true, logoShow:true, deadline:'',
+    dressColors:[{ name:'Beige', color:'#d6bf9a' }, { name:'Doré', color:'#c9a14e' }],
+    dress:{ show:true, text:"Pour le {fête}, nous vous invitons à porter une tenue **beige et/ou dorée**." },
+    gift:{ show:true, text:"Votre présence est notre plus beau cadeau. Si vous souhaitez nous gâter, nous souhaitons **uniquement une participation financière** : une urne sera à disposition pendant le {fête}." }
+  }, FORM_TEXTS.reduce(function(o, t){ o[t[0]] = t[2]; return o; }, {}));
+  function formMerge(v){
+    v = v && typeof v === 'object' ? v : {};
+    const d = FORM_DEFAULT, box = function(x, def){ x = x && typeof x === 'object' ? x : {}; return { show:x.show !== false, text:typeof x.text === 'string' && x.text.trim() ? x.text : def.text }; };
+    const out = {
+      event:typeof v.event === 'string' ? v.event : d.event,
+      name:typeof v.name === 'string' && v.name.trim() ? v.name : d.name,
+      date:/^\d{4}-\d{2}-\d{2}$/.test(v.date || '') ? v.date : d.date,
+      start:typeof v.start === 'string' ? v.start : d.start,
+      end:typeof v.end === 'string' ? v.end : d.end,
+      place:typeof v.place === 'string' ? v.place : d.place,
+      intro:typeof v.intro === 'string' && v.intro.trim() ? v.intro : d.intro,
+      solo:v.solo !== false, logoShow:v.logoShow !== false,
+      deadline:/^\d{4}-\d{2}-\d{2}$/.test(v.deadline || '') ? v.deadline : '',
+      // Pastilles du dress code : une liste vide est un choix (aucune pastille).
+      dressColors:Array.isArray(v.dressColors)
+        ? v.dressColors.filter(function(c){ return c && /^#[0-9a-f]{6}$/i.test(c.color || ''); }).slice(0, 6)
+            .map(function(c){ return { name:String(c.name || '').slice(0, 30), color:c.color }; })
+        : d.dressColors.slice(),
+      dress:box(v.dress, d.dress), gift:box(v.gift, d.gift)
+    };
+    FORM_TEXTS.forEach(function(t){ out[t[0]] = typeof v[t[0]] === 'string' && v[t[0]].trim() ? v[t[0]] : t[2]; });
+    return out;
+  }
+  function pfTime(t){ return /^\d{2}:\d{2}$/.test(t || '') ? Number(t.slice(0, 2)) + 'h' + (t.slice(3) === '00' ? '' : t.slice(3)) : ''; }
+  function pfHours(f){ const s = pfTime(f.start), e = pfTime(f.end); return s && e ? 'de ' + s + ' à ' + e : s ? 'à partir de ' + s : e ? "jusqu'à " + e : ''; }
+  function pfArrow(f){ const s = pfTime(f.start), e = pfTime(f.end); return s && e ? s + ' → ' + e : s ? 'dès ' + s : e ? "jusqu'à " + e : ''; }
+  function pfLongDate(f){ return new Date(f.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+  function pfShortDate(f){ return new Date(f.date + 'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'long' }); }
+  function pfDots(f){ return f.date.slice(8, 10) + '.' + f.date.slice(5, 7) + '.' + f.date.slice(0, 4); }
+  function pfCap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function pfLower(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  // Repères remplacés dans les textes : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu}, {lieu court}.
+  // Sans horaire, « , {horaire} » disparaît.
+  function pfFill(f, text){
+    return text.replace(/\{Fête\}/g, f.name).replace(/\{fête\}/g, pfLower(f.name))
+      .replace(/\{date chiffres\}/g, pfDots(f)).replace(/\{date\}/g, pfLongDate(f)).replace(/\{jour\}/g, pfShortDate(f))
+      .replace(/\{lieu court\}/g, f.place.split(',')[0].trim()).replace(/\{lieu\}/g, f.place)
+      .replace(/,?\s*\{horaire\}/g, function(m){ const h = pfHours(f); return h ? m.replace('{horaire}', h) : ''; });
+  }
+  // Même chose, puis on retire les séparateurs restés seuls quand un repère est vide (lieu absent…).
+  function pfText(f, text){
+    return pfFill(f, text).replace(/\s+,/g, ',').replace(/,\s*(?=[.,]|$)/g, '')
+      .replace(/(\s*·\s*){2,}/g, ' · ').replace(/^\s*·\s*|\s*·\s*$/g, '').trim();
+  }
+
+  // ---------- Lien avec le formulaire (onglet Réponses) ----------
+  // Chaque réponse au formulaire alimente la liste du jour de fête choisi dans Réglages → Formulaire
+  // (le vin d'honneur par défaut) : la personne y est ajoutée, ou rattachée à l'invité du même nom,
+  // avec la présence qu'elle a donnée. Les mariés, déjà présents d'office, sont ignorés.
+  let forms = null, formReady = false, fmDirty = false, syncing = false;
+  // Réponses rattachées à un invité, une par fête : { vin:'<id>' } (ancien format : rsvp_id = vin d'honneur).
+  function rsvpOf(g){ return g.rsvp && typeof g.rsvp === 'object' ? g.rsvp : (g.rsvp_id ? { vin:g.rsvp_id } : {}); }
+  function linkedTo(g, evId){ const id = rsvpOf(g)[evId]; return formRowExists(id) ? id : null; }
+  function hasForm(g){ return Object.keys(rsvpOf(g)).some(function(e){ return linkedTo(g, e); }); }
+  const createdFor = {};
+  function nameKey(first, last){
+    return (first + ' ' + last).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+  function formRowExists(id){ return !!id && rows.some(function(r){ return r.id === id; }); }
+  async function syncResponses(){
+    if (syncing || !syncAllowed()) return;
+    syncing = true;
+    let changed = false;
+    try {
+      const coupleKeys = coupleMembers().map(function(m){ return nameKey(m.first_name, m.last_name); });
+      for (const r of rows){
+        const info = rsvpInfo(r), evId = info.event;
+        if (!info.first || !events.some(function(ev){ return ev.id === evId; })) continue;
+        const key = nameKey(info.first, info.last);
+        if (coupleKeys.indexOf(key) >= 0) continue;
+        let g = guests.filter(function(x){ return rsvpOf(x)[evId] === info.id; })[0];
+        if (!g && createdFor[info.id]) continue;
+        if (!g){
+          g = guests.filter(function(x){ return !rsvpOf(x)[evId] && roleOf(x) !== 'plus' && nameKey(x.first_name, x.last_name) === key; })[0];
+          const link = Object.assign({}, g ? rsvpOf(g) : {}); link[evId] = info.id;
+          if (g){
+            const evs = Object.assign({}, g.events); evs[evId] = info.status;
+            await gUpdate(g, { rsvp:link, events:evs, contact:g.contact || info.contact.slice(0, 120) });
+          } else {
+            const evs = {}; evs[evId] = info.status;
+            createdFor[info.id] = true;
+            await gCreate({ first_name:info.first.slice(0, 60), last_name:info.last.slice(0, 60), contact:info.contact.slice(0, 120),
+              age:'adult', role:'guest', plus_of:null, witness:false, rsvp:link, events:evs });
+          }
+          changed = true;
+        } else if (g.events[evId] !== info.status){
+          const evs = Object.assign({}, g.events); evs[evId] = info.status;
+          await gUpdate(g, { events:evs });
+          changed = true;
+        }
+      }
+    } catch(e){
+      $('g-error').textContent = "Certaines réponses au formulaire n'ont pas pu être ajoutées à la liste. Rechargez la page pour réessayer.";
+    } finally { syncing = false; }
+    if (changed) gRender();
+  }
+
+  // Réglages → Formulaires : un formulaire par jour de fête (ouvert ou non, textes, lien).
+  // forms = { main:'vin', list:{ vin:{ open, name, date, … }, … } } ; null tant que rien n'est réglé
+  // (seul le formulaire d'origine du vin d'honneur existe alors).
+  const FORM_BASE = 'https://theryble.github.io/mariage-rsvp/';
+  const FM_FIELDS = ['fm-deadline', 'fm-logo-show', 'fm-open', 'fm-place', 'fm-introtext', 'fm-solo', 'fm-dress-show', 'fm-dress-text', 'fm-gift-show', 'fm-gift-text'];
+  let fmEditing = 'vin', respEvent = '';
+  // Date limite propre à chaque formulaire (vide : la date limite par défaut).
+  function formDeadline(ev){ const f = formFor(ev); return f && /^\d{4}-\d{2}-\d{2}$/.test(f.deadline || '') ? f.deadline : defaultDeadline(); }
+  function fmDeadlineHint(){
+    const v = $('fm-deadline').value, own = /^\d{4}-\d{2}-\d{2}$/.test(v), d = own ? v : defaultDeadline();
+    $('fm-deadline-hint').textContent = (own
+      ? 'Dernier jour pour modifier une réponse à ce formulaire : ' + dlLabel(d) + ' (jusqu\'à 23h59).'
+      : 'Sans date choisie, c\'est le ' + dlLabel(d) + ' qui s\'applique.') +
+      (deadlinePassed(d) ? ' Cette date est passée : les réponses déjà envoyées ne peuvent plus être modifiées.' : '');
+  }
+  $('fm-deadline').addEventListener('input', function(){ this.dataset.auto = ''; fmDeadlineHint(); });
+  // Un formulaire sans date à lui affiche la date de départ (l'ancienne date commune), qu'il garde une fois enregistré.
+  function fmDeadlineRefresh(){
+    const el = $('fm-deadline');
+    if (!el.value || el.dataset.auto === '1'){ el.value = defaultDeadline(); el.dataset.auto = '1'; }
+    fmDeadlineHint();
+  }
+  // Textes du formulaire : un champ par texte modifiable, rangé dans son groupe.
+  (function fmBuildTexts(){
+    FORM_TEXTS.forEach(function(t){
+      const box = $('fm-group-' + t[3]); if (!box) return;
+      const field = document.createElement('div'); field.className = 'field';
+      const label = document.createElement('label'); label.htmlFor = 'fm-t-' + t[0]; label.textContent = t[1];
+      const long = t[2].length > 60;
+      const input = document.createElement(long ? 'textarea' : 'input');
+      if (long) input.rows = 2; else { input.type = 'text'; input.autocomplete = 'off'; }
+      input.id = 'fm-t-' + t[0]; input.maxLength = 400;
+      input.addEventListener('input', function(){ fmDirty = true; });
+      field.appendChild(label); field.appendChild(input); box.appendChild(field);
+    });
+  })();
+  // Logo : image réduite dans le navigateur (au plus 600 px, format léger) avant d'être enregistrée.
+  let fmLogo = null, fmLogoDraft;   // fmLogo : logo enregistré de la fête affichée ; fmLogoDraft : changement en cours (null = logo d'origine)
+  function readLogo(file){
+    return new Promise(function(resolve, reject){
+      const fr = new FileReader();
+      fr.onerror = reject;
+      fr.onload = function(){
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = function(){
+          let w = Math.min(600, img.naturalWidth || 600);
+          for (let i = 0; i < 6; i++){
+            const h = Math.max(1, Math.round((img.naturalHeight || w) * w / (img.naturalWidth || w)));
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            let url = c.toDataURL('image/webp', 0.86);
+            if (url.indexOf('data:image/webp') !== 0) url = c.toDataURL('image/png');
+            if (url.length < 120000) return resolve(url);
+            w = Math.round(w * 0.75);
+          }
+          reject(new Error('image trop lourde'));
+        };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  function fmLogoShown(){ return fmLogoDraft !== undefined ? fmLogoDraft : fmLogo; }
+  function fmLogoPreview(){
+    const l = fmLogoShown();
+    $('fm-logo-img').src = l && l.light ? l.light : defaultLogo();
+    $('fm-logo-note').textContent = l && l.light
+      ? (l.dark ? 'Logo personnalisé, avec une version pour le mode sombre.' : 'Logo personnalisé (le même en mode sombre).')
+      : "Logo d'origine.";
+  }
+  async function fmLoadLogo(ev){
+    fmLogo = null; fmLogoDraft = undefined; fmLogoPreview();
+    try { const v = await logoFetch(ev); if (ev === fmEditing){ fmLogo = v && v.light ? v : null; fmLogoPreview(); } } catch(e){ /* logo d'origine */ }
+  }
+  ['fm-logo-file', 'fm-logo-dark-file'].forEach(function(id){
+    $(id).addEventListener('change', async function(){
+      const file = this.files && this.files[0]; this.value = '';
+      if (!file) return;
+      try {
+        const url = await readLogo(file), base = Object.assign({}, fmLogoShown() || {});
+        if (id === 'fm-logo-file') base.light = url;
+        else if (!base.light){ fmToast("Choisissez d'abord le logo principal, puis sa version pour le mode sombre."); return; }
+        else base.dark = url;
+        fmLogoDraft = base; fmDirty = true; $('fm-logo-show').checked = true; fmLogoPreview();
+        fmToast('Logo prêt. Cliquez sur « Enregistrer ce formulaire » pour le garder.');
+      } catch(e){ fmToast("Cette image n'a pas pu être utilisée. Essayez une image PNG, JPEG ou SVG plus simple."); }
+    });
+  });
+  $('fm-logo-reset').addEventListener('click', function(){
+    fmLogoDraft = null; fmDirty = true; fmLogoPreview();
+    fmToast("Logo d'origine rétabli. Cliquez sur « Enregistrer ce formulaire » pour le garder.");
+  });
+  function formsMerge(v, legacy){
+    if (v && typeof v === 'object' && v.list && typeof v.list === 'object') return { main:typeof v.main === 'string' ? v.main : 'vin', list:v.list };
+    if (legacy && typeof legacy === 'object' && legacy.event){
+      const list = {}; list[legacy.event] = Object.assign({ open:true }, legacy);
+      return { main:legacy.event, list:list };
+    }
+    return null;
+  }
+  function formFor(ev){ return forms && forms.list[ev] ? forms.list[ev] : null; }
+  function formIsOpen(ev){ return forms ? !!(formFor(ev) && formFor(ev).open !== false) : ev === 'vin'; }
+  function mainForm(){ return forms ? forms.main : 'vin'; }
+  function formUrl(ev){ return FORM_BASE + (ev === mainForm() ? '' : '?fete=' + encodeURIComponent(slugOf(ev))); }
+  function openForms(){ return sortedEvents().filter(function(ev){ return formIsOpen(ev.id); }); }
+  function eventName(id){ const ev = events.filter(function(x){ return x.id === id; })[0]; return ev ? ev.name : id; }
+  // Réglage d'une fête, complété par le nom, la date et les heures du jour de fête.
+  function fmEventCfg(id){
+    const ev = events.filter(function(x){ return x.id === id; })[0];
+    const f = formMerge(formFor(id) || (id === 'vin' ? null : { place:'' }));
+    f.event = id;
+    if (ev){ f.name = ev.name; f.date = /^\d{4}-\d{2}-\d{2}$/.test(ev.date || '') ? ev.date : f.date; f.start = ev.start || ''; f.end = ev.end || ''; }
+    return f;
+  }
+  function fmToast(text){ $('fm-toast').textContent = text; setTimeout(function(){ if ($('fm-toast').textContent === text) $('fm-toast').textContent = ''; }, 8000); }
+  function fmFill(f){
+    $('fm-open').checked = formIsOpen(fmEditing);
+    $('fm-place').value = f.place; $('fm-introtext').value = f.intro; $('fm-solo').checked = f.solo;
+    $('fm-dress-show').checked = f.dress.show; $('fm-dress-text').value = f.dress.text;
+    $('fm-gift-show').checked = f.gift.show; $('fm-gift-text').value = f.gift.text;
+    $('fm-logo-show').checked = f.logoShow;
+    fmColors = f.dressColors.map(function(c){ return Object.assign({}, c); }); fmColorsRender();
+    $('fm-slug').value = slugOf(fmEditing);
+    $('fm-deadline').value = f.deadline || ''; $('fm-deadline').dataset.auto = f.deadline ? '' : '1'; fmDeadlineRefresh();
+    FORM_TEXTS.forEach(function(t){ $('fm-t-' + t[0]).value = f[t[0]]; });
+  }
+  function fmCurrent(){
+    const out = Object.assign(fmEventCfg(fmEditing), {
+      open:$('fm-open').checked,
+      place:$('fm-place').value.trim(),
+      intro:$('fm-introtext').value.trim() || FORM_DEFAULT.intro,
+      solo:$('fm-solo').checked,
+      dress:{ show:$('fm-dress-show').checked, text:$('fm-dress-text').value.trim() || FORM_DEFAULT.dress.text },
+      gift:{ show:$('fm-gift-show').checked, text:$('fm-gift-text').value.trim() || FORM_DEFAULT.gift.text }
+    });
+    out.logoShow = $('fm-logo-show').checked;
+    out.dressColors = fmColors.filter(function(c){ return /^#[0-9a-f]{6}$/i.test(c.color || ''); })
+      .map(function(c){ return { name:(c.name || '').trim().slice(0, 30) || 'Couleur', color:c.color.toLowerCase() }; });
+    out.deadline = /^\d{4}-\d{2}-\d{2}$/.test($('fm-deadline').value) ? $('fm-deadline').value : '';
+    out.slug = slugify($('fm-slug').value || out.name);
+    FORM_TEXTS.forEach(function(t){ out[t[0]] = $('fm-t-' + t[0]).value.trim() || t[2]; });
+    return out;
+  }
+  let fmOpenId = null;   // compartiment déplié (un seul à la fois ; aucun par défaut)
+  function fmRender(){
+    if (!events.some(function(ev){ return ev.id === fmEditing; })) fmEditing = events.length ? sortedEvents()[0].id : 'vin';
+    if (fmOpenId && !events.some(function(ev){ return ev.id === fmOpenId; })) fmOpenId = null;
+    // Un compartiment par fête ; les réglages (un seul éditeur) se placent dans celui qui est déplié.
+    const box = $('fm-list'), editor = $('fm-editor');
+    box.textContent = '';
+    sortedEvents().forEach(function(ev){
+      const open = fmOpenId === ev.id;
+      const item = document.createElement('section'); item.className = 'fm-item' + (open ? ' open' : '');
+      const head = document.createElement('button');
+      head.type = 'button'; head.className = 'fm-item-head'; head.setAttribute('aria-expanded', String(open));
+      const chev = document.createElement('span'); chev.className = 'chev'; chev.setAttribute('aria-hidden', 'true');
+      chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+      const text = document.createElement('span'); text.className = 'fm-item-text';
+      const name = document.createElement('span'); name.className = 'fm-item-name'; name.textContent = ev.name;
+      const meta = document.createElement('span'); meta.className = 'fm-item-meta';
+      meta.textContent = pfCap(eventLabel(ev)) + ' · ' + formUrl(ev.id).replace(/^https?:\/\//, '');
+      text.appendChild(name); text.appendChild(meta);
+      const tags = document.createElement('span'); tags.className = 'fm-item-tags';
+      const st = document.createElement('span'); st.className = 'pill ' + (formIsOpen(ev.id) ? 'open' : 'closed');
+      st.textContent = formIsOpen(ev.id) ? 'Ouvert' : 'Fermé'; tags.appendChild(st);
+      if (mainForm() === ev.id){ const m = document.createElement('span'); m.className = 'pill main'; m.textContent = 'Principal'; tags.appendChild(m); }
+      head.appendChild(chev); head.appendChild(text); head.appendChild(tags);
+      head.addEventListener('click', function(){ fmToggle(ev.id); });
+      item.appendChild(head);
+      if (open){ item.appendChild(editor); editor.hidden = false; }
+      box.appendChild(item);
+    });
+    if (!fmOpenId){ editor.hidden = true; box.parentNode.insertBefore(editor, box.nextSibling); }
+    fmLinkRender(); fmRootRender();
+    const pv = $('fm-preview'); if (pv && pv.tagName === 'A') pv.href = formUrl(fmEditing);
+    const n = openForms().length, st = $('fm-state');
+    st.className = 'pill ' + (n ? 'open' : 'closed');
+    st.textContent = n ? n + (n > 1 ? ' formulaires ouverts' : ' formulaire ouvert') : 'Aucun formulaire ouvert';
+  }
+  // Déplier un compartiment charge les réglages de ce formulaire ; le replier garde ce qui est en cours.
+  function fmToggle(id){
+    if (fmOpenId === id){ fmOpenId = null; fmRender(); return; }
+    if (fmEditing !== id){
+      if (fmDirty) fmToast('Les modifications non enregistrées du formulaire « ' + eventName(fmEditing) + ' » ont été abandonnées.');
+      fmEditing = id; fmDirty = false;
+      fmFill(fmEventCfg(id)); fmLoadLogo(id);
+    }
+    fmOpenId = id; fmRender();
+  }
+  FM_FIELDS.forEach(function(id){
+    const el = $(id);
+    el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', function(){ fmDirty = true; });
+  });
+  $('fm-copy').addEventListener('click', async function(){
+    const url = fmDraftUrl();
+    fmToast((await copy(url)) ? 'Lien copié : ' + url + (fmDirty ? ' (pensez à enregistrer le formulaire pour qu\'il soit actif).' : '') : 'Copie impossible : sélectionnez le lien et copiez-le à la main.');
+  });
+  async function fmLoad(){
+    try { const v = await fmFetch(); forms = formsMerge(v && v.forms, v && v.legacy); } catch(e){ /* réglage absent : formulaire d'origine */ }
+    formReady = true;
+    if (!fmDirty) fmFill(fmEventCfg(fmEditing));
+    fmRender(); respRender(); shareRender();
+    fmLoadLogo(fmEditing);
+    syncResponses();
+  }
+  $('fm-save').addEventListener('click', async function(){
+    const cfg = fmCurrent();
+    // Deux formulaires ne peuvent pas avoir la même adresse.
+    const clash = Object.keys(forms ? forms.list : {}).filter(function(id){ return id !== fmEditing && slugOf(id) === cfg.slug; })[0];
+    if (clash){ fmToast('L\'adresse « ' + cfg.slug + ' » est déjà celle du formulaire « ' + eventName(clash) + ' » : choisissez-en une autre.'); $('fm-slug').focus(); return; }
+    const next = { main:mainForm(), list:Object.assign({}, forms ? forms.list : {}) };
+    // Premier réglage d'une autre fête : le vin d'honneur d'origine reste ouvert tel quel.
+    if (!forms && fmEditing !== 'vin') next.list.vin = Object.assign(fmEventCfg('vin'), { open:true });
+    next.list[fmEditing] = cfg;
+    const b = $('fm-save'); b.disabled = true;
+    try {
+      if (fmLogoDraft !== undefined){
+        if (fmLogoDraft) await logoStore(fmEditing, fmLogoDraft); else await logoDelete(fmEditing);
+        fmLogo = fmLogoDraft; fmLogoDraft = undefined; afterLogoSaved(fmEditing);
+      }
+      await fmStore(next);
+      forms = next; fmDirty = false; fmRender(); respRender(); shareRender();
+      fmToast('Formulaire « ' + cfg.name + ' » enregistré' + (cfg.open ? ', ouvert à l\'adresse ' + formUrl(fmEditing) : ', fermé : les invités ne peuvent pas répondre') + '.' +
+        (next.main ? '' : ' Aucun formulaire principal : l\'adresse simple affiche « formulaire fermé ».'));
+      syncResponses();
+    } catch(err){
+      fmToast(err && (err.status === 404 || err.code === 'PGRST205' || err.code === '42P01')
+        ? "Enregistrement impossible : exécutez d'abord supabase/invites.sql dans Supabase."
+        : "L'enregistrement n'a pas abouti. Réessayez.");
+    } finally { b.disabled = false; }
+  });
+  // Adresse lisible de chaque formulaire : tirée du nom de la fête (« Fête du 22 août » → fete-du-22-aout),
+  // modifiable dans Réglages → Formulaires et gardée une fois enregistrée.
+  function slugify(s){
+    return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'fete';
+  }
+  function slugOf(ev){ const f = formFor(ev); return f && f.slug ? f.slug : slugify(eventName(ev)); }
+  function fmDraftUrl(){ return FORM_BASE + (mainForm() === fmEditing ? '' : '?fete=' + slugify($('fm-slug').value || eventName(fmEditing))); }
+  function fmLinkRender(){
+    // Formulaire de l'adresse simple : pas besoin de son adresse ?fete=… (gardée en réserve).
+    const isRoot = mainForm() === fmEditing;
+    $('fm-slug-field').hidden = isRoot; $('fm-root-note').hidden = !isRoot;
+    const el = $('fm-slug');
+    if (!el.value) el.value = slugOf(fmEditing);
+    const full = FORM_BASE + '?fete=' + slugify(el.value);
+    $('fm-link-hint').textContent = (mainForm() === fmEditing
+      ? 'Formulaire de l\'adresse simple ' + FORM_BASE + ' : il s\'ouvre aussi avec ' + full + '.'
+      : 'Lien à envoyer : ' + full);
+  }
+  $('fm-slug').addEventListener('input', function(){ fmDirty = true; fmLinkRender(); });
+  $('fm-slug').addEventListener('blur', function(){ this.value = slugify(this.value || eventName(fmEditing)); fmLinkRender(); });
+
+  // En-tête « Voir le formulaire » : choisir parmi les formulaires ouverts.
+  function pickRender(){
+    const box = $('pick-list'); box.textContent = '';
+    const list = openForms();
+    if (!list.length){
+      const p = document.createElement('p'); p.className = 'pick-empty';
+      p.textContent = 'Aucun formulaire ouvert pour le moment. Ouvrez-en un dans Réglages → Formulaires.';
+      box.appendChild(p); return;
+    }
+    list.forEach(function(ev){
+      const row = document.createElement('div'); row.className = 'pick-item';
+      const text = document.createElement('div'); text.className = 'pick-text';
+      const name = document.createElement('span'); name.className = 'pick-name'; name.textContent = ev.name;
+      if (mainForm() === ev.id){ const m = document.createElement('span'); m.className = 'pick-main'; m.textContent = 'Principal'; name.appendChild(m); }
+      const meta = document.createElement('span'); meta.className = 'pick-meta';
+      meta.textContent = pfCap(eventLabel(ev)) + ' · ' + formUrl(ev.id);
+      text.appendChild(name); text.appendChild(meta);
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-ghost'; b.textContent = 'Voir';
+      b.setAttribute('aria-label', 'Voir le formulaire ' + ev.name);
+      b.addEventListener('click', function(){ viewForm(ev.id); });
+      row.appendChild(text); row.appendChild(b); box.appendChild(row);
+    });
+  }
+  $('pick-close').addEventListener('click', function(){ $('pick-dialog').close(); });
+  $('pick-dialog').addEventListener('click', function(e){ if (e.target === this) this.close(); });
+  $('pick-open').addEventListener('click', function(){ pickRender(); $('pick-dialog').showModal(); });
+
+  // Pastilles du dress code : un nom et une couleur, jusqu'à 6 (aucune : seul le texte s'affiche).
+  let fmColors = [];
+  function fmColorsRender(){
+    const box = $('fm-colors'); box.textContent = '';
+    fmColors.forEach(function(c, i){
+      const row = document.createElement('div'); row.className = 'fm-color';
+      const pick = document.createElement('input'); pick.type = 'color'; pick.value = c.color;
+      pick.setAttribute('aria-label', 'Couleur de la pastille ' + (i + 1));
+      const name = document.createElement('input'); name.type = 'text'; name.value = c.name; name.maxLength = 30;
+      name.placeholder = 'Nom affiché (ex. Champagne)'; name.setAttribute('aria-label', 'Nom de la pastille ' + (i + 1));
+      const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = 'Retirer';
+      pick.addEventListener('input', function(){ c.color = pick.value; fmDirty = true; });
+      name.addEventListener('input', function(){ c.name = name.value; fmDirty = true; });
+      del.addEventListener('click', function(){ fmColors.splice(fmColors.indexOf(c), 1); fmDirty = true; fmColorsRender(); });
+      row.appendChild(pick); row.appendChild(name); row.appendChild(del); box.appendChild(row);
+    });
+    if (!fmColors.length){
+      const p = document.createElement('p'); p.className = 'fm-hint';
+      p.textContent = "Aucune pastille : seul le texte du dress code s'affiche.";
+      box.appendChild(p);
+    }
+    $('fm-color-add').disabled = fmColors.length >= 6;
+  }
+  $('fm-color-add').addEventListener('click', function(){
+    if (fmColors.length >= 6) return;
+    fmColors.push({ name:'', color:'#c9a14e' }); fmDirty = true; fmColorsRender();
+    const inputs = $('fm-colors').querySelectorAll('input[type=text]'); if (inputs.length) inputs[inputs.length - 1].focus();
+  });
+
+  // Adresse simple (racine du site, celle des QR codes déjà envoyés) : le formulaire qu'elle ouvre.
+  // Les autres formulaires gardent leur adresse ?fete=… ; « Aucun » affiche « formulaire fermé ».
+  let fmRootDirty = false;
+  function fmRootHint(){
+    const v = $('fm-root').value;
+    $('fm-root-hint').textContent = !v
+      ? "Aucun formulaire : l'adresse simple affichera « Ce formulaire n'est pas ouvert »."
+      : (!formIsOpen(v)
+        ? 'Le formulaire « ' + eventName(v) + ' » est fermé : ouvrez-le dans son compartiment pour que l\'adresse simple fonctionne.'
+        : "Les invités qui ouvrent l'adresse simple (ou scannent les QR codes déjà envoyés) arrivent sur « " + eventName(v) + " ». Les autres formulaires gardent leur propre adresse.") +
+      (fmRootDirty ? ' Cliquez sur « Appliquer » pour valider.' : '');
+  }
+  function fmRootRender(){
+    const sel = $('fm-root'), keep = fmRootDirty ? sel.value : mainForm();
+    sel.textContent = '';
+    sortedEvents().forEach(function(ev){
+      const o = document.createElement('option'); o.value = ev.id;
+      o.textContent = ev.name + (formIsOpen(ev.id) ? '' : ' (fermé)'); sel.appendChild(o);
+    });
+    const none = document.createElement('option'); none.value = ''; none.textContent = 'Aucun formulaire'; sel.appendChild(none);
+    sel.value = events.some(function(ev){ return ev.id === keep; }) ? keep : '';
+    fmRootHint();
+  }
+  $('fm-root').addEventListener('change', function(){ fmRootDirty = true; fmRootHint(); });
+  $('fm-root-save').addEventListener('click', async function(){
+    const v = $('fm-root').value;
+    const next = { main:v, list:Object.assign({}, forms ? forms.list : {}) };
+    // Premier réglage : le vin d'honneur d'origine reste ouvert tel quel.
+    if (!forms) next.list.vin = Object.assign(fmEventCfg('vin'), { open:true });
+    const b = $('fm-root-save'); b.disabled = true;
+    try {
+      await fmStore(next);
+      forms = next; fmRootDirty = false; fmRender(); shareRender();
+      fmToast(v ? "L'adresse simple " + FORM_BASE + ' ouvre maintenant le formulaire « ' + eventName(v) + ' ».' : "L'adresse simple n'ouvre plus aucun formulaire.");
+    } catch(err){
+      fmToast(err && (err.status === 404 || err.code === 'PGRST205' || err.code === '42P01')
+        ? "Enregistrement impossible : exécutez d'abord supabase/invites.sql dans Supabase."
+        : "L'enregistrement n'a pas abouti. Réessayez.");
+    } finally { b.disabled = false; }
+  });
+
+  // Aperçu avant enregistrement : le formulaire avec les réglages en cours (textes, logo, date limite).
+  $('fm-draft').addEventListener('click', function(){ showDraftPreview(fmCurrent(), fmLogoShown()); });
+  // Aperçu (dépôt) : les réglages en cours passent par ce navigateur à la page du formulaire (?apercu=1),
+  // ouverte dans une fenêtre ; elle se met à jour si on relance l'aperçu.
+  function showDraftPreview(cfg, logo){
+    try { localStorage.setItem('rsvp-form-preview', JSON.stringify({ cfg:cfg, logo:logo || null, at:Date.now() })); }
+    catch(e){ fmToast("Aperçu impossible : ce navigateur refuse de garder le brouillon (stockage plein ou bloqué)."); return; }
+    const frame = $('pv-frame');
+    if (!$('pv-dialog').open){ frame.src = './?apercu=1'; $('pv-dialog').showModal(); }
+  }
+  $('pv-close').addEventListener('click', function(){ $('pv-dialog').close(); });
+  $('pv-dialog').addEventListener('click', function(e){ if (e.target === this) this.close(); });
+  $('pv-dialog').addEventListener('close', function(){ $('pv-frame').src = 'about:blank'; });
+  ['pv-phone', 'pv-wide'].forEach(function(id){
+    $(id).addEventListener('click', function(){
+      $('pv-stage').classList.toggle('wide', id === 'pv-wide');
+      $('pv-phone').setAttribute('aria-pressed', String(id === 'pv-phone'));
+      $('pv-wide').setAttribute('aria-pressed', String(id === 'pv-wide'));
+    });
+  });
+  $('fm-reset').addEventListener('click', function(){
+    const f = formMerge(fmEditing === 'vin' ? null : { place:'' });
+    const keep = $('fm-open').checked;
+    fmFill(f); $('fm-open').checked = keep; fmDirty = true;
+    fmToast("Textes d'origine rétablis. Cliquez sur « Enregistrer ce formulaire » pour les garder.");
+  });
+  (function(){ const pv = $('fm-preview'); if (pv && pv.tagName === 'BUTTON') pv.addEventListener('click', function(){ previewForm(fmEditing); }); })();
+  // Quand un jour de fête change (nom, date, heures), son formulaire suit.
+  function fmSyncEvent(){
+    if (!formReady || !forms) return;
+    let changed = false;
+    const list = Object.assign({}, forms.list);
+    Object.keys(list).forEach(function(id){
+      const ev = events.filter(function(x){ return x.id === id; })[0], f = list[id];
+      if (!ev || (ev.name === f.name && ev.date === f.date && (ev.start || '') === (f.start || '') && (ev.end || '') === (f.end || ''))) return;
+      list[id] = Object.assign({}, f, { name:ev.name, date:ev.date, start:ev.start || '', end:ev.end || '' }); changed = true;
+    });
+    if (!changed) return;
+    const next = { main:forms.main, list:list };
+    fmStore(next).then(function(){ forms = next; }).catch(function(){});
+  }
+  // Onglet Réponses : filtre par fête.
+  function rowEvent(r){ return r.event || 'vin'; }
+  // En-tête de l'espace mariés : les dates de toutes les fêtes et les prénoms des mariés (Réglages → Les mariés).
+  function adminWhen(){
+    const days = events.map(function(ev){ return ev.date; }).filter(function(d){ return /^\d{4}-\d{2}-\d{2}$/.test(d || ''); }).sort();
+    if (!days.length) return '';
+    const a = days[0], b = days[days.length - 1];
+    const dots = function(d){ return d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4); };
+    if (a === b) return dots(a);
+    if (a.slice(0, 4) !== b.slice(0, 4)) return dots(a) + ' – ' + dots(b);
+    return (a.slice(5, 7) === b.slice(5, 7) ? a.slice(8, 10) : a.slice(8, 10) + '.' + a.slice(5, 7)) + ' – ' + dots(b);
+  }
+  function adminHeader(){
+    const when = adminWhen();
+    $('adm-kicker').textContent = 'Espace mariés' + (when ? ' · ' + when : '');
+    if (!coupleSaved) return;
+    const names = [coupleSaved.bride.first_name, coupleSaved.groom.first_name].map(function(n){ return (n || '').trim(); }).filter(Boolean);
+    if (!names.length) return;
+    const h1 = $('adm-title'); h1.textContent = '';
+    names.forEach(function(n, i){
+      if (i){ h1.appendChild(document.createTextNode(' ')); const a = document.createElement('span'); a.className = 'amp'; a.textContent = '&'; h1.appendChild(a); h1.appendChild(document.createTextNode(' ')); }
+      h1.appendChild(document.createTextNode(n));
+    });
+  }
+
+  // Onglet Réponses : un bouton par formulaire (avec son nombre de réponses) et un tableau par fête.
+  function isYes(r){ return r.attending === true || r.attending === 'yes'; }
+  // Ordre des formulaires : celui des fêtes, puis les réponses à une fête supprimée depuis.
+  function respOrder(){
+    const ids = sortedEvents().map(function(ev){ return ev.id; });
+    rows.forEach(function(r){ if (ids.indexOf(rowEvent(r)) < 0) ids.push(rowEvent(r)); });
+    return ids;
+  }
+  function respTitle(id){ return events.some(function(ev){ return ev.id === id; }) ? eventName(id) : 'Fête supprimée (« ' + id + ' »)'; }
+  function respTabs(){
+    const box = $('resp-tabs'); box.textContent = '';
+    if (respEvent && respOrder().indexOf(respEvent) < 0) respEvent = '';
+    const tab = function(id, label, n){
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'resp-tab'; b.setAttribute('aria-pressed', String(respEvent === id));
+      b.textContent = label;
+      const c = document.createElement('span'); c.className = 'count'; c.textContent = n; b.appendChild(c);
+      b.addEventListener('click', function(){ respEvent = id; render(); });
+      box.appendChild(b);
+    };
+    tab('', 'Tous les formulaires', rows.length);
+    respOrder().forEach(function(id){
+      const n = rows.filter(function(r){ return rowEvent(r) === id; }).length;
+      if (n || formIsOpen(id)) tab(id, respTitle(id), n);
+    });
+  }
+  function respRender(){ respTabs(); }
+  // Partager : choix du formulaire (seuls les formulaires ouverts).
+  function shareRender(){
+    const sel = $('share-event'), keep = sel.value || mainForm();
+    sel.textContent = '';
+    openForms().forEach(function(ev){ const o = document.createElement('option'); o.value = ev.id; o.textContent = ev.name; sel.appendChild(o); });
+    sel.value = openForms().some(function(ev){ return ev.id === keep; }) ? keep : (sel.options[0] ? sel.options[0].value : '');
+    sel.hidden = sel.options.length < 2;
+  }
+  respRender(); shareRender();
+
+  // Version Supabase : réponses (first_name, attending vrai/faux) et écritures dans la table guests.
+  let guestsReady = false;
+  function syncAllowed(){ return guestsReady && formReady; }
+  function rsvpInfo(r){ return { id:r.id, first:r.first_name || '', last:r.last_name || '', contact:r.contact || '', status:r.attending ? 'yes' : 'no', event:rowEvent(r) }; }
+  async function gCreate(data){
+    const res = await api('guests', { method:'POST', body:JSON.stringify(data) });
+    if (res && res[0]) guests.push(Object.assign(res[0], { events:Object.assign({}, res[0].events) }));
+  }
+  function gUpdate(g, fields){ return gPatch(g, fields); }
+  function defaultDeadline(){ return deadlineDay; }
+  function deadlinePassed(day){ return Date.now() >= dlClosingInstant(day).getTime(); }
+  function viewForm(id){ window.open(formUrl(id), '_blank', 'noopener'); }
+  // Logos personnalisés : une ligne par fête (clé « logo:<fête> »), lue aussi par le formulaire public.
+  function defaultLogo(){ return 'assets/logo-clair.png'; }
+  async function logoFetch(ev){
+    const res = await api('settings?key=eq.' + encodeURIComponent('logo:' + ev) + '&select=value');
+    return res && res[0] ? res[0].value : null;
+  }
+  function logoStore(ev, v){
+    return api('settings', {
+      method:'POST',
+      headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
+      body:JSON.stringify({ key:'logo:' + ev, value:v, updated_at:new Date().toISOString() })
+    });
+  }
+  function logoDelete(ev){ return api('settings?key=eq.' + encodeURIComponent('logo:' + ev), { method:'DELETE', headers:{ 'Prefer':'return=minimal' } }); }
+  function afterLogoSaved(){}
+  // Formulaires (clé « forms ») ; « form » est l'ancien réglage à un seul formulaire, repris s'il existe.
+  async function fmFetch(){
+    const res = await api('settings?key=in.(forms,form)&select=key,value') || [];
+    const get = function(k){ const x = res.filter(function(r){ return r.key === k; })[0]; return x ? x.value : null; };
+    return { forms:get('forms'), legacy:get('form') };
+  }
+  function fmStore(value){
+    return api('settings', {
+      method:'POST',
+      headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
+      body:JSON.stringify({ key:'forms', value:value, updated_at:new Date().toISOString() })
+    });
+  }
+
+  // Compartiments d'un jour de fête : les témoins d'abord (quelle que soit leur catégorie) ;
+  // les accompagnants ont le leur, triés par invité accompagné.
+  const STATUS_RANK = { yes:0, pending:1, no:2 };
+  const AGE_RANK = { adult:0, child:1, baby:2 };
+  const GROUPS = [['couple', 'Les mariés'], ['witness', 'Témoins'], ['family', 'Famille'], ['friend', 'Amis'], ['work', 'Travail'], ['plus', 'Accompagnants'], ['vendor', 'Prestataires'], ['guest', 'Invités']];
+  function groupOf(g){
+    if (g.virtual) return 'couple';
+    if (g.witness) return 'witness';
+    if (roleOf(g) === 'plus') return 'plus';
+    if (isVendor(g)) return 'vendor';
+    return roleOf(g);
+  }
+  // Accompagnants : chacun est rattaché à un invité (plus_of) et numéroté dans l'ordre d'ajout.
+  function ownerOf(g){
+    if (roleOf(g) !== 'plus' || !g.plus_of) return null;
+    return guests.filter(function(x){ return x.id === g.plus_of && x !== g; })[0] || null;
+  }
+  function companionsOf(o){
+    return guests.filter(function(g){ return roleOf(g) === 'plus' && g.plus_of === o.id; }).sort(function(a, b){
+      return String(a.created_at || '').localeCompare(String(b.created_at || '')) || String(a.id).localeCompare(String(b.id));
+    });
+  }
+  function plusLabel(g){
+    const o = ownerOf(g);
+    return o ? 'Accompagnant ' + (companionsOf(o).indexOf(g) + 1) + ' de ' + fullName(o) : 'Accompagnant';
+  }
+  // Un accompagnant sans nom s'affiche sous la forme « Accompagnant 1 de … ».
+  function displayName(g){ return fullName(g) || (roleOf(g) === 'plus' ? plusLabel(g) : 'Sans nom'); }
+  // Ordre alphabétique sur le nom affiché (prénom puis nom, sans tenir compte des accents ni des majuscules) ;
+  // les accompagnants sont classés selon l'invité qu'ils accompagnent, puis dans leur ordre d'ajout.
+  function guestOrder(a, b){
+    const oa = ownerOf(a) || a, ob = ownerOf(b) || b;
+    return fullName(oa).localeCompare(fullName(ob), 'fr', { sensitivity:'base' }) ||
+      String(oa.id).localeCompare(String(ob.id)) ||
+      ((a === oa ? 0 : 1) - (b === ob ? 0 : 1)) ||
+      String(a.created_at || '').localeCompare(String(b.created_at || '')) || String(a.id).localeCompare(String(b.id));
+  }
+  // Menu « Accompagnant de » : visible seulement pour la catégorie Accompagnant.
+  function syncPlusBox(prefix, selected, exceptId){
+    const box = $(prefix + '-plus-box'), sel = $(prefix + '-plus-of');
+    box.hidden = roleChoice(prefix) !== 'plus';
+    const keep = selected !== undefined ? selected : sel.value;
+    sel.textContent = '';
+    const first = document.createElement('option'); first.value = ''; first.textContent = "Choisir l'invité…"; sel.appendChild(first);
+    guests.filter(function(g){ return roleOf(g) !== 'plus' && g.id !== exceptId && fullName(g); })
+      .sort(guestOrder)
+      .forEach(function(g){ const o = document.createElement('option'); o.value = g.id; o.textContent = fullName(g); sel.appendChild(o); });
+    sel.value = keep || '';
+  }
+  function roleOf(g){ return ROLE_LABEL[g.role] ? g.role : 'guest'; }
+  function roleChoice(prefix){ const c = document.querySelector('input[name="' + prefix + '-role"]:checked'); return c ? c.value : 'guest'; }
+  function ageChoice(prefix){ const c = document.querySelector('input[name="' + prefix + '-age"]:checked'); return c ? c.value : 'adult'; }
+  function plural(n, word){ return n + ' ' + word + (n > 1 ? 's' : ''); }
+
+  async function guestsLoad(){
+    $('g-error').textContent = '';
+    try {
+      const res = await api('settings?key=eq.events&select=value');
+      const list = res && res[0] && res[0].value && res[0].value.list;
+      if (Array.isArray(list) && list.length) events = list;
+    } catch(e){ /* réglage absent : jours de fête par défaut */ }
+    try {
+      guests = await api('guests?select=*');
+      guestsReady = true;
+    } catch(err){
+      guests = [];
+      $('g-error').textContent = notInstalled(err)
+        ? "La liste des invités n'est pas encore installée : exécutez supabase/invites.sql dans Supabase."
+        : 'Impossible de charger les invités. Réessayez avec « Actualiser ».';
+    }
+    if (evDirty) evRender(); else evReset();
+    gRender();
+    syncResponses();
+  }
+
+  function checkboxes(box, prefix, checked){
+    box.textContent = '';
+    sortedEvents().forEach(function(ev){
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox'; input.value = ev.id; input.id = prefix + ev.id; input.checked = !!checked[ev.id];
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(ev.name));
+      box.appendChild(label);
+    });
+  }
+  function checkedIds(box){
+    return Array.prototype.map.call(box.querySelectorAll('input:checked'), function(i){ return i.value; });
+  }
+
+  function gCell(g, ev){
+    const status = ev ? (g.events[ev.id] || 'pending') : 'pending';
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (ev && status !== 'pending' ? ' ' + status : '');
+    const main = document.createElement('button');
+    main.type = 'button'; main.className = 'cell-main';
+    const text = document.createElement('span'); text.className = 'cell-text';
+    const name = document.createElement('span'); name.className = 'cell-name';
+    const meta = document.createElement('span'); meta.className = 'cell-meta';
+    // Ligne du dessous : âge, catégorie, contact, sur une seule ligne coupée proprement si trop longue.
+    const tags = [];
+    const o = ownerOf(g), n = o ? companionsOf(o).indexOf(g) + 1 : 0;
+    if (roleOf(g) === 'plus' && !fullName(g)){
+      name.textContent = 'Accomp.' + (n ? ' ' + n : '');
+      if (o) tags.push(['tag-role', 'de ' + fullName(o)]);
+    } else {
+      name.textContent = displayName(g);
+      if (roleOf(g) !== 'guest') tags.push(['tag-role', roleOf(g) === 'plus' ? plusLabel(g).replace(/^Accompagnant/, 'Accomp.') : ROLE_LABEL[roleOf(g)]]);
+    }
+    if (ageOf(g) !== 'adult') tags.unshift(['tag-age', AGE_LABEL[ageOf(g)]]);
+    if (hasForm(g)) tags.push(['tag-form', 'Formulaire']);
+    if (g.contact) tags.push(['', g.contact]);
+    if (g.virtual) tags.splice(0, tags.length, ['tag-role', g.label]);
+    if (!tags.length) tags.push(['', ROLE_LABEL.guest]);
+    tags.forEach(function(t, i){
+      if (i) meta.appendChild(document.createTextNode(' · '));
+      const s = document.createElement('span'); if (t[0]) s.className = t[0]; s.textContent = t[1]; meta.appendChild(s);
+    });
+    text.appendChild(name); text.appendChild(meta); main.appendChild(text);
+    // « Accomp. » abrège la cellule ; la bulle et le lecteur d'écran gardent le mot entier.
+    const details = (name.textContent + ' — ' + meta.textContent).replace(/Accomp\./g, 'Accompagnant');
+    if (ev){
+      const ico = document.createElement('span'); ico.className = 'cell-ico'; ico.setAttribute('aria-hidden', 'true');
+      ico.textContent = { yes:'✓', no:'✕', pending:'…' }[status];
+      main.appendChild(ico);
+      main.title = details + ' — ' + STATUS_LABEL[status].slice(2) + (g.virtual ? '. Modifiable dans Réglages → Les mariés.' : '. Cliquer pour changer la présence.');
+      main.setAttribute('aria-label', details + ', ' + ev.name + ' : ' + STATUS_LABEL[status].slice(2) + '. Changer la présence');
+      main.addEventListener('click', function(){ gToggle(g, ev.id); });
+    } else {
+      main.title = details;
+      main.addEventListener('click', function(){ gOpen(g); });
+    }
+    const edit = document.createElement('button');
+    edit.type = 'button'; edit.className = 'cell-edit'; edit.title = 'Modifier';
+    edit.setAttribute('aria-label', 'Modifier ' + name.textContent.replace(/Accomp\./g, 'Accompagnant'));
+    edit.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+    edit.addEventListener('click', function(){ gOpen(g); });
+    cell.appendChild(main); cell.appendChild(edit);
+    return cell;
+  }
+
+  // Jours de fête repliés par défaut ; ceux qu'on déplie sont retenus dans ce navigateur.
+  const EXPAND_KEY = 'rsvp-guest-expanded';
+  let expanded = {};
+  try { expanded = JSON.parse(localStorage.getItem(EXPAND_KEY)) || {}; } catch(e){ expanded = {}; }
+  function setExpanded(key, on){
+    if (on) expanded[key] = true; else delete expanded[key];
+    try { localStorage.setItem(EXPAND_KEY, JSON.stringify(expanded)); } catch(e){}
+  }
+
+  // Tuile à gros chiffre : classe, nombre, libellé, précision (facultative).
+  function gTile(cls, n, label, sub){
+    const tile = document.createElement('div'); tile.className = 'g-stat ' + cls;
+    [['n', n], ['l', label], ['s', sub]].forEach(function(p){
+      if (p[1] === '' || p[1] == null) return;
+      const s = document.createElement('span'); s.className = p[0]; s.textContent = p[1]; tile.appendChild(s);
+    });
+    return tile;
+  }
+
+  function gSection(title, sub, list, ev){
+    const sec = document.createElement('section');
+    sec.className = 'card g-event';
+    const head = document.createElement('div'); head.className = 'g-head';
+    const titles = document.createElement('div');
+    const h = document.createElement('h2'); h.textContent = title; titles.appendChild(h);
+    const d = document.createElement('p'); d.className = 'g-date'; d.textContent = sub; titles.appendChild(d);
+    head.appendChild(titles);
+    sec.appendChild(head);
+    if (ev){
+      // Chiffres clés en grand : présence, puis repas des présents (les bébés n'ont pas de repas).
+      const invited = people().filter(function(g){ return g.events[ev.id]; });
+      const present = invited.filter(function(g){ return g.events[ev.id] === 'yes'; });
+      const no = invited.filter(function(g){ return g.events[ev.id] === 'no'; }).length;
+      // Photographe et vidéaste ont un repas : ils sont comptés à part, comme prestataires.
+      const kind = function(g){ return isVendor(g) ? 'vendor' : ageOf(g); };
+      const count = function(l, k){ return l.filter(function(g){ return kind(g) === k; }).length; };
+      const adults = count(present, 'adult'), kids = count(present, 'child'), vendors = count(present, 'vendor'), babies = count(present, 'baby');
+      const summary = document.createElement('div'); summary.className = 'g-summary';
+      summary.appendChild(gTile('yes', present.length, 'Présents', 'sur ' + plural(invited.length, 'invité')));
+      summary.appendChild(gTile('no', no, 'Absents'));
+      summary.appendChild(gTile('wait', invited.length - present.length - no, 'En attente'));
+      const parts = [plural(adults, 'adulte'), plural(kids, 'enfant')];
+      if (count(invited, 'vendor')) parts.push(plural(vendors, 'prestataire'));
+      const total = gTile('total', adults + kids + vendors, 'Repas à prévoir', parts.join(' · '));
+      if (count(invited, 'baby')){ const b = document.createElement('span'); b.className = 's'; b.textContent = '+ ' + plural(babies, 'bébé') + ' sans repas'; total.appendChild(b); }
+      summary.appendChild(total);
+      sec.appendChild(summary);
+    }
+    if (list.length){
+      // Un compartiment par catégorie ; la liste est déjà triée (accompagnants regroupés par invité accompagné).
+      GROUPS.forEach(function(grp){
+        // Dans chaque compartiment : présents, puis en attente, puis absents ; dans chaque statut,
+        // les adultes, puis les enfants, puis les bébés ; à égalité, l'ordre habituel.
+        const items = list.filter(function(g){ return groupOf(g) === grp[0]; });
+        items.sort(function(a, b){
+          return (ev ? STATUS_RANK[a.events[ev.id] || 'pending'] - STATUS_RANK[b.events[ev.id] || 'pending'] : 0) ||
+            AGE_RANK[ageOf(a)] - AGE_RANK[ageOf(b)] || guestOrder(a, b);
+        });
+        if (!items.length) return;
+        const box = document.createElement('div'); box.className = 'g-group';
+        const gh = document.createElement('h3'); gh.className = 'g-group-title'; gh.textContent = grp[1];
+        const gc = document.createElement('span'); gc.className = 'g-group-count';
+        gc.textContent = ev
+          ? plural(items.filter(function(g){ return g.events[ev.id] === 'yes'; }).length, 'présent') + ' sur ' + items.length
+          : String(items.length);
+        gh.appendChild(gc); box.appendChild(gh);
+        const cells = document.createElement('div'); cells.className = 'cells';
+        items.forEach(function(g){ cells.appendChild(gCell(g, ev)); });
+        box.appendChild(cells);
+        sec.appendChild(box);
+      });
+    } else {
+      const p = document.createElement('p'); p.className = 'empty';
+      p.textContent = $('g-search').value.trim() ? 'Aucun invité ne correspond à la recherche.' : 'Aucun invité pour ce jour de fête.';
+      sec.appendChild(p);
+    }
+    // Tout ce qui suit l'en-tête se replie ; une recherche en cours déplie tout.
+    const key = ev ? ev.id : 'none';
+    const body = document.createElement('div'); body.className = 'g-body'; body.id = 'g-body-' + key;
+    while (head.nextSibling) body.appendChild(head.nextSibling);
+    sec.appendChild(body);
+    const closed = !expanded[key] && !$('g-search').value.trim();
+    body.hidden = closed;
+    const tog = document.createElement('button');
+    tog.type = 'button'; tog.className = 'g-toggle';
+    tog.setAttribute('aria-expanded', String(!closed)); tog.setAttribute('aria-controls', body.id);
+    tog.setAttribute('aria-label', (closed ? 'Afficher ' : 'Réduire ') + title);
+    tog.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+    const toggle = function(){ setExpanded(key, !expanded[key]); gRender(); const t = $('g-sections').querySelector('[aria-controls="' + body.id + '"]'); if (t) t.focus(); };
+    tog.addEventListener('click', toggle);
+    titles.classList.add('g-titles');
+    titles.addEventListener('click', toggle);
+    head.insertBefore(tog, head.firstChild);
+    if (closed && ev){
+      const inv = people().filter(function(g){ return g.events[ev.id]; });
+      const pres = inv.filter(function(g){ return g.events[ev.id] === 'yes'; }).length;
+      const mini = document.createElement('p'); mini.className = 'g-mini';
+      mini.textContent = plural(pres, 'présent') + ' sur ' + plural(inv.length, 'invité');
+      titles.appendChild(mini);
+    }
+    return sec;
+  }
+
+  function gRender(){
+    // Redessine les cases du formulaire d'ajout en gardant celles déjà cochées.
+    const kept = {}; checkedIds($('ga-events')).forEach(function(id){ kept[id] = true; });
+    checkboxes($('ga-events'), 'ga-ev-', kept);
+    guests.forEach(function(g){ if (!g.events || typeof g.events !== 'object') g.events = {}; });
+    guests.sort(guestOrder);
+    syncPlusBox('ga');
+    const q = $('g-search').value.trim().toLowerCase();
+    const match = function(g){ return !q || (g.first_name + ' ' + g.last_name + ' ' + g.last_name + ' ' + g.first_name + ' ' + (g.contact || '')).toLowerCase().indexOf(q) >= 0; };
+    const box = $('g-sections');
+    box.textContent = '';
+    sortedEvents().forEach(function(ev){
+      const list = people().filter(function(g){ return g.events[ev.id] && match(g); });
+      box.appendChild(gSection('Invités · ' + ev.name, eventLabel(ev), list, ev));
+    });
+    const known = {}; events.forEach(function(ev){ known[ev.id] = true; });
+    const orphans = guests.filter(function(g){ return !Object.keys(g.events).some(function(k){ return known[k]; }) && match(g); });
+    if (orphans.length) box.appendChild(gSection('Sans jour de fête', 'Ces invités ne sont rattachés à aucun jour : modifiez-les pour les ajouter à un jour.', orphans, null));
+    fmRender(); respRender(); shareRender(); adminHeader();
+  }
+
+  let gaTimer = null;
+  function gaToast(text){
+    $('ga-toast').textContent = text;
+    clearTimeout(gaTimer);
+    gaTimer = setTimeout(function(){ $('ga-toast').textContent = ''; }, 6000);
+  }
+
+  $('ga-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const first = $('ga-first').value.trim(), last = $('ga-last').value.trim(), contact = $('ga-contact').value.trim(), age = ageChoice('ga'), role = roleChoice('ga'), plusOf = role === 'plus' ? $('ga-plus-of').value : null, witness = $('ga-witness').checked;
+    const ids = checkedIds($('ga-events'));
+    if (role === 'plus' && !plusOf){ gaToast("Choisissez l'invité qu'il accompagne."); $('ga-plus-of').focus(); return; }
+    if (!first && role !== 'plus'){ gaToast('Indiquez au moins le prénom.'); $('ga-first').focus(); return; }
+    if (!ids.length){ gaToast('Cochez au moins un jour de fête.'); return; }
+    const evs = {}; ids.forEach(function(id){ evs[id] = 'pending'; });
+    const btn = $('ga-submit'); btn.disabled = true;
+    try {
+      const res = await api('guests', { method:'POST', body:JSON.stringify({ first_name:first, last_name:last, contact:contact, age:age, role:role, plus_of:plusOf, witness:witness, events:evs }) });
+      guests.push(res[0]);
+      $('ga-first').value = ''; $('ga-last').value = ''; $('ga-contact').value = ''; $('ga-adult').checked = true; $('ga-guest').checked = true; syncPlusBox('ga', ''); $('ga-witness').checked = false;
+      gRender();
+      gaToast(first + ' ' + last + ' ajouté(e).');
+      $('ga-first').focus();
+    } catch(err){
+      gaToast(notInstalled(err) ? "Ajout impossible : exécutez d'abord supabase/invites.sql dans Supabase." : "L'ajout n'a pas abouti. Réessayez.");
+    } finally { btn.disabled = false; }
+  });
+
+  async function gPatch(g, fields){
+    const res = await api('guests?id=eq.' + encodeURIComponent(g.id), {
+      method:'PATCH', body:JSON.stringify(Object.assign({ updated_at:new Date().toISOString() }, fields))
+    });
+    if (res && res[0]) Object.assign(g, res[0]);
+  }
+
+  async function gToggle(g, evId){
+    if (g.virtual){ showTab('reglages'); return; }
+    if (linkedTo(g, evId)){
+      $('g-error').textContent = displayName(g) + " a répondu au formulaire : sa présence à ce jour vient de sa réponse (onglet Réponses).";
+      return;
+    }
+    const before = Object.assign({}, g.events);
+    g.events[evId] = NEXT_STATUS[g.events[evId] || 'pending'];
+    gRender();
+    try { await gPatch(g, { events:g.events }); }
+    catch(err){
+      g.events = before; gRender();
+      $('g-error').textContent = "Le changement de présence n'a pas été enregistré. Réessayez.";
+    }
+  }
+
+  function gOpen(g){
+    if (g.virtual){ showTab('reglages'); return; }
+    editing = g; pendingGuestDelete = false;
+    $('gd-first').value = g.first_name; $('gd-last').value = g.last_name; $('gd-contact').value = g.contact || ''; $('gd-' + ageOf(g)).checked = true; $('gd-' + roleOf(g)).checked = true; syncPlusBox('gd', g.plus_of || '', g.id); $('gd-witness').checked = !!g.witness;
+    checkboxes($('gd-events'), 'gd-ev-', g.events);
+    $('gd-error').textContent = '';
+    $('gd-delete').textContent = "Supprimer l'invité"; $('gd-delete').classList.remove('confirm');
+    $('g-dialog').showModal();
+  }
+  function gClose(){ $('g-dialog').close(); editing = null; }
+  $('gd-close').addEventListener('click', gClose);
+  $('gd-cancel').addEventListener('click', gClose);
+  $('g-dialog').addEventListener('click', function(e){ if (e.target === this) gClose(); });
+
+  $('gd-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const g = editing; if (!g) return;
+    const first = $('gd-first').value.trim(), last = $('gd-last').value.trim(), contact = $('gd-contact').value.trim(), age = ageChoice('gd'), role = roleChoice('gd'), plusOf = role === 'plus' ? $('gd-plus-of').value : null, witness = $('gd-witness').checked;
+    if (role === 'plus' && !plusOf){ $('gd-error').textContent = "Choisissez l'invité qu'il accompagne."; return; }
+    if (!first && role !== 'plus'){ $('gd-error').textContent = 'Indiquez au moins le prénom.'; return; }
+    // Les jours décochés sont retirés ; ceux qui restent gardent leur présence.
+    const evs = {};
+    Object.keys(g.events).forEach(function(k){ if (!events.some(function(ev){ return ev.id === k; })) evs[k] = g.events[k]; });
+    checkedIds($('gd-events')).forEach(function(id){ evs[id] = g.events[id] || 'pending'; });
+    $('gd-save').disabled = true;
+    try {
+      await gPatch(g, { first_name:first, last_name:last, contact:contact, age:age, role:role, plus_of:plusOf, witness:witness, events:evs });
+      gClose(); gRender();
+    } catch(err){ $('gd-error').textContent = "L'enregistrement n'a pas abouti. Réessayez."; }
+    finally { $('gd-save').disabled = false; }
+  });
+
+  $('gd-delete').addEventListener('click', async function(){
+    const g = editing; if (!g) return;
+    if (hasForm(g)){ $('gd-error').textContent = "Cette personne a répondu au formulaire : supprimez d'abord sa réponse dans l'onglet Réponses, sinon elle reviendra dans la liste."; return; }
+    if (!pendingGuestDelete){
+      pendingGuestDelete = true;
+      this.textContent = 'Confirmer la suppression'; this.classList.add('confirm');
+      return;
+    }
+    try {
+      await api('guests?id=eq.' + encodeURIComponent(g.id), { method:'DELETE' });
+      guests = guests.filter(function(x){ return x !== g; });
+      gClose(); gRender();
+    } catch(err){ $('gd-error').textContent = "La suppression n'a pas abouti. Réessayez."; }
+  });
+
+  $('g-search').addEventListener('input', gRender);
+  ['ga', 'gd'].forEach(function(prefix){
+    document.querySelectorAll('input[name="' + prefix + '-role"]').forEach(function(r){
+      r.addEventListener('change', function(){ syncPlusBox(prefix, undefined, prefix === 'gd' && editing ? editing.id : undefined); });
+    });
+  });
+  // En choisissant l'invité accompagné, on reprend ses jours de fête si aucun n'est encore coché.
+  $('ga-plus-of').addEventListener('change', function(){
+    const o = guests.filter(function(g){ return g.id === $('ga-plus-of').value; })[0];
+    if (!o || checkedIds($('ga-events')).length) return;
+    $('ga-events').querySelectorAll('input').forEach(function(i){ i.checked = !!o.events[i.value]; });
+  });
+
+  // ---------- Réglage des jours de fête ----------
+  function evReset(){
+    evDraft = events.map(function(ev){ return Object.assign({}, ev); });
+    evDirty = false; evPendingRemove = null;
+    evRender();
+  }
+  function evToast(text){
+    $('ev-toast').textContent = text;
+    setTimeout(function(){ if ($('ev-toast').textContent === text) $('ev-toast').textContent = ''; }, 7000);
+  }
+  function evRender(){
+    const box = $('ev-list');
+    box.textContent = '';
+    evDraft.forEach(function(ev, i){
+      const row = document.createElement('div'); row.className = 'ev-row';
+      [['name', 'Nom du jour de fête', 'text', 'field'], ['date', 'Date', 'date', 'field date'], ['start', 'Début', 'time', 'field time'], ['end', 'Fin', 'time', 'field time']].forEach(function(f){
+        const field = document.createElement('div'); field.className = f[3];
+        const label = document.createElement('label'); label.htmlFor = 'ev-' + f[0] + '-' + i; label.textContent = f[1];
+        const input = document.createElement('input'); input.type = f[2]; input.id = 'ev-' + f[0] + '-' + i; input.value = ev[f[0]] || '';
+        if (f[0] === 'name') input.maxLength = 40;
+        input.addEventListener('input', function(){ ev[f[0]] = input.value; evDirty = true; });
+        field.appendChild(label); field.appendChild(input); row.appendChild(field);
+      });
+      const n = guests.filter(function(g){ return g.events && g.events[ev.id]; }).length;
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'del' + (evPendingRemove === ev ? ' confirm' : '');
+      del.textContent = evPendingRemove === ev ? 'Confirmer : ' + plural(n, 'invité') + ' quitteront ce jour' : 'Retirer';
+      del.disabled = evDraft.length <= 1;
+      del.addEventListener('click', function(){
+        if (n && evPendingRemove !== ev){ evPendingRemove = ev; evRender(); return; }
+        evDraft.splice(evDraft.indexOf(ev), 1); evDirty = true; evPendingRemove = null; evRender();
+        evToast('Jour retiré. Cliquez sur « Enregistrer les jours de fête » pour valider.');
+      });
+      row.appendChild(del);
+      box.appendChild(row);
+    });
+    $('ev-add').disabled = evDraft.length >= EVENTS_MAX;
+  }
+  $('ev-add').addEventListener('click', function(){
+    if (evDraft.length >= EVENTS_MAX) return;
+    evDraft.push({ id:'j' + Date.now().toString(36), name:'', date:'', start:'', end:'' });
+    evDirty = true; evRender();
+    $('ev-name-' + (evDraft.length - 1)).focus();
+  });
+  $('ev-save').addEventListener('click', async function(){
+    const list = evDraft.map(function(ev){ return { id:ev.id, name:(ev.name || '').trim(), date:ev.date || '', start:ev.start || '', end:ev.end || '' }; });
+    if (list.some(function(ev){ return !ev.name; })){ evToast('Donnez un nom à chaque jour de fête.'); return; }
+    if (list.some(function(ev){ return !/^\d{4}-\d{2}-\d{2}$/.test(ev.date); })){ evToast('Choisissez une date pour chaque jour de fête.'); return; }
+    const btn = $('ev-save'); btn.disabled = true;
     try {
       await api('settings', {
         method:'POST',
         headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
-        body:JSON.stringify({ key:'deadline', value:{ date:v }, updated_at:new Date().toISOString() })
+        body:JSON.stringify({ key:'events', value:{ list:list }, updated_at:new Date().toISOString() })
       });
-      deadlineDay = v;
-      dlRender();
-      dlToast('Date limite enregistrée : ' + dlLabel(v) + '. Le formulaire est à jour.');
+      events = list;
+      evReset(); gRender(); fmSyncEvent();
+      evToast('Jours de fête enregistrés. L\'onglet « Invités » est à jour.');
     } catch(err){
-      dlToast(err.status === 404 || err.code === 'PGRST205' || err.code === '42P01'
-        ? "Enregistrement impossible : exécutez d'abord supabase/date-limite-reglable.sql dans Supabase."
+      evToast(notInstalled(err)
+        ? "Enregistrement impossible : exécutez d'abord supabase/invites.sql dans Supabase."
         : "L'enregistrement n'a pas abouti. Réessayez.");
     } finally { btn.disabled = false; }
   });
-  dlRender();
+  evReset(); gRender();
+
+  // ---------- Les mariés ----------
+  const COUPLE_DEFAULT = { bride:{ first_name:'Marine', last_name:'' }, groom:{ first_name:'Jeremy', last_name:'' }, children:[] };
+  const KIDS_MAX = 10;
+  let couple = cpNormalize(null), cpDirty = false;
+  coupleSaved = cpNormalize(null);
+  function cpPerson(x){ return { first_name:String((x && x.first_name) || ''), last_name:String((x && x.last_name) || '') }; }
+  function cpNormalize(v){
+    v = v || {};
+    return {
+      bride:cpPerson(v.bride || COUPLE_DEFAULT.bride),
+      groom:cpPerson(v.groom || COUPLE_DEFAULT.groom),
+      children:Array.isArray(v.children) ? v.children.map(function(k, i){ return Object.assign({ id:k.id || 'k' + i, age:AGE_LABEL[k.age] ? k.age : 'child' }, cpPerson(k)); }) : []
+    };
+  }
+  function cpToast(text){ $('cp-toast').textContent = text; setTimeout(function(){ if ($('cp-toast').textContent === text) $('cp-toast').textContent = ''; }, 7000); }
+  function cpRender(){
+    ['bride', 'groom'].forEach(function(who){
+      $('cp-' + who + '-first').value = couple[who].first_name;
+      $('cp-' + who + '-last').value = couple[who].last_name;
+    });
+    const box = $('cp-kids'); box.textContent = '';
+    couple.children.forEach(function(k, i){
+      const row = document.createElement('div'); row.className = 'ev-row';
+      [['first_name', 'Prénom'], ['last_name', 'Nom']].forEach(function(f){
+        const field = document.createElement('div'); field.className = 'field';
+        const label = document.createElement('label'); label.htmlFor = 'cp-kid-' + f[0] + '-' + i; label.textContent = f[1];
+        const input = document.createElement('input'); input.type = 'text'; input.id = 'cp-kid-' + f[0] + '-' + i; input.maxLength = 60; input.autocomplete = 'off';
+        input.value = k[f[0]];
+        input.addEventListener('input', function(){ k[f[0]] = input.value; cpDirty = true; });
+        field.appendChild(label); field.appendChild(input); row.appendChild(field);
+      });
+      // Âge de l'enfant : compte pour les repas (un bébé n'a pas de repas).
+      const af = document.createElement('div'); af.className = 'field date';
+      const al = document.createElement('label'); al.htmlFor = 'cp-kid-age-' + i; al.textContent = 'Âge';
+      const as = document.createElement('select'); as.id = 'cp-kid-age-' + i;
+      [['child', 'Enfant'], ['adult', 'Adulte'], ['baby', 'Bébé']].forEach(function(o){
+        const op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; as.appendChild(op);
+      });
+      as.value = k.age || 'child';
+      as.addEventListener('change', function(){ k.age = as.value; cpDirty = true; });
+      af.appendChild(al); af.appendChild(as); row.appendChild(af);
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'del'; del.textContent = 'Retirer';
+      del.addEventListener('click', function(){
+        couple.children.splice(couple.children.indexOf(k), 1); cpDirty = true; cpRender();
+        cpToast('Enfant retiré. Cliquez sur « Enregistrer les mariés » pour valider.');
+      });
+      row.appendChild(del); box.appendChild(row);
+    });
+    $('cp-kids-empty').hidden = couple.children.length > 0;
+    $('cp-add-kid').disabled = couple.children.length >= KIDS_MAX;
+  }
+  ['bride', 'groom'].forEach(function(who){
+    ['first', 'last'].forEach(function(part){
+      $('cp-' + who + '-' + part).addEventListener('input', function(){ couple[who][part + '_name'] = this.value; cpDirty = true; });
+    });
+  });
+  $('cp-add-kid').addEventListener('click', function(){
+    if (couple.children.length >= KIDS_MAX) return;
+    couple.children.push({ id:'k' + Date.now().toString(36), first_name:'', last_name:'', age:'child' });
+    cpDirty = true; cpRender();
+    $('cp-kid-first_name-' + (couple.children.length - 1)).focus();
+  });
+  async function cpFetch(){
+    const res = await api('settings?key=eq.couple&select=value');
+    return res && res[0] ? res[0].value : null;
+  }
+  function cpStore(value){
+    return api('settings', {
+      method:'POST',
+      headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
+      body:JSON.stringify({ key:'couple', value:value, updated_at:new Date().toISOString() })
+    });
+  }
+  async function cpLoad(){
+    try { const v = await cpFetch(); coupleSaved = cpNormalize(v); if (!cpDirty){ couple = cpNormalize(v); cpRender(); } gRender(); }
+    catch(e){ /* réglage absent : valeurs par défaut */ }
+  }
+  $('cp-save').addEventListener('click', async function(){
+    const trim = function(p){ return { first_name:p.first_name.trim().slice(0, 60), last_name:p.last_name.trim().slice(0, 60) }; };
+    const value = {
+      bride:trim(couple.bride), groom:trim(couple.groom),
+      children:couple.children.map(function(k){ return Object.assign({ id:k.id, age:AGE_LABEL[k.age] ? k.age : 'child' }, trim(k)); })
+    };
+    if (!value.bride.first_name || !value.groom.first_name){ cpToast('Indiquez le prénom de la mariée et celui du marié.'); return; }
+    if (value.children.some(function(k){ return !k.first_name; })){ cpToast('Donnez un prénom à chaque enfant, ou retirez la ligne.'); return; }
+    const b = $('cp-save'); b.disabled = true;
+    try {
+      await cpStore(value);
+      couple = cpNormalize(value); cpDirty = false; cpRender();
+      coupleSaved = cpNormalize(value); gRender();
+      cpToast('Mariés enregistrés.');
+    } catch(err){
+      cpToast(err && (err.status === 404 || err.code === 'PGRST205' || err.code === '42P01')
+        ? "Enregistrement impossible : exécutez d'abord supabase/invites.sql dans Supabase."
+        : "L'enregistrement n'a pas abouti. Réessayez.");
+    } finally { b.disabled = false; }
+  });
+  cpRender(); gRender();
+
+  // ---------- Onglet Réglages : fenêtres repliables ----------
+  // Chaque fenêtre se replie avec son chevron ou son titre ; repliées par défaut, ouverture retenue dans ce navigateur.
+  (function(){
+    const KEY = 'rsvp-settings-open';
+    let open = {};
+    try { open = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ open = {}; }
+    document.querySelectorAll('#panel-reglages > section.card').forEach(function(sec){
+      const head = sec.querySelector('.dl-head'), title = head && head.querySelector('h2');
+      if (!head || !title || !title.id) return;
+      const key = title.id;
+      const body = document.createElement('div'); body.className = 'set-body'; body.id = key + '-body';
+      while (head.nextSibling) body.appendChild(head.nextSibling);
+      sec.appendChild(body);
+      const tog = document.createElement('button');
+      tog.type = 'button'; tog.className = 'g-toggle'; tog.setAttribute('aria-controls', body.id);
+      tog.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+      head.insertBefore(tog, head.firstChild);
+      head.classList.add('set-head');
+      const apply = function(){
+        const on = !!open[key];
+        body.hidden = !on; sec.classList.toggle('set-closed', !on);
+        tog.setAttribute('aria-expanded', String(on));
+        tog.setAttribute('aria-label', (on ? 'Réduire ' : 'Afficher ') + title.textContent);
+      };
+      const toggle = function(){
+        if (open[key]) delete open[key]; else open[key] = true;
+        try { localStorage.setItem(KEY, JSON.stringify(open)); } catch(e){}
+        apply();
+      };
+      tog.addEventListener('click', toggle);
+      title.addEventListener('click', toggle);
+      apply();
+    });
+  })();
 
   // ---------- Invitation ----------
   const FORM_URL = 'https://theryble.github.io/mariage-rsvp/';
@@ -742,7 +2510,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   function message(){
     const name = $('inv-name').value.trim();
-    return invText.value.replace(/\{prénom\}/g, name).replace(/\{date limite\}/g, dlLabel(deadlineDay)).replace(/Bonjour ,/g, 'Bonjour,').trim();
+    return invText.value.replace(/\{prénom\}/g, name).replace(/\{date limite\}/g, dlLabel(formDeadline(mainForm()))).replace(/Bonjour ,/g, 'Bonjour,').trim();
   }
 
   let toastTimer = null;
@@ -770,24 +2538,33 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     clearTimeout(shareTimer);
     shareTimer = setTimeout(function(){ $('share-toast').textContent = ''; }, 5000);
   }
-  $('share-open').addEventListener('click', function(){ $('share-dialog').showModal(); });
+  // Un lien et un QR code par formulaire ouvert (menu en haut de la fenêtre s'il y en a plusieurs).
+  let shareQr = null;
+  function shareUrl(){ return formUrl($('share-event').value || mainForm()); }
+  function shareApply(){
+    const url = shareUrl();
+    $('share-url').value = url;
+    if (shareQr){ shareQr.clear(); shareQr.makeCode(url); }
+  }
+  $('share-open').addEventListener('click', function(){ shareRender(); shareApply(); $('share-dialog').showModal(); });
   $('share-close').addEventListener('click', function(){ $('share-dialog').close(); });
   $('share-dialog').addEventListener('click', function(e){ if (e.target === this) this.close(); });
+  $('share-event').addEventListener('change', shareApply);
   $('share-url').value = FORM_URL;
   $('share-url').addEventListener('focus', function(){ this.select(); });
   if (window.QRCode){
-    new QRCode($('qr'), { text:FORM_URL, width:360, height:360, colorDark:'#3a2e28', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M });
+    shareQr = new QRCode($('qr'), { text:FORM_URL, width:360, height:360, colorDark:'#3a2e28', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M });
   } else {
     $('qr').hidden = true;
     $('share-dl').hidden = true;
   }
   $('share-copy').addEventListener('click', async function(){
-    shareToast(await copy(FORM_URL) ? 'Lien copié. Collez-le dans un message.' : 'Copie impossible : sélectionnez le lien et copiez-le à la main.');
+    shareToast(await copy(shareUrl()) ? 'Lien copié. Collez-le dans un message.' : 'Copie impossible : sélectionnez le lien et copiez-le à la main.');
   });
   if (navigator.share){
     $('share-native').hidden = false;
     $('share-native').addEventListener('click', function(){
-      navigator.share({ title:"Vin d'honneur — Marine & Jeremy", url:FORM_URL }).catch(function(){});
+      navigator.share({ title:eventName($('share-event').value || mainForm()) + ' — Marine & Jeremy', url:shareUrl() }).catch(function(){});
     });
   }
   $('share-dl').addEventListener('click', function(){
@@ -795,7 +2572,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     if (!canvas){ shareToast('Le QR code n\'est pas disponible.'); return; }
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
-    a.download = 'qrcode-mariage-rsvp.png';
+    a.download = 'qrcode-' + ($('share-event').value || 'mariage-rsvp') + '.png';
     document.body.appendChild(a); a.click(); a.remove();
   });
 
@@ -878,7 +2655,8 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
 
   function rapRecipients(){
     const withEmail = [], without = [];
-    rows.filter(function(r){ return r.attending; }).forEach(function(r){
+    // Présents de la fête choisie dans l'onglet Réponses (toutes les fêtes si aucune n'est choisie).
+    rows.filter(function(r){ return r.attending && (!respEvent || rowEvent(r) === respEvent); }).forEach(function(r){
       const m = (r.contact || '').match(EMAIL_RE);
       if (m) withEmail.push({ name:r.first_name + ' ' + r.last_name, email:m[0].toLowerCase() });
       else without.push({ name:r.first_name + ' ' + r.last_name, contact:r.contact });
@@ -893,7 +2671,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     const p = document.createElement('p');
     const c = document.createElement('span'); c.className = 'count';
     c.textContent = r.withEmail.length + ' présent' + (r.withEmail.length > 1 ? 's' : '') + ' avec une adresse e-mail';
-    p.appendChild(c); p.appendChild(document.createTextNode(' recevront le rappel.'));
+    p.appendChild(c); p.appendChild(document.createTextNode(' recevront le rappel' + (respEvent ? ' (formulaire « ' + eventName(respEvent) + ' », choisi dans l\'onglet Réponses).' : ' (toutes les fêtes ; choisissez une fête dans l\'onglet Réponses pour cibler).')));
     box.appendChild(p);
     if (r.without.length){
       const p2 = document.createElement('p');
