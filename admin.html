@@ -375,6 +375,8 @@
   .pv-stage iframe{ width:400px; max-width:100%; height:min(72vh, 820px); border:1px solid var(--line); border-radius:18px; background:var(--paper); }
   .pv-stage.wide iframe{ width:100%; border-radius:12px; }
   /* ---------- Formulaires : un compartiment par fête ---------- */
+  .pill.lock{ background:var(--rose-tint); color:var(--rose-deep); }
+  #fm-code{ text-transform:uppercase; letter-spacing:.12em; }
   .fm-root-note{ margin:0; padding:10px 12px; border-radius:10px; background:var(--gold-tint); color:var(--gold-ink); font-size:.88rem; }
   .fm-root-note strong{ overflow-wrap:anywhere; }
   .fm-root{ display:grid; gap:6px; padding:12px 14px; border:1px solid var(--gold); border-radius:12px; background:var(--gold-tint); }
@@ -782,6 +784,15 @@
           <input type="text" id="fm-place" maxlength="120" autocomplete="off">
         </div>
         <label class="fm-check"><input type="checkbox" id="fm-open">Formulaire ouvert : les invités peuvent répondre</label>
+        <label class="fm-check"><input type="checkbox" id="fm-lock">Protéger ce formulaire par un code : seuls les invités qui ont le code peuvent l'ouvrir et répondre</label>
+        <div class="field" id="fm-code-field" hidden>
+          <label for="fm-code">Code d'accès</label>
+          <div class="fm-link-row">
+            <input type="text" id="fm-code" maxlength="30" autocomplete="off" spellcheck="false">
+            <button type="button" class="btn-ghost" id="fm-code-gen">Générer un code</button>
+          </div>
+          <p class="fm-hint">Communiquez ce code avec l'invitation. Les majuscules et les espaces ne comptent pas.</p>
+        </div>
         <p class="fm-root-note" id="fm-root-note" hidden>Ce formulaire s'ouvre avec l'adresse simple <strong>theryble.github.io/mariage-rsvp</strong> (choisie en haut de la fenêtre).</p>
         <div class="field" id="fm-slug-field">
           <label for="fm-slug">Adresse du formulaire</label>
@@ -1359,6 +1370,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       return head + word.slice(head.length).replace(/(^|[-'’])(\p{L})/gu, function(m, sep, ch){ return sep + ch.toLocaleUpperCase('fr-FR'); });
     }).join(' ');
   }
+  // Code d'accès : les majuscules et les espaces ne comptent pas ; l'empreinte (SHA-256) sert à le vérifier sans le montrer.
+  function normCode(c){ return String(c || '').replace(/\s+/g, '').toUpperCase(); }
+  async function codeHash(ev, code){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('rsvp:' + ev + ':' + normCode(code)));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+  }
   // Mise en forme dès qu'on quitte un champ de prénom ou de nom.
   function formatOnBlur(el){ if (el) el.addEventListener('blur', function(){ const v = formatName(el.value); if (v !== el.value) el.value = v; }); }
   // Repères remplacés dans les textes : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu}, {lieu court}.
@@ -1431,7 +1448,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   // forms = { main:'vin', list:{ vin:{ open, name, date, … }, … } } ; null tant que rien n'est réglé
   // (seul le formulaire d'origine du vin d'honneur existe alors).
   const FORM_BASE = 'https://theryble.github.io/mariage-rsvp/';
-  const FM_FIELDS = ['fm-deadline', 'fm-logo-show', 'fm-open', 'fm-place', 'fm-introtext', 'fm-solo', 'fm-dress-show', 'fm-dress-text', 'fm-gift-show', 'fm-gift-text'];
+  const FM_FIELDS = ['fm-lock', 'fm-code', 'fm-deadline', 'fm-logo-show', 'fm-open', 'fm-place', 'fm-introtext', 'fm-solo', 'fm-dress-show', 'fm-dress-text', 'fm-gift-show', 'fm-gift-text'];
   let fmEditing = 'vin', respEvent = '';
   // Date limite propre à chaque formulaire (vide : la date limite par défaut).
   function formDeadline(ev){ const f = formFor(ev); return f && /^\d{4}-\d{2}-\d{2}$/.test(f.deadline || '') ? f.deadline : defaultDeadline(); }
@@ -1545,6 +1562,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   function fmToast(text){ $('fm-toast').textContent = text; setTimeout(function(){ if ($('fm-toast').textContent === text) $('fm-toast').textContent = ''; }, 8000); }
   function fmFill(f){
     $('fm-open').checked = formIsOpen(fmEditing);
+    $('fm-lock').checked = formLocked(fmEditing); $('fm-code').value = fmCodes[fmEditing] || ''; $('fm-code-field').hidden = !$('fm-lock').checked;
     $('fm-place').value = f.place; $('fm-introtext').value = f.intro; $('fm-solo').checked = f.solo;
     $('fm-dress-show').checked = f.dress.show; $('fm-dress-text').value = f.dress.text;
     $('fm-gift-show').checked = f.gift.show; $('fm-gift-text').value = f.gift.text;
@@ -1594,6 +1612,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       const st = document.createElement('span'); st.className = 'pill ' + (formIsOpen(ev.id) ? 'open' : 'closed');
       st.textContent = formIsOpen(ev.id) ? 'Ouvert' : 'Fermé'; tags.appendChild(st);
       if (mainForm() === ev.id){ const m = document.createElement('span'); m.className = 'pill main'; m.textContent = 'Principal'; tags.appendChild(m); }
+      if (formLocked(ev.id)){ const l = document.createElement('span'); l.className = 'pill lock'; l.textContent = 'Code'; tags.appendChild(l); }
       head.appendChild(chev); head.appendChild(text); head.appendChild(tags);
       head.addEventListener('click', function(){ fmToggle(ev.id); });
       item.appendChild(head);
@@ -1626,6 +1645,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     fmToast((await copy(url)) ? 'Lien copié : ' + url + (fmDirty ? ' (pensez à enregistrer le formulaire pour qu\'il soit actif).' : '') : 'Copie impossible : sélectionnez le lien et copiez-le à la main.');
   });
   async function fmLoad(){
+    try { fmCodes = (await codesFetch()) || {}; } catch(e){ fmCodes = {}; }
     try { const v = await fmFetch(); forms = formsMerge(v && v.forms, v && v.legacy); } catch(e){ /* réglage absent : formulaire d'origine */ }
     formReady = true;
     if (!fmDirty) fmFill(fmEventCfg(fmEditing));
@@ -1644,6 +1664,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     next.list[fmEditing] = cfg;
     const b = $('fm-save'); b.disabled = true;
     try {
+      // Code d'accès : le code en clair reste réservé aux mariés ; le formulaire n'en garde qu'une empreinte.
+      const lockOn = $('fm-lock').checked, code = normCode($('fm-code').value);
+      if (lockOn && code.length < 3) throw Object.assign(new Error('code'), { fmMessage:"Choisissez un code d'au moins 3 caractères, ou décochez la protection." });
+      cfg.access = { on:lockOn, hash:lockOn ? await codeHash(fmEditing, code) : '' };
+      const codes = Object.assign({}, fmCodes); if (lockOn) codes[fmEditing] = code; else delete codes[fmEditing];
+      if (JSON.stringify(codes) !== JSON.stringify(fmCodes)){ await codesStore(codes); fmCodes = codes; }
       if (fmLogoDraft !== undefined){
         if (fmLogoDraft) await logoStore(fmEditing, fmLogoDraft); else await logoDelete(fmEditing);
         fmLogo = fmLogoDraft; fmLogoDraft = undefined; afterLogoSaved(fmEditing);
@@ -1654,6 +1680,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
         (next.main ? '' : ' Aucun formulaire principal : l\'adresse simple affiche « formulaire fermé ».'));
       syncResponses();
     } catch(err){
+      if (err && err.fmMessage){ fmToast(err.fmMessage); $('fm-code').focus(); return; }
       fmToast(err && (err.status === 404 || err.code === 'PGRST205' || err.code === '42P01')
         ? "Enregistrement impossible : exécutez d'abord supabase/invites.sql dans Supabase."
         : "L'enregistrement n'a pas abouti. Réessayez.");
@@ -1782,6 +1809,21 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   $('cp-kids').addEventListener('focusout', function(e){
     if (e.target.matches && e.target.matches('input[type=text]')){ const v = formatName(e.target.value); if (v !== e.target.value){ e.target.value = v; e.target.dispatchEvent(new Event('input')); } }
   });
+  // Code d'accès d'un formulaire : le code en clair n'est lisible que par les mariés ; le formulaire n'en garde qu'une empreinte.
+  let fmCodes = {};
+  function formLocked(ev){ const f = formFor(ev); return !!(f && f.access && f.access.on); }
+  function newCode(){
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', a = new Uint32Array(6);
+    crypto.getRandomValues(a);
+    return Array.from(a, function(x){ return chars.charAt(x % chars.length); }).join('');
+  }
+  $('fm-lock').addEventListener('change', function(){
+    $('fm-code-field').hidden = !this.checked;
+    if (this.checked && !$('fm-code').value.trim()) $('fm-code').value = newCode();
+  });
+  $('fm-code-gen').addEventListener('click', function(){ $('fm-code').value = newCode(); fmDirty = true; });
+  $('fm-code').addEventListener('blur', function(){ this.value = normCode(this.value); });
+
   // Aperçu avant enregistrement : le formulaire avec les réglages en cours (textes, logo, date limite).
   $('fm-draft').addEventListener('click', function(){ showDraftPreview(fmCurrent(), fmLogoShown()); });
   // Aperçu (dépôt) : les réglages en cours passent par ce navigateur à la page du formulaire (?apercu=1),
@@ -1897,6 +1939,15 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   function defaultDeadline(){ return deadlineDay; }
   function deadlinePassed(day){ return Date.now() >= dlClosingInstant(day).getTime(); }
   function viewForm(id){ window.open(formUrl(id), '_blank', 'noopener'); }
+  // Codes d'accès en clair (clé « form_codes »), réservés aux mariés : la page publique ne les reçoit jamais.
+  async function codesFetch(){ const res = await api('settings?key=eq.form_codes&select=value'); return res && res[0] ? res[0].value : {}; }
+  function codesStore(v){
+    return api('settings', {
+      method:'POST',
+      headers:{ 'Prefer':'resolution=merge-duplicates,return=minimal' },
+      body:JSON.stringify({ key:'form_codes', value:v, updated_at:new Date().toISOString() })
+    });
+  }
   // Logos personnalisés : une ligne par fête (clé « logo:<fête> »), lue aussi par le formulaire public.
   function defaultLogo(){ return 'assets/logo-clair.png'; }
   async function logoFetch(ev){

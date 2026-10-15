@@ -17,6 +17,7 @@ supabase/empechement.sql           signalement d'un empêchement après le 31 ma
 supabase/date-limite-reglable.sql  date limite réglable depuis l'espace mariés (à exécuter une fois)
 supabase/securite.sql              durcissement conseillé par le Security Advisor (à exécuter une fois)
 supabase/invites.sql               listes d'invités par jour de fête (à exécuter une fois)
+supabase/code-acces.sql            code d'accès par formulaire (à exécuter une fois, après invites.sql)
 .github/workflows/keepalive.yml    garde la base gratuite éveillée
 ```
 
@@ -123,6 +124,13 @@ défaut ; son chevron déplie tous les réglages de ce formulaire (un seul compa
   remplacés automatiquement : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu},
   {lieu court} ; **mot** met un mot en gras. « Revenir aux textes d'origine » remet les textes du
   vin d'honneur.
+
+**Code d'accès** : dans le compartiment d'un formulaire, « Protéger ce formulaire par un code » (avec
+« Générer un code ») réserve le formulaire aux invités qui ont le code. Ils voient d'abord un écran
+« Formulaire protégé » ; le bon code ouvre le formulaire et reste retenu sur leur appareil. La base
+vérifie le code (textes et envoi de la réponse) et ne le transmet jamais à la page publique. Les
+majuscules et les espaces ne comptent pas. Avant la première utilisation, exécuter
+`supabase/code-acces.sql` dans **SQL Editor** (après `invites.sql`).
 
 Le bouton **« Voir le formulaire »** de l'en-tête ouvre la liste des formulaires ouverts (fête, date,
 adresse) pour choisir lequel voir.

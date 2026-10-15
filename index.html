@@ -266,6 +266,12 @@
     margin:0; text-align:center; font-size:.86rem; font-weight:600; color:var(--gold-ink);
     background:var(--gold-tint); border:1px dashed var(--gold); border-radius:10px; padding:9px 14px;
   }
+  /* ---------- formulaire protégé par un code ---------- */
+  .lock-card{ text-align:center; }
+  .lock-row{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:center; gap:12px; text-align:left; }
+  .lock-row .field{ flex:1 1 220px; max-width:320px; }
+  #pf-lock-code{ text-transform:uppercase; letter-spacing:.14em; text-align:center; font-size:1.1rem; }
+  #pf-lock-status:empty{ display:none; }
   .trap{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
   [hidden]{ display:none !important; }
   img{ max-width:100%; }
@@ -274,6 +280,18 @@
 <body>
 <div class="page">
   <p class="preview-banner" id="pf-preview" hidden>Aperçu des réglages non enregistrés : rien n'est envoyé depuis cette page.</p>
+  <section class="card lock-card" id="pf-lock" hidden aria-labelledby="pf-lock-title">
+    <h2 id="pf-lock-title">Formulaire protégé</h2>
+    <p class="lede" id="pf-lock-text">Ce formulaire est réservé aux invités qui ont reçu un code. Saisissez-le pour continuer.</p>
+    <form class="lock-row" id="pf-lock-form" novalidate>
+      <div class="field">
+        <label for="pf-lock-code">Code d'accès</label>
+        <input type="text" id="pf-lock-code" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      </div>
+      <button type="submit" id="pf-lock-btn">Accéder au formulaire</button>
+    </form>
+    <p class="status err" id="pf-lock-status" role="status" aria-live="polite"></p>
+  </section>
   <header>
     <div class="seal" id="pf-seal">
       <img class="logo-light" src="assets/logo-clair.png" width="1160" height="912" alt="Sceau JMPP de Marine et Jeremy">
@@ -609,6 +627,12 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       return head + word.slice(head.length).replace(/(^|[-'’])(\p{L})/gu, function(m, sep, ch){ return sep + ch.toLocaleUpperCase('fr-FR'); });
     }).join(' ');
   }
+  // Code d'accès : les majuscules et les espaces ne comptent pas ; l'empreinte (SHA-256) sert à le vérifier sans le montrer.
+  function normCode(c){ return String(c || '').replace(/\s+/g, '').toUpperCase(); }
+  async function codeHash(ev, code){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('rsvp:' + ev + ':' + normCode(code)));
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+  }
   // Mise en forme dès qu'on quitte un champ de prénom ou de nom.
   function formatOnBlur(el){ if (el) el.addEventListener('blur', function(){ const v = formatName(el.value); if (v !== el.value) el.value = v; }); }
   // Repères remplacés dans les textes : {Fête} / {fête}, {date}, {jour}, {date chiffres}, {horaire}, {lieu}, {lieu court}.
@@ -701,16 +725,23 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     const s = load(); if (s && !done.hidden) showDone(s);
   }
   // Formulaire de la fête demandée (ou principal). Sans aucun réglage, seul le vin d'honneur existe.
-  async function loadFormCfg(){
+  async function loadFormCfg(code){
     try {
       const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
       if (SUPABASE_KEY.indexOf('eyJ') === 0) headers['Authorization'] = 'Bearer ' + SUPABASE_KEY;
+      // Code d'accès : celui qu'on vient de saisir, sinon celui gardé sur cet appareil.
+      const key = FETE || '_main', c = code || savedCode(key), body = {};
+      if (FETE) body.p_event = FETE;
+      if (c) body.p_code = c;
       const res = await fetch(SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/rpc/get_form_config', {
-        method:'POST', headers:headers, body:JSON.stringify(FETE ? { p_event:FETE } : {})
+        method:'POST', headers:headers, body:JSON.stringify(body)
       });
       if (!res.ok){ if (FETE && FETE !== 'vin') showFormClosed(); return; }
       const v = await res.json();
       if (!v || typeof v !== 'object') return;
+      if (v.locked){ if (code) return 'bad'; showLock(v.name); return 'locked'; }
+      hideLock();
+      if (c){ formCode = c; saveCode(key, c); }
       const ev = typeof v.event === 'string' && v.event ? v.event : currentEvent;
       let cfg = null;
       if (!v.configured) cfg = ev === 'vin' ? formMerge(null) : null;
@@ -719,6 +750,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
       cfg.event = ev;
       if (ev !== currentEvent){ currentEvent = ev; switchEvent(); }
       formCfg = cfg; pfLogo = v.logo && v.logo.light ? v.logo : null; applyFormCfg(); applyDeadline();
+      return 'ok';
     } catch(e){ /* on garde les textes d'origine */ }
     finally { revealPage(); }
   }
@@ -747,7 +779,48 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
   // Avec ?fete=, la page reste masquée le temps de charger les bons textes (au plus 4 secondes).
   const page = document.querySelector('.page');
   function revealPage(){ page.style.visibility = ''; }
-  if (FETE){ page.style.visibility = 'hidden'; setTimeout(revealPage, 4000); }
+  if (FETE || (SUPABASE_URL && SUPABASE_KEY && !PREVIEW)){ page.style.visibility = 'hidden'; setTimeout(revealPage, 4000); }
+
+  // ---------- Formulaire protégé par un code ----------
+  // Seul l'écran du code reste visible ; le reste de la page revient tel quel une fois le code accepté.
+  const pfPage = document.querySelector('#guest-view .page') || document.querySelector('.page');
+  let pfLocked = false;
+  function showLock(name){
+    if (!pfLocked){
+      Array.prototype.forEach.call(pfPage.children, function(el){
+        if (el.id === 'pf-lock' || el.id === 'pf-preview') return;
+        el.dataset.lockHidden = el.hidden ? '1' : '0'; el.hidden = true;
+      });
+      pfLocked = true;
+    }
+    document.getElementById('pf-lock').hidden = false;
+    document.getElementById('pf-lock-text').textContent = 'Le formulaire' + (name ? ' « ' + name + ' »' : '') +
+      ' est réservé aux invités qui ont reçu un code. Saisissez-le pour continuer.';
+  }
+  function hideLock(){
+    if (!pfLocked) return;
+    Array.prototype.forEach.call(pfPage.children, function(el){
+      if (el.dataset.lockHidden !== undefined){ el.hidden = el.dataset.lockHidden === '1'; delete el.dataset.lockHidden; }
+    });
+    document.getElementById('pf-lock').hidden = true; pfLocked = false;
+  }
+  function savedCode(key){ try { return localStorage.getItem('rsvp-code-' + key) || ''; } catch(e){ return ''; } }
+  function saveCode(key, code){ try { localStorage.setItem('rsvp-code-' + key, code); } catch(e){} }
+  document.getElementById('pf-lock-form').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const code = normCode(document.getElementById('pf-lock-code').value), st = document.getElementById('pf-lock-status');
+    if (!code){ st.textContent = 'Saisissez le code reçu avec votre invitation.'; return; }
+    const b = document.getElementById('pf-lock-btn'); b.disabled = true; st.textContent = '';
+    try {
+      if (!(await tryCode(code))) st.textContent = 'Ce code ne correspond pas. Vérifiez-le, ou contactez directement Marine ou Jeremy.';
+      else document.getElementById('pf-lock-code').value = '';
+    } catch(err){ st.textContent = 'Vérification impossible pour le moment. Vérifiez votre connexion puis réessayez.'; }
+    finally { b.disabled = false; }
+  });
+
+  // Le code est vérifié par la base : sans lui, ni les textes ni l'envoi d'une réponse.
+  let formCode = '';
+  async function tryCode(code){ return (await loadFormCfg(code)) !== 'bad'; }
 
   function showDone(data){
     form.hidden = true;
@@ -824,6 +897,8 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
         const saved = load();
         if (saved) showDone(saved);
         else setStatus('La date limite du ' + deadlineLabel() + ' est passée : cette réponse ne peut plus être modifiée.', 'err');
+      } else if (err && err.badCode){
+        setStatus("Le code d'accès de ce formulaire a changé : rechargez la page et saisissez le nouveau code.", 'err');
       } else {
         setStatus("La réponse n'a pas été enregistrée. Vérifiez votre connexion Internet puis réessayez.", 'err');
       }
@@ -846,6 +921,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
     };
     // La fête n'est envoyée que si ce n'est pas le vin d'honneur (valeur par défaut de la base).
     if (currentEvent !== 'vin') payload.p_event = currentEvent;
+    if (formCode) payload.p_code = formCode;
     const body = JSON.stringify(payload);
     let lastError;
     for (let attempt = 1; attempt <= 3; attempt++){
@@ -855,6 +931,7 @@ const SUPABASE_KEY = 'sb_publishable_dd39HTJgxH99JcDIK1a4lQ_OgawMAMI';
         const info = await res.json().catch(function(){ return {}; });
         lastError = new Error('HTTP ' + res.status);
         if (String(info.message || '').indexOf('modifications_closes') >= 0) lastError.closed = true;
+        if (String(info.message || '').indexOf('code_invalide') >= 0) lastError.badCode = true;
         if (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429) break; // refus définitif
       } catch(err){ lastError = err; }
       if (attempt === 3) break;
